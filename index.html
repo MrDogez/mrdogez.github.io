@@ -6,124 +6,307 @@
 <title>MrDogez Project — Программное обеспечение</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#050508;color:#e0e0e8;font-family:"Segoe UI",system-ui,sans-serif;min-height:100vh}
-.bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,200,255,.06),transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(124,77,255,.06),transparent 60%)}
-.c{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:40px 24px}
-.logo{width:100px;height:100px;border-radius:24px;margin:0 auto 20px;display:block;box-shadow:0 8px 32px rgba(0,200,255,.2)}
-h1{font-size:36px;font-weight:900;text-align:center;background:linear-gradient(135deg,#00c8ff,#7c4dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
-.sub{text-align:center;font-size:14px;color:#7a7a9a;margin-bottom:36px}
-.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:28px;margin-bottom:20px}
-.card h2{font-size:18px;font-weight:800;margin-bottom:14px;color:#fff}
-.card h3{font-size:15px;font-weight:700;margin:18px 0 8px;color:#c0c0d0}
-.card p,.card li{font-size:13px;color:#9a9ab0;line-height:1.7}
-.card ul{padding-left:20px}
-.card li{margin-bottom:4px}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:30px}
-.fc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:22px 18px;text-align:center}
-.fc-icon{font-size:28px;margin-bottom:8px}
-.fc-t{font-size:14px;font-weight:700;margin-bottom:4px}
-.fc-d{font-size:11px;color:#7a7a9a}
-a{color:#00c8ff;text-decoration:none}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;background:linear-gradient(135deg,#00c8ff,#7c4dff);color:#fff;box-shadow:0 8px 24px rgba(0,200,255,.25);transition:transform .2s}
-.btn:hover{transform:translateY(-2px)}
-.btns{display:flex;gap:12px;justify-content:center;margin-bottom:36px}
-.footer{text-align:center;font-size:11px;color:#3a3a5a;padding:20px 0;border-top:1px solid rgba(255,255,255,.04)}
-.contact{font-size:13px;color:#7a7a9a;margin-bottom:6px}
-@media(max-width:600px){.cards{grid-template-columns:1fr}h1{font-size:26px}}
+body{background:#050508;color:#e0e0e8;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* Background effects */
+.bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:60px 60px}
+.bg-glow{position:fixed;inset:0;z-index:0}
+.bg-glow .orb{position:absolute;border-radius:50%;filter:blur(80px);animation:orb-float 20s ease-in-out infinite}
+.bg-glow .orb-1{width:500px;height:500px;background:rgba(0,200,255,.07);top:-10%;left:-5%;animation-delay:0s}
+.bg-glow .orb-2{width:400px;height:400px;background:rgba(124,77,255,.06);top:30%;right:-10%;animation-delay:-7s}
+.bg-glow .orb-3{width:350px;height:350px;background:rgba(0,255,136,.05);bottom:-5%;left:20%;animation-delay:-14s}
+@keyframes orb-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-40px) scale(1.1)}}
+
+/* Content */
+.container{position:relative;z-index:1;max-width:840px;margin:0 auto;padding:0 24px}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 0}
+.hero-logo{width:110px;height:110px;border-radius:28px;margin-bottom:24px;box-shadow:0 12px 48px rgba(0,200,255,.25),0 0 0 1px rgba(255,255,255,.05);animation:logo-float 3s ease-in-out infinite}
+@keyframes logo-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero h1{font-size:48px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#7c4dff,#00ff88);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradient-shift 4s ease infinite;margin-bottom:8px}
+@keyframes gradient-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero-sub{font-size:16px;color:#6a6a8a;margin-bottom:40px;max-width:500px;line-height:1.6}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:16px 36px;border-radius:14px;font-size:15px;font-weight:700;text-decoration:none;color:#fff;background:linear-gradient(135deg,#00c8ff,#7c4dff);box-shadow:0 8px 32px rgba(0,200,255,.3);transition:all .3s}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,200,255,.4)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:16px 36px;border-radius:14px;font-size:15px;font-weight:700;text-decoration:none;color:#e0e0e8;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);transition:all .3s}
+.btn-ghost:hover{transform:translateY(-3px);background:rgba(255,255,255,.1)}
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+.scroll-hint svg{width:24px;height:24px;stroke:#3a3a5a}
+
+/* Sections */
+section{padding:80px 0}
+.section-title{font-size:32px;font-weight:900;text-align:center;margin-bottom:8px;color:#fff}
+.section-sub{font-size:14px;color:#6a6a8a;text-align:center;margin-bottom:48px;max-width:500px;margin-left:auto;margin-right:auto}
+
+/* Feature cards */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:20px;padding:28px 22px;transition:all .4s cubic-bezier(.16,1,.3,1);opacity:0;transform:translateY(30px)}
+.feat.visible{opacity:1;transform:translateY(0)}
+.feat:hover{transform:translateY(-6px);border-color:rgba(0,200,255,.2);background:rgba(0,200,255,.03);box-shadow:0 12px 40px rgba(0,200,255,.08)}
+.feat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px;background:linear-gradient(135deg,rgba(0,200,255,.1),rgba(124,77,255,.1))}
+.feat h3{font-size:15px;font-weight:800;margin-bottom:6px}
+.feat p{font-size:12px;color:#7a7a9a;line-height:1.6}
+
+/* Pricing */
+.pricing{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.price-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:20px;padding:32px 24px;text-align:center;transition:all .4s;opacity:0;transform:translateY(30px)}
+.price-card.visible{opacity:1;transform:translateY(0)}
+.price-card.featured{border-color:rgba(124,77,255,.3);background:rgba(124,77,255,.05);position:relative;overflow:hidden}
+.price-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00c8ff,#7c4dff,#00ff88)}
+.price-card:hover{transform:translateY(-4px)}
+.price-name{font-size:18px;font-weight:800;margin-bottom:4px}
+.price-val{font-size:28px;font-weight:900;color:#7c4dff;margin:12px 0}
+.price-list{list-style:none;padding:0;margin:16px 0 20px;text-align:left}
+.price-list li{font-size:12px;color:#8a8aa0;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:8px}
+.price-list li::before{content:'';width:6px;height:6px;border-radius:50%;background:#00c8ff;flex-shrink:0}
+.badge{display:inline-block;font-size:10px;font-weight:800;padding:3px 10px;border-radius:6px;background:linear-gradient(135deg,#7c4dff,#00c8ff);color:#fff;margin-bottom:12px}
+
+/* Legal cards */
+.legal{margin-top:20px}
+.legal-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:18px;padding:28px;margin-bottom:16px;opacity:0;transform:translateY(20px);transition:all .4s}
+.legal-card.visible{opacity:1;transform:translateY(0)}
+.legal-card h2{font-size:18px;font-weight:800;margin-bottom:14px;color:#fff}
+.legal-card h3{font-size:14px;font-weight:700;margin:16px 0 8px;color:#b0b0c8}
+.legal-card p{font-size:13px;color:#8a8aa0;line-height:1.7;margin-bottom:6px}
+.legal-card ul{padding-left:18px;margin-bottom:8px}
+.legal-card li{font-size:13px;color:#8a8aa0;line-height:1.7;margin-bottom:4px}
+.legal-card a{color:#00c8ff;text-decoration:none}
+.legal-card a:hover{text-decoration:underline}
+
+/* Footer */
+.footer{text-align:center;padding:40px 0;border-top:1px solid rgba(255,255,255,.04);margin-top:40px}
+.footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:#5a5a7a;text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:#00c8ff}
+.footer-copy{font-size:11px;color:#2a2a3a}
+
+/* Counter animation */
+.counter{font-size:36px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#7c4dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:60px}
+.stat{text-align:center;opacity:0;transform:translateY(20px);transition:all .4s}
+.stat.visible{opacity:1;transform:translateY(0)}
+.stat-label{font-size:12px;color:#5a5a7a;margin-top:4px}
+
+@media(max-width:768px){
+  .hero h1{font-size:32px}
+  .features,.pricing,.stats{grid-template-columns:1fr}
+  .hero{min-height:auto;padding:100px 0 60px}
+  section{padding:50px 0}
+}
 </style>
 </head>
 <body>
-<div class="bg"></div>
-<div class="c">
-  <img src="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png" alt="MrDogez" class="logo">
-  <h1>MrDogez Project</h1>
-  <div class="sub">Программное обеспечение для оптимизации сетевого подключения</div>
 
-  <div class="cards">
-    <div class="fc"><div class="fc-icon">&#x1f6e1;</div><div class="fc-t">DPI Bypass</div><div class="fc-d">27 стратегий обхода</div></div>
-    <div class="fc"><div class="fc-icon">&#x1f310;</div><div class="fc-t">WARP Tunnel</div><div class="fc-d">Cloudflare VPN</div></div>
-    <div class="fc"><div class="fc-icon">&#x1f512;</div><div class="fc-t">Privacy</div><div class="fc-d">DNS-over-HTTPS</div></div>
-    <div class="fc"><div class="fc-icon">&#x1f451;</div><div class="fc-t">Premium</div><div class="fc-d">Расширенные функции</div></div>
-  </div>
-
-  <div class="btns">
-    <a href="https://t.me/MrDogezProject" class="btn">Telegram канал</a>
-  </div>
-
-  <div class="card">
-    <h2>Описание услуг</h2>
-    <p>MrDogez Project предоставляет программное обеспечение для оптимизации сетевого подключения на платформе Windows.</p>
-    <h3>Тарифные планы</h3>
-    <ul>
-      <li><strong>Бесплатный план:</strong> базовый доступ, ограничение скорости 1 МБ/с, до 3 профилей, 5 ГБ трафика в месяц</li>
-      <li><strong>Premium 30 дней — цена уточняется:</strong> 10 параллельных прокси, авто-TUN, гео-фильтр, мониторинг качества, безлимитный трафик, неограниченные профили, разблокировка РФ</li>
-      <li><strong>Premium навсегда — цена уточняется:</strong> все функции Premium без ограничения по времени</li>
-      <li><strong>Дополнительный трафик +20 ГБ — цена уточняется:</strong> дополнение к текущему тарифному плану</li>
-    </ul>
-    <p style="margin-top:10px">Доступ к оплаченным функциям предоставляется автоматически после подтверждения платежа.</p>
-  </div>
-
-  <div class="card">
-    <h2>Условия возврата и отмены платежа</h2>
-    <p>Возврат денежных средств осуществляется в следующих случаях:</p>
-    <ul>
-      <li>Услуга не была предоставлена по техническим причинам со стороны сервиса</li>
-      <li>Произошло двойное списание средств</li>
-      <li>Запрос на возврат подан в течение 24 часов с момента оплаты при условии, что услуга не была активирована или использована</li>
-    </ul>
-    <h3>Порядок возврата</h3>
-    <p>Для оформления возврата необходимо обратиться в службу поддержки любым удобным способом (email или Telegram), указав email аккаунта и причину возврата.</p>
-    <p style="margin-top:6px">Срок рассмотрения заявки: до 3 рабочих дней. Возврат средств производится тем же способом, которым была произведена оплата, в срок до 10 рабочих дней.</p>
-    <h3>Возврат не осуществляется</h3>
-    <ul>
-      <li>Если с момента оплаты прошло более 24 часов и услуга была активирована</li>
-      <li>Если нарушены условия использования сервиса</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h2>Политика обработки персональных данных</h2>
-    <p>MrDogez Project обрабатывает персональные данные в соответствии с ФЗ-152 «О персональных данных».</p>
-    <h3>Какие данные собираются</h3>
-    <ul>
-      <li>Email адрес — для регистрации, авторизации и восстановления доступа</li>
-      <li>Данные об использовании трафика — для учёта в рамках тарифного плана</li>
-    </ul>
-    <h3>Цели обработки</h3>
-    <ul>
-      <li>Предоставление доступа к сервису</li>
-      <li>Учёт оплаченных услуг</li>
-      <li>Техническая поддержка пользователей</li>
-    </ul>
-    <h3>Защита данных</h3>
-    <p>Персональные данные не передаются третьим лицам. Пароли хранятся в захешированном виде. Пользователь вправе запросить удаление своих данных, обратившись в поддержку.</p>
-  </div>
-
-  <div class="card">
-    <h2>Публичная оферта</h2>
-    <p>Настоящий документ является публичной офертой в соответствии со ст. 437 Гражданского кодекса Российской Федерации.</p>
-    <h3>1. Предмет договора</h3>
-    <p>Исполнитель (MrDogez Project) предоставляет Заказчику (пользователю) доступ к программному обеспечению MrDogez Ultimate и связанным сервисам на условиях выбранного тарифного плана.</p>
-    <h3>2. Порядок оплаты</h3>
-    <p>Оплата производится через платёжные системы, представленные на сайте и в приложении. Доступ предоставляется автоматически после подтверждения оплаты платёжной системой.</p>
-    <h3>3. Права и обязанности сторон</h3>
-    <p>Исполнитель обязуется обеспечить доступ к оплаченным функциям в течение оплаченного периода. Заказчик обязуется не использовать сервис в противоправных целях.</p>
-    <h3>4. Ответственность</h3>
-    <p>Исполнитель не несёт ответственности за работу сторонних сервисов, интернет-провайдеров и платёжных систем. Программное обеспечение предоставляется на условиях «как есть» (as is).</p>
-    <h3>5. Акцепт оферты</h3>
-    <p>Оплата услуг является полным и безоговорочным акцептом настоящей оферты. Совершая оплату, пользователь подтверждает согласие со всеми условиями.</p>
-    <h3>6. Срок действия</h3>
-    <p>Оферта действует бессрочно с момента публикации на сайте до момента её отзыва Исполнителем.</p>
-  </div>
-
-  <div class="card">
-    <h2>Контакты</h2>
-    <div class="contact">Email: <a href="mailto:mrdogezproject@gmail.com">mrdogezproject@gmail.com</a></div>
-    <div class="contact">Telegram поддержка: <a href="https://t.me/MrDogez">@MrDogez</a> (ответ в течение 24 часов)</div>
-    <div class="contact">Telegram канал: <a href="https://t.me/MrDogezProject">@MrDogezProject</a></div>
-  </div>
-
-  <div class="footer">&copy; 2026 MrDogez Project. Все права защищены.</div>
+<div class="bg-grid"></div>
+<div class="bg-glow">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 </div>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <img src="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png" alt="MrDogez" class="hero-logo">
+    <h1>MrDogez Project</h1>
+    <div class="hero-sub">Программное обеспечение для оптимизации сетевого подключения и свободного доступа в интернет</div>
+    <div class="hero-btns">
+      <a href="https://t.me/MrDogezProject" class="btn-primary">&#x1f4e2; Telegram канал</a>
+      <a href="https://t.me/MrDogez" class="btn-ghost">&#x1f4ac; Поддержка</a>
+    </div>
+    <div class="scroll-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg></div>
+  </div>
+
+  <!-- STATS -->
+  <section>
+    <div class="stats">
+      <div class="stat anim"><div class="counter" data-target="27">0</div><div class="stat-label">Стратегий обхода</div></div>
+      <div class="stat anim"><div class="counter" data-target="18">0</div><div class="stat-label">DNS серверов</div></div>
+      <div class="stat anim"><div class="counter" data-target="43">0</div><div class="stat-label">Стран</div></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="section-title">Возможности</div>
+    <div class="section-sub">Всё что нужно для свободного интернета в одном приложении</div>
+    <div class="features">
+      <div class="feat anim"><div class="feat-icon">&#x26a1;</div><h3>DPI Bypass</h3><p>27 стратегий обхода блокировок через WinDivert. Fake TLS, multi-split, ECH-bypass.</p></div>
+      <div class="feat anim"><div class="feat-icon">&#x1f310;</div><h3>WARP Tunnel</h3><p>Cloudflare WARP тоннель с автоматическим подключением через прокси.</p></div>
+      <div class="feat anim"><div class="feat-icon">&#x1f512;</div><h3>Приватность</h3><p>DNS-over-HTTPS, без логов, шифрованное подключение.</p></div>
+      <div class="feat anim"><div class="feat-icon">&#x1f680;</div><h3>Быстрый старт</h3><p>Подключение в 1 клик. Cloudflare Workers для мгновенного соединения.</p></div>
+      <div class="feat anim"><div class="feat-icon">&#x1f513;</div><h3>Разблокировка</h3><p>YouTube, Discord, Telegram, Instagram, Twitter и другие сервисы.</p></div>
+      <div class="feat anim"><div class="feat-icon">&#x1f6e1;</div><h3>Watchdog</h3><p>Автоматический перезапуск при сбое. Мониторинг состояния 24/7.</p></div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section>
+    <div class="section-title">Тарифы</div>
+    <div class="section-sub">Выберите подходящий план</div>
+    <div class="pricing">
+      <div class="price-card anim">
+        <div class="price-name">Бесплатный</div>
+        <div class="price-val">0 &#x20bd;</div>
+        <ul class="price-list">
+          <li>Базовый DPI bypass</li>
+          <li>5 прокси параллельно</li>
+          <li>3 профиля</li>
+          <li>5 ГБ трафика / мес</li>
+          <li>Скорость до 1 МБ/с</li>
+          <li>Базовые DNS</li>
+        </ul>
+      </div>
+      <div class="price-card featured anim">
+        <div class="badge">ПОПУЛЯРНЫЙ</div>
+        <div class="price-name">Premium 30 дней</div>
+        <div class="price-val">Скоро</div>
+        <ul class="price-list">
+          <li>10 параллельных прокси</li>
+          <li>Безлимитный трафик</li>
+          <li>Безлимитные профили</li>
+          <li>Авто-TUN (все приложения)</li>
+          <li>Гео-фильтр EU прокси</li>
+          <li>Мониторинг качества</li>
+          <li>Разблокировка РФ</li>
+          <li>Все DNS серверы</li>
+        </ul>
+      </div>
+      <div class="price-card anim">
+        <div class="price-name">Premium навсегда</div>
+        <div class="price-val">Скоро</div>
+        <ul class="price-list">
+          <li>Всё из Premium</li>
+          <li>Без ограничений по времени</li>
+          <li>Приоритетная поддержка</li>
+          <li>Ранний доступ к обновлениям</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEGAL -->
+  <section class="legal">
+    <div class="section-title">Документы</div>
+    <div class="section-sub">Правовая информация</div>
+
+    <div class="legal-card anim">
+      <h2>Условия возврата и отмены платежа</h2>
+      <p>Возврат денежных средств осуществляется в следующих случаях:</p>
+      <ul>
+        <li>Услуга не была предоставлена по техническим причинам со стороны сервиса</li>
+        <li>Произошло двойное списание средств</li>
+        <li>Запрос на возврат подан в течение 24 часов с момента оплаты при условии, что услуга не была активирована</li>
+      </ul>
+      <h3>Порядок возврата</h3>
+      <p>Для оформления возврата обратитесь в поддержку: <a href="https://t.me/MrDogez">@MrDogez</a> или <a href="mailto:mrdogezproject@gmail.com">mrdogezproject@gmail.com</a>.</p>
+      <p>Срок рассмотрения: до 3 рабочих дней. Возврат производится тем же способом оплаты в срок до 10 рабочих дней.</p>
+      <h3>Возврат не осуществляется</h3>
+      <ul>
+        <li>Если прошло более 24 часов и услуга была активирована</li>
+        <li>При нарушении условий использования сервиса</li>
+      </ul>
+    </div>
+
+    <div class="legal-card anim">
+      <h2>Политика обработки персональных данных</h2>
+      <p>MrDogez Project обрабатывает персональные данные в соответствии с ФЗ-152.</p>
+      <h3>Собираемые данные</h3>
+      <ul>
+        <li>Email — регистрация, авторизация, восстановление доступа</li>
+        <li>Данные об использовании трафика — учёт тарифного плана</li>
+      </ul>
+      <h3>Защита</h3>
+      <p>Данные не передаются третьим лицам. Пароли хранятся в захешированном виде. Пользователь вправе запросить удаление данных через поддержку.</p>
+    </div>
+
+    <div class="legal-card anim">
+      <h2>Публичная оферта</h2>
+      <p>Настоящий документ является публичной офертой (ст. 437 ГК РФ).</p>
+      <h3>1. Предмет договора</h3>
+      <p>Исполнитель предоставляет доступ к ПО MrDogez Ultimate на условиях выбранного тарифа.</p>
+      <h3>2. Порядок оплаты</h3>
+      <p>Оплата через платёжные системы на сайте и в приложении. Доступ предоставляется автоматически после подтверждения оплаты.</p>
+      <h3>3. Обязанности сторон</h3>
+      <p>Исполнитель обеспечивает доступ к оплаченным функциям. Заказчик не использует сервис в противоправных целях.</p>
+      <h3>4. Ответственность</h3>
+      <p>Сервис предоставляется «как есть». Исполнитель не отвечает за работу сторонних сервисов и провайдеров.</p>
+      <h3>5. Акцепт</h3>
+      <p>Оплата является акцептом оферты и подтверждением согласия с условиями.</p>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section>
+    <div class="section-title">Контакты</div>
+    <div class="section-sub">Свяжитесь с нами</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div class="feat anim" style="text-align:center"><div class="feat-icon" style="margin:0 auto 14px">&#x1f4e7;</div><h3>Email</h3><p><a href="mailto:mrdogezproject@gmail.com" style="color:#00c8ff">mrdogezproject@gmail.com</a></p></div>
+      <div class="feat anim" style="text-align:center"><div class="feat-icon" style="margin:0 auto 14px">&#x1f4ac;</div><h3>Поддержка</h3><p><a href="https://t.me/MrDogez" style="color:#00c8ff">@MrDogez</a><br><span style="font-size:11px;color:#5a5a7a">Ответ в течение 24 часов</span></p></div>
+      <div class="feat anim" style="text-align:center"><div class="feat-icon" style="margin:0 auto 14px">&#x1f4e2;</div><h3>Канал</h3><p><a href="https://t.me/MrDogezProject" style="color:#00c8ff">@MrDogezProject</a></p></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-links">
+      <a href="#pricing">Тарифы</a>
+      <a href="https://t.me/MrDogezProject">Telegram</a>
+      <a href="mailto:mrdogezproject@gmail.com">Email</a>
+      <a href="https://t.me/MrDogez">Поддержка</a>
+    </div>
+    <div class="footer-copy">&copy; 2026 MrDogez Project. Все права защищены.</div>
+  </div>
+</div>
+
+<!-- Scroll animations + Counter -->
+<script>
+// Intersection Observer for scroll animations
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      // Counter animation
+      var counter = e.target.querySelector('.counter');
+      if(counter && !counter.dataset.done){
+        counter.dataset.done='1';
+        var target = parseInt(counter.dataset.target);
+        var current = 0;
+        var step = Math.max(1, Math.floor(target/40));
+        var timer = setInterval(function(){
+          current += step;
+          if(current >= target){current = target; clearInterval(timer);}
+          counter.textContent = current;
+        }, 30);
+      }
+    }
+  });
+}, {threshold: 0.15, rootMargin: '0px 0px -40px 0px'});
+
+document.querySelectorAll('.anim').forEach(function(el){
+  observer.observe(el);
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    var target = document.querySelector(this.getAttribute('href'));
+    if(target){e.preventDefault(); target.scrollIntoView({behavior:'smooth'});}
+  });
+});
+
+// Parallax on orbs
+window.addEventListener('scroll', function(){
+  var y = window.scrollY;
+  var orbs = document.querySelectorAll('.orb');
+  orbs[0].style.transform = 'translateY(' + (y*0.15) + 'px)';
+  orbs[1].style.transform = 'translateY(' + (-y*0.1) + 'px)';
+  orbs[2].style.transform = 'translateY(' + (y*0.08) + 'px)';
+});
+</script>
 </body>
 </html>
