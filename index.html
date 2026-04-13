@@ -114,7 +114,7 @@ section{padding:140px 0}
    ═══════════════════════════════════════════════════════════════ */
 .about-text{font-size:clamp(22px,3.5vw,36px);font-weight:400;line-height:1.5;letter-spacing:-.02em;max-width:900px}
 .about-text em{font-style:normal;color:var(--accent2);font-weight:500}
-.about-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:72px}
+.about-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:72px}
 .about-col{background:var(--bg);padding:40px 30px;transition:background .25s}
 .about-col:hover{background:var(--bg2)}
 .about-col .ico{font-size:28px;margin-bottom:16px}
@@ -141,7 +141,7 @@ section{padding:140px 0}
 .proj-chip:hover{background:var(--accent-dim);border-color:rgba(124,106,239,.2);color:var(--accent2)}
 
 /* Features grid inside project */
-.proj-feats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:18px;overflow:hidden;margin-top:48px}
+.proj-feats{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--border);border-radius:18px;overflow:hidden;margin-top:48px}
 .proj-feat{background:var(--bg);padding:32px 24px;transition:background .2s}
 .proj-feat:hover{background:var(--bg2)}
 .proj-feat .fi{font-size:20px;margin-bottom:12px}
@@ -202,7 +202,7 @@ section{padding:140px 0}
 .leg-btn svg{width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;flex-shrink:0;transition:transform .3s var(--ease)}
 .leg.on .leg-btn svg{transform:rotate(180deg)}
 .leg-body{max-height:0;overflow:hidden;transition:max-height .4s var(--ease)}
-.leg.on .leg-body{max-height:600px}
+.leg.on .leg-body{max-height:2000px}
 .leg-content{padding:0 0 28px;font-size:13px;color:var(--text2);line-height:1.85}
 .leg-content h3{font-size:13px;font-weight:600;color:var(--text);margin:20px 0 8px}
 .leg-content h3:first-child{margin-top:0}
@@ -423,13 +423,125 @@ footer{border-top:1px solid var(--border);padding:40px 0;display:flex;align-item
   <div class="sec-tag rv">Документы</div>
   <div class="sec-h rv" style="margin-bottom:40px">Правовая <span class="thin">информация</span></div>
 
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Описание услуг<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content"><p>MrDogez Project — программное обеспечение для оптимизации сетевого подключения на платформе Windows.</p><h3>Состав услуг</h3><ul><li>DPI Bypass — 27 стратегий оптимизации маршрутизации</li><li>WARP Tunnel — защищённое подключение через Cloudflare</li><li>DNS-over-HTTPS — шифрование DNS-запросов</li><li>Мониторинг — отслеживание качества подключения</li><li>Автоматическое управление — watchdog, авто-переподключение</li></ul><h3>Способ предоставления</h3><p>Услуги предоставляются в электронном виде. Доступ активируется автоматически после оплаты. Системные требования: Windows 10/11 (x64).</p></div></div></div>
+  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Описание услуг<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
+    <p>MrDogez Project — программное обеспечение для оптимизации сетевого подключения на платформе Windows. Сервис предоставляет инструменты для улучшения качества интернет-соединения, обхода ограничений и защиты приватности.</p>
+    <h3>Состав услуг</h3>
+    <ul>
+      <li>DPI Bypass — оптимизация маршрутизации трафика (27 стратегий: Fake TLS, multi-split, ECH-bypass, badack-increment и другие)</li>
+      <li>WARP Tunnel — защищённое подключение через сеть Cloudflare с автоматическим подбором endpoint</li>
+      <li>DNS-over-HTTPS — шифрование DNS-запросов для повышения приватности (20+ серверов)</li>
+      <li>Мониторинг сети — отслеживание качества подключения, пинг сервисов, статистика трафика</li>
+      <li>Автоматическое управление — watchdog, авто-переподключение, hot-swap прокси, ISP-кэширование</li>
+      <li>MITM-защита — автоматическое обнаружение и блокировка перехватывающих прокси</li>
+      <li>Premium-подписка — расширенные возможности (безлимитная скорость, 20 параллельных прокси, Авто-TUN)</li>
+    </ul>
+    <h3>Способ предоставления</h3>
+    <p>Услуги предоставляются в электронном виде посредством программного обеспечения, устанавливаемого на компьютер пользователя. Доставка физических товаров не осуществляется. Доступ к платным функциям активируется автоматически после подтверждения оплаты платёжной системой.</p>
+    <h3>Тарифные планы</h3>
+    <ul>
+      <li>Бесплатный — базовый DPI bypass, 5 ГБ трафика/мес, скорость до 1 МБ/с, 3 профиля, базовые DNS</li>
+      <li>Premium (199 ₽/30 дней) — безлимитный трафик и скорость, 20 прокси, Авто-TUN, гео-фильтр EU, все DNS</li>
+      <li>Дополнительный трафик: +5 ГБ (49 ₽), +20 ГБ (149 ₽)</li>
+      <li>Буст скорости (99 ₽/30 дней) — снятие ограничения скорости без Premium</li>
+    </ul>
+    <h3>Системные требования</h3>
+    <ul>
+      <li>Операционная система: Windows 10 / 11 (x64)</li>
+      <li>Подключение к интернету</li>
+      <li>Права администратора (для некоторых функций DPI bypass)</li>
+    </ul>
+  </div></div></div>
 
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Условия возврата<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content"><h3>Основания для возврата</h3><ul><li>Услуга не предоставлена по техническим причинам</li><li>Двойное или ошибочное списание</li><li>Запрос в течение 24 часов (услуга не активирована)</li></ul><h3>Порядок</h3><p>Заявка через <a href="https://t.me/MrDogez">@MrDogez</a> в Telegram. Укажите email, дату, сумму. Рассмотрение — до 3 рабочих дней.</p></div></div></div>
+  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Условия возврата и отмены платежа<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
+    <p>Возврат денежных средств осуществляется в соответствии с законодательством РФ и настоящими условиями.</p>
+    <h3>Основания для возврата</h3>
+    <ul>
+      <li>Услуга не была предоставлена по техническим причинам со стороны сервиса</li>
+      <li>Произошло двойное или ошибочное списание средств</li>
+      <li>Запрос на возврат подан в течение 24 часов с момента оплаты при условии, что услуга не была активирована или использована</li>
+      <li>Существенное несоответствие предоставленной услуги заявленному описанию</li>
+    </ul>
+    <h3>Порядок оформления возврата</h3>
+    <p>1. Направьте заявку в поддержку: <a href="https://t.me/MrDogez">@MrDogez</a> (Telegram) или <a href="mailto:mrdogezproject@gmail.com">mrdogezproject@gmail.com</a>.</p>
+    <p>2. Укажите: email аккаунта, дату и сумму платежа, причину возврата.</p>
+    <p>3. Срок рассмотрения: до 3 рабочих дней.</p>
+    <p>4. Возврат средств производится тем же способом оплаты в срок до 10 рабочих дней после одобрения.</p>
+    <h3>Возврат не осуществляется</h3>
+    <ul>
+      <li>Если с момента оплаты прошло более 24 часов и услуга была активирована</li>
+      <li>При нарушении пользователем условий использования</li>
+      <li>Если пользователь использовал более 50% оплаченного трафика</li>
+      <li>При отказе предоставить информацию для идентификации платежа</li>
+    </ul>
+    <h3>Частичный возврат</h3>
+    <p>При частичном использовании услуги возможен частичный возврат пропорционально неиспользованному периоду. Решение принимается индивидуально.</p>
+  </div></div></div>
 
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Политика конфиденциальности<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content"><h3>Собираемые данные</h3><ul><li>Email — регистрация и уведомления</li><li>Данные трафика — учёт тарифа</li><li>Данные карт не хранятся — обрабатываются платёжной системой</li></ul><p>Пароли хешируются (PBKDF2-SHA256). Данные не передаются третьим лицам.</p></div></div></div>
+  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Политика конфиденциальности<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
+    <p>MrDogez Project обрабатывает персональные данные в соответствии с ФЗ от 27.07.2006 № 152-ФЗ «О персональных данных».</p>
+    <h3>1. Собираемые данные</h3>
+    <ul>
+      <li>Email адрес — для регистрации, авторизации, восстановления доступа и уведомлений</li>
+      <li>Данные об использовании трафика — для учёта в рамках тарифного плана</li>
+      <li>Техническая информация — тип ОС, версия приложения (для диагностики)</li>
+      <li>Данные о платежах — обрабатываются платёжной системой, мы не храним данные банковских карт</li>
+    </ul>
+    <h3>2. Цели обработки</h3>
+    <ul>
+      <li>Предоставление доступа к сервису и его функциям</li>
+      <li>Учёт оплаченных услуг и тарифных планов</li>
+      <li>Техническая поддержка пользователей</li>
+      <li>Улучшение качества сервиса</li>
+    </ul>
+    <h3>3. Хранение и защита</h3>
+    <p>Персональные данные хранятся на устройстве пользователя и на защищённых серверах. Пароли хранятся исключительно в захешированном виде (PBKDF2-SHA256). Применяются технические меры защиты от несанкционированного доступа.</p>
+    <h3>4. Передача третьим лицам</h3>
+    <p>Персональные данные не продаются, не передаются и не раскрываются третьим лицам, за исключением случаев, предусмотренных законодательством РФ.</p>
+    <h3>5. Права пользователя</h3>
+    <ul>
+      <li>Получить информацию об обрабатываемых данных</li>
+      <li>Запросить исправление или удаление своих данных</li>
+      <li>Отозвать согласие на обработку</li>
+    </ul>
+    <p>Для реализации прав: <a href="mailto:mrdogezproject@gmail.com">mrdogezproject@gmail.com</a></p>
+  </div></div></div>
 
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Публичная оферта<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content"><p>Оплата услуг является акцептом оферты (ст. 437 ГК РФ). Исполнитель предоставляет доступ к функциям на условиях тарифа. Сервис предоставляется «как есть». Споры решаются путём переговоров в соответствии с законодательством РФ.</p></div></div></div>
+  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Публичная оферта<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
+    <p>Настоящий документ является публичной офертой в соответствии со ст. 437 ГК РФ.</p>
+    <h3>1. Предмет договора</h3>
+    <p>Исполнитель (MrDogez Project) предоставляет Заказчику доступ к функциям Сервиса на условиях выбранного тарифного плана. Перечень функций указан в разделе «Тарифы».</p>
+    <h3>2. Порядок оплаты</h3>
+    <p>Оплата производится через платёжные системы. Стоимость указана в рублях РФ. Доступ предоставляется автоматически после подтверждения. Исполнитель вправе изменять цены с предварительным уведомлением.</p>
+    <h3>3. Обязанности сторон</h3>
+    <p>Исполнитель обязуется: обеспечить доступ к оплаченным функциям, осуществлять поддержку, уведомлять об изменениях. Заказчик обязуется: использовать сервис по назначению, не передавать аккаунт третьим лицам, не использовать в противоправных целях.</p>
+    <h3>4. Ответственность</h3>
+    <p>Сервис предоставляется «как есть» (as is). Исполнитель не несёт ответственности за работу интернет-провайдеров, временную недоступность по независящим причинам, действия третьих лиц.</p>
+    <h3>5. Акцепт</h3>
+    <p>Оплата является полным и безоговорочным акцептом настоящей оферты. Совершая оплату, Заказчик подтверждает согласие с условиями оферты, политикой конфиденциальности и условиями возврата.</p>
+    <h3>6. Срок действия</h3>
+    <p>Оферта действует бессрочно до момента её отзыва. Продолжение использования сервиса после изменений означает согласие с новыми условиями.</p>
+    <h3>7. Разрешение споров</h3>
+    <p>Споры разрешаются путём переговоров. При невозможности — в соответствии с законодательством РФ.</p>
+  </div></div></div>
+
+  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Условия использования<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
+    <h3>Разрешённое использование</h3>
+    <ul>
+      <li>Личное некоммерческое использование на собственных устройствах</li>
+      <li>Оптимизация собственного интернет-подключения</li>
+      <li>Доступ к легальному контенту и сервисам</li>
+    </ul>
+    <h3>Запрещённое использование</h3>
+    <ul>
+      <li>Использование в противоправных целях</li>
+      <li>Распространение вредоносного ПО через сервис</li>
+      <li>Попытки обхода системы тарификации</li>
+      <li>Передача доступа к аккаунту третьим лицам</li>
+      <li>Реверс-инжиниринг и декомпиляция ПО</li>
+    </ul>
+    <h3>Приостановка доступа</h3>
+    <p>Исполнитель оставляет за собой право приостановить доступ без предварительного уведомления при нарушении условий использования.</p>
+  </div></div></div>
 </section>
 
 <!-- ═══════════ FOOTER ═══════════ -->
