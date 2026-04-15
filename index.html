@@ -1,677 +1,1002 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="verification" content="56db57b4db0a6fcb7f9e0c0b504f6472" />
-<title>MrDogez Project — Software Development</title>
-<meta name="description" content="MrDogez Project — разработка программного обеспечения. VPN, утилиты, инструменты безопасности. Профессиональная разработка под Windows.">
-<meta property="og:title" content="MrDogez Project — Software Development">
-<meta property="og:description" content="Разработка ПО для свободного и безопасного интернета">
+<meta name="verification" content="56db57b4db0a6fcb7f9e0c0b504f6472">
+<title>MrDogez — Software</title>
+<meta name="description" content="MrDogez — разработка инструментов для свободного интернета. VPN, DPI bypass, утилиты безопасности.">
+<meta property="og:title" content="MrDogez — Software">
+<meta property="og:description" content="Инструменты для свободного и безопасного интернета">
 <meta property="og:image" content="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png">
 <meta property="og:url" content="https://mrdogez.github.io">
 <link rel="icon" href="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════════════════════
-   RESET & VARIABLES
-   ═══════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════
+   RESET & THEME VARIABLES
+   ════════════════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
+
+[data-theme="dark"]{
   --bg:#040406;--bg2:#0a0a10;--bg3:#12121c;--bg4:#1a1a28;--bg5:#222236;
+  --card:rgba(255,255,255,.025);--card-hover:rgba(255,255,255,.045);
   --border:rgba(255,255,255,.055);--border2:rgba(255,255,255,.09);--border3:rgba(255,255,255,.14);
-  --text:#f2f2f8;--text2:#8a8aa8;--text3:#4c4c68;--text4:#2c2c40;
+  --text:#f2f2f8;--text2:#9494b8;--text3:#5c5c7a;
   --accent:#7c6aef;--accent2:#a594fd;--accent3:#c4b8ff;--accent-dim:rgba(124,106,239,.08);--accent-glow:rgba(124,106,239,.15);
   --green:#1dd1a1;--green-dim:rgba(29,209,161,.08);--gold:#f7b731;--red:#ee5a5a;
-  --radius:16px;--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif;
-  --ease:cubic-bezier(.16,1,.3,1);--dur:.5s;
+  --nav-bg:rgba(4,4,6,.85);--shadow:0 8px 40px rgba(0,0,0,.4);
+  --orb1:rgba(124,106,239,.04);--orb2:rgba(29,209,161,.025);--orb3:rgba(247,183,49,.02);
+  --noise-opacity:.5;
 }
+[data-theme="light"]{
+  --bg:#f4f4f8;--bg2:#eaeaf0;--bg3:#e0e0ea;--bg4:#d4d4e0;--bg5:#c8c8d6;
+  --card:rgba(0,0,0,.03);--card-hover:rgba(0,0,0,.06);
+  --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.12);--border3:rgba(0,0,0,.18);
+  --text:#101020;--text2:#555570;--text3:#8888a0;
+  --accent:#5b4cd4;--accent2:#6b5ce0;--accent3:#8070f0;--accent-dim:rgba(91,76,212,.06);--accent-glow:rgba(91,76,212,.1);
+  --green:#15a87e;--green-dim:rgba(21,168,126,.06);--gold:#d99e20;--red:#d04040;
+  --nav-bg:rgba(244,244,248,.9);--shadow:0 8px 40px rgba(0,0,0,.08);
+  --orb1:rgba(91,76,212,.04);--orb2:rgba(21,168,126,.03);--orb3:rgba(217,158,32,.02);
+  --noise-opacity:.15;
+}
+
+:root{--radius:16px;--mono:'JetBrains Mono',monospace;--sans:'Inter',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);--dur:.5s}
 html{scroll-behavior:smooth;scroll-padding-top:80px}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .4s,color .4s}
 ::selection{background:var(--accent);color:#fff}
 img{max-width:100%;display:block}
 a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
 
-/* ═══════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    BACKGROUND EFFECTS
-   ═══════════════════════════════════════════════════════════════ */
-.noise{position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.5;
+   ════════════════════════════════════════════════════════════════ */
+.noise{position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:var(--noise-opacity);
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E")}
 .grid-bg{position:fixed;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(124,106,239,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(124,106,239,.02) 1px,transparent 1px);
+  background-image:linear-gradient(var(--accent-dim) 1px,transparent 1px),linear-gradient(90deg,var(--accent-dim) 1px,transparent 1px);
   background-size:72px 72px;mask-image:radial-gradient(ellipse 70% 50% at 50% 15%,black,transparent)}
-.orb{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;will-change:transform}
-.orb-1{width:800px;height:800px;background:rgba(124,106,239,.045);top:-25%;left:-20%;animation:orb-drift 28s ease-in-out infinite}
-.orb-2{width:600px;height:600px;background:rgba(29,209,161,.03);bottom:-20%;right:-15%;animation:orb-drift 32s ease-in-out infinite reverse}
-.orb-3{width:500px;height:500px;background:rgba(247,183,49,.02);top:45%;left:55%;animation:orb-drift 36s ease-in-out infinite 4s}
-@keyframes orb-drift{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(50px,-40px) scale(1.04)}50%{transform:translate(-30px,50px) scale(.96)}75%{transform:translate(40px,25px) scale(1.02)}}
+.orb{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;will-change:transform;transition:background .6s}
+.orb-1{width:800px;height:800px;background:var(--orb1);top:-25%;left:-20%;animation:orb-d 28s ease-in-out infinite}
+.orb-2{width:600px;height:600px;background:var(--orb2);bottom:-20%;right:-15%;animation:orb-d 32s ease-in-out infinite reverse}
+.orb-3{width:500px;height:500px;background:var(--orb3);top:45%;left:55%;animation:orb-d 36s ease-in-out infinite 4s}
+@keyframes orb-d{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(50px,-40px) scale(1.04)}50%{transform:translate(-30px,50px) scale(.96)}75%{transform:translate(40px,25px) scale(1.02)}}
 
-/* ═══════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    LAYOUT
-   ═══════════════════════════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════════ */
 .wrap{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 32px}
-.wrap-sm{max-width:800px}
+section{padding:100px 0}
 
-/* ═══════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    NAVIGATION
-   ═══════════════════════════════════════════════════════════════ */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;transition:all .4s var(--ease)}
-nav.scrolled{background:rgba(4,4,6,.9);backdrop-filter:blur(24px) saturate(1.2);border-bottom:1px solid var(--border)}
-.nav-brand{display:flex;align-items:center;gap:12px}
-.nav-brand img{width:36px;height:36px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
-.nav-brand span{font-size:16px;font-weight:700;letter-spacing:-.02em}
-.nav-links{display:flex;gap:32px;align-items:center}
-.nav-links a{font-size:13px;color:var(--text2);font-weight:500;position:relative;transition:color .2s}
-.nav-links a:hover{color:var(--text)}
-.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--accent2);transition:width .3s var(--ease)}
-.nav-links a:hover::after{width:100%}
+   ════════════════════════════════════════════════════════════════ */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;transition:all .4s var(--ease)}
+nav.scrolled{background:var(--nav-bg);backdrop-filter:blur(24px) saturate(1.2);border-bottom:1px solid var(--border);padding:10px 32px}
+.nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+.nav-brand img{width:34px;height:34px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.nav-brand span{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.nav-center{display:flex;gap:28px;align-items:center}
+.nav-center a{font-size:13px;color:var(--text2);font-weight:500;position:relative;transition:color .2s;cursor:pointer}
+.nav-center a:hover,.nav-center a.active{color:var(--text)}
+.nav-center a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--accent2);transition:width .3s var(--ease)}
+.nav-center a:hover::after,.nav-center a.active::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:12px}
 
-/* ═══════════════════════════════════════════════════════════════
+/* Nav controls */
+.nav-btn{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);color:var(--text2);transition:all .2s;font-size:16px}
+.nav-btn:hover{background:var(--card-hover);color:var(--text);border-color:var(--border2)}
+
+/* Language selector */
+.lang-sel{position:relative}
+.lang-sel .lang-btn{font-size:12px;font-weight:600;padding:6px 10px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--text2);transition:all .2s;display:flex;align-items:center;gap:4px}
+.lang-sel .lang-btn:hover{color:var(--text);border-color:var(--border2)}
+.lang-dd{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:6px;min-width:120px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s var(--ease);box-shadow:var(--shadow)}
+.lang-sel.open .lang-dd{opacity:1;visibility:visible;transform:none}
+.lang-dd button{width:100%;padding:8px 12px;border-radius:8px;text-align:left;font-size:13px;color:var(--text2);transition:all .15s;display:flex;align-items:center;gap:8px}
+.lang-dd button:hover,.lang-dd button.active{background:var(--accent-dim);color:var(--text)}
+
+/* Mobile hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:2px;background:var(--text2);border-radius:2px;transition:all .3s var(--ease)}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+/* Mobile menu */
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:199;padding:100px 32px 32px;flex-direction:column;gap:8px;opacity:0;visibility:hidden;transition:all .3s var(--ease)}
+.mobile-menu.open{display:flex;opacity:1;visibility:visible}
+.mobile-menu a{font-size:18px;font-weight:600;padding:16px 0;border-bottom:1px solid var(--border);color:var(--text2);transition:color .2s}
+.mobile-menu a:hover{color:var(--text)}
+
+/* ════════════════════════════════════════════════════════════════
    HERO
-   ═══════════════════════════════════════════════════════════════ */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:160px 32px 120px;position:relative}
-.hero-badge{display:inline-flex;align-items:center;gap:9px;padding:8px 20px;border-radius:24px;background:var(--accent-dim);border:1px solid rgba(124,106,239,.18);font-size:12px;color:var(--accent2);font-weight:500;letter-spacing:.04em;margin-bottom:40px;animation:fade-up .6s var(--ease) both}
+   ════════════════════════════════════════════════════════════════ */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 32px 100px;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:9px;padding:8px 20px;border-radius:24px;background:var(--accent-dim);border:1px solid rgba(124,106,239,.18);font-size:12px;color:var(--accent2);font-weight:500;letter-spacing:.04em;margin-bottom:40px}
 .hero-badge .dot{width:7px;height:7px;background:var(--accent2);border-radius:50%;animation:pulse 2.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.55)}}
-@keyframes fade-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
 
-.hero h1{font-size:clamp(52px,10vw,96px);font-weight:900;letter-spacing:-.055em;line-height:.92;margin-bottom:28px;animation:fade-up .6s .1s var(--ease) both}
-.hero h1 .glow{background:linear-gradient(135deg,var(--accent2) 0%,var(--green) 40%,var(--gold) 80%,var(--accent2) 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 6s ease infinite,fade-up .6s .1s var(--ease) both}
-@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-
-.hero-sub{font-size:clamp(17px,2.5vw,20px);color:var(--text2);max-width:620px;font-weight:300;line-height:1.7;margin-bottom:52px;animation:fade-up .6s .2s var(--ease) both}
-.hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:fade-up .6s .3s var(--ease) both}
+.hero h1{font-size:clamp(44px,9vw,88px);font-weight:900;letter-spacing:-.055em;line-height:.92;margin-bottom:28px}
+.hero h1 .grad{background:linear-gradient(135deg,var(--accent2) 0%,var(--green) 40%,var(--gold) 80%,var(--accent2) 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 6s ease infinite}
+@keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.hero p{font-size:clamp(16px,2.2vw,20px);color:var(--text2);max-width:580px;line-height:1.7;margin-bottom:44px}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 
 /* Buttons */
-.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 34px;border-radius:13px;font-size:14px;font-weight:600;transition:all .3s var(--ease);cursor:pointer;border:none}
-.btn-primary{color:#fff;background:linear-gradient(135deg,var(--accent) 0%,#6052c9 100%);box-shadow:0 8px 36px rgba(124,106,239,.22)}
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 14px 48px rgba(124,106,239,.32)}
-.btn-secondary{color:var(--text2);background:var(--bg3);border:1px solid var(--border2)}
-.btn-secondary:hover{color:var(--text);border-color:var(--border3);transform:translateY(-3px)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:12px;font-size:14px;font-weight:600;transition:all .25s var(--ease);border:1px solid transparent}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 24px rgba(124,106,239,.3)}
+.btn-primary:hover{background:#6b58e0;transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,106,239,.4)}
+.btn-ghost{color:var(--text2);border-color:var(--border2)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border3);background:var(--card)}
 
-/* Stats bar under hero */
-.hero-stats{display:flex;justify-content:center;gap:60px;margin-top:80px;animation:fade-up .6s .45s var(--ease) both}
-.hero-stat{text-align:center}
-.hero-stat .num{font-size:36px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,var(--text),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-stat .lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.14em;font-weight:500;margin-top:4px}
+/* ════════════════════════════════════════════════════════════════
+   SECTION TITLES
+   ════════════════════════════════════════════════════════════════ */
+.section-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--accent2);margin-bottom:12px}
+.section-title{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:16px}
+.section-desc{font-size:16px;color:var(--text2);max-width:560px;line-height:1.7}
 
-.scroll-hint{position:absolute;bottom:32px;display:flex;flex-direction:column;align-items:center;gap:6px;animation:bob 3s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
-.scroll-hint span{font-size:9px;color:var(--text4);text-transform:uppercase;letter-spacing:.22em;font-weight:600}
-.scroll-hint svg{width:16px;height:16px;stroke:var(--text3);fill:none;stroke-width:2}
+/* ════════════════════════════════════════════════════════════════
+   ABOUT SECTION
+   ════════════════════════════════════════════════════════════════ */
+.about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
+.about-card{padding:32px 28px;border-radius:var(--radius);background:var(--card);border:1px solid var(--border);transition:all .3s var(--ease);position:relative;overflow:hidden}
+.about-card:hover{background:var(--card-hover);border-color:var(--border2);transform:translateY(-4px)}
+.about-card .icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;background:var(--accent-dim);border:1px solid rgba(124,106,239,.12)}
+.about-card h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.about-card p{font-size:13px;color:var(--text2);line-height:1.6}
 
-/* ═══════════════════════════════════════════════════════════════
-   SECTIONS COMMON
-   ═══════════════════════════════════════════════════════════════ */
-section{padding:140px 0}
-.sec-tag{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent2);margin-bottom:16px}
-.sec-h{font-size:clamp(32px,5.5vw,52px);font-weight:800;letter-spacing:-.04em;line-height:1.08;margin-bottom:20px}
-.sec-h .thin{font-weight:300;color:var(--text2)}
-.sec-desc{font-size:16px;color:var(--text2);max-width:560px;font-weight:300;line-height:1.75;margin-bottom:64px}
+/* ════════════════════════════════════════════════════════════════
+   PROJECTS SECTION
+   ════════════════════════════════════════════════════════════════ */
+.project-card{display:flex;align-items:center;gap:28px;padding:28px 32px;border-radius:var(--radius);background:var(--card);border:1px solid var(--border);transition:all .3s var(--ease);margin-bottom:16px;cursor:pointer}
+.project-card:hover{background:var(--card-hover);border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.project-card .p-icon{width:64px;height:64px;border-radius:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px;background:linear-gradient(135deg,var(--accent-dim),var(--green-dim));border:1px solid var(--border2)}
+.project-card .p-icon img{width:40px;height:40px;border-radius:10px}
+.project-card .p-info{flex:1;min-width:0}
+.project-card .p-info h3{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.project-card .p-info h3 .badge{font-size:10px;padding:2px 8px;border-radius:6px;background:var(--green-dim);color:var(--green);font-weight:600;border:1px solid rgba(29,209,161,.15)}
+.project-card .p-info p{font-size:13px;color:var(--text2);line-height:1.5}
+.project-card .p-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.project-card .p-tags span{font-size:10px;padding:3px 10px;border-radius:6px;background:var(--bg3);color:var(--text3);border:1px solid var(--border);font-weight:500}
+.project-card .p-arrow{font-size:20px;color:var(--text3);transition:all .3s;flex-shrink:0}
+.project-card:hover .p-arrow{color:var(--accent2);transform:translateX(4px)}
 
-/* ═══════════════════════════════════════════════════════════════
-   ABOUT / WHO WE ARE
-   ═══════════════════════════════════════════════════════════════ */
-.about-text{font-size:clamp(22px,3.5vw,36px);font-weight:400;line-height:1.5;letter-spacing:-.02em;max-width:900px}
-.about-text em{font-style:normal;color:var(--accent2);font-weight:500}
-.about-cols{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:72px}
-.about-col{background:var(--bg);padding:40px 30px;transition:background .25s}
-.about-col:hover{background:var(--bg2)}
-.about-col .ico{font-size:28px;margin-bottom:16px}
-.about-col h4{font-size:15px;font-weight:700;margin-bottom:8px}
-.about-col p{font-size:13px;color:var(--text2);line-height:1.7;font-weight:300}
+/* ════════════════════════════════════════════════════════════════
+   PROJECT DETAIL PAGE (SPA)
+   ════════════════════════════════════════════════════════════════ */
+.page{display:none;padding-top:80px;min-height:100vh}
+.page.active{display:block}
+#page-home.active{display:block}
 
-/* ═══════════════════════════════════════════════════════════════
-   PROJECTS
-   ═══════════════════════════════════════════════════════════════ */
-.proj-card{background:var(--bg2);border:1px solid var(--border);border-radius:24px;overflow:hidden;position:relative;transition:all .45s var(--ease);clip-path:inset(0 round 24px)}
-.proj-card:hover{border-color:var(--border2);transform:translateY(-8px);box-shadow:0 30px 90px rgba(124,106,239,.07)}
-.proj-accent{height:3px;background:linear-gradient(90deg,var(--accent),var(--green),var(--gold),var(--accent));background-size:200% 100%;animation:bar-flow 4s linear infinite;opacity:0;transition:opacity .4s}
-.proj-card:hover .proj-accent{opacity:1}
-@keyframes bar-flow{0%{background-position:0% 0}100%{background-position:200% 0}}
-.proj-inner{padding:52px 48px}
-.proj-top{display:flex;align-items:center;gap:22px;margin-bottom:24px}
-.proj-logo{width:72px;height:72px;border-radius:20px;box-shadow:0 8px 36px rgba(0,0,0,.4)}
-.proj-name{font-size:28px;font-weight:800;letter-spacing:-.025em}
-.proj-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:600;margin-top:3px}
-.proj-tag .dot-green{width:6px;height:6px;background:var(--green);border-radius:50%}
-.proj-body{font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:32px;font-weight:300;max-width:680px}
-.proj-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px}
-.proj-chip{font-size:11px;padding:7px 15px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--text2);font-weight:500;transition:all .2s}
-.proj-chip:hover{background:var(--accent-dim);border-color:rgba(124,106,239,.2);color:var(--accent2)}
+/* Project detail hero */
+.pd-hero{padding:60px 0 40px;display:flex;align-items:center;gap:24px}
+.pd-hero .pd-icon{width:80px;height:80px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(135deg,var(--accent),#5b4cd4);box-shadow:0 8px 32px rgba(124,106,239,.3)}
+.pd-hero .pd-icon img{width:52px;height:52px;border-radius:14px}
+.pd-hero .pd-meta h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.03em}
+.pd-hero .pd-meta .pd-sub{font-size:14px;color:var(--text2);margin-top:4px}
+.pd-hero .pd-meta .pd-version{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:600;margin-top:8px}
+.pd-hero .pd-meta .pd-version .dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
 
-/* Features grid inside project */
-.proj-feats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:18px;overflow:hidden;margin-top:48px}
-.proj-feat{background:var(--bg);padding:32px 24px;transition:background .2s}
-.proj-feat:hover{background:var(--bg2)}
-.proj-feat .fi{font-size:20px;margin-bottom:12px}
-.proj-feat h5{font-size:13px;font-weight:700;margin-bottom:6px}
-.proj-feat p{font-size:12px;color:var(--text2);line-height:1.7;font-weight:300}
+/* Project tabs */
+.pd-tabs{display:flex;gap:4px;padding:4px;background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:40px;overflow-x:auto}
+.pd-tabs button{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;color:var(--text3);transition:all .2s;white-space:nowrap}
+.pd-tabs button:hover{color:var(--text2)}
+.pd-tabs button.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(124,106,239,.3)}
+.pd-tab-content{display:none}
+.pd-tab-content.active{display:block;animation:fade-in .3s var(--ease)}
+@keyframes fade-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-/* ═══════════════════════════════════════════════════════════════
-   PRICING
-   ═══════════════════════════════════════════════════════════════ */
-.price-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.price-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px 32px;position:relative;transition:all .3s var(--ease)}
-.price-box:hover{border-color:var(--border2);transform:translateY(-4px)}
-.price-box.featured{border-color:rgba(124,106,239,.22);background:linear-gradient(180deg,rgba(124,106,239,.045) 0%,var(--bg2) 100%);overflow:hidden}
-.price-box.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.featured-tag{display:inline-block;font-size:9px;font-weight:700;padding:4px 12px;border-radius:6px;background:var(--accent);color:#fff;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
-.price-title{font-size:19px;font-weight:700;margin-bottom:4px}
-.price-amount{font-size:40px;font-weight:900;letter-spacing:-.04em;margin:16px 0}
-.price-amount span{font-size:14px;color:var(--text2);font-weight:400}
-.price-list{list-style:none;margin:20px 0 0}
-.price-list li{font-size:13px;color:var(--text2);padding:9px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;font-weight:400}
-.price-list li::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.price-list li.ok::before{background:var(--green)}
-.price-list li.no::before{background:var(--text4)}
-.price-list li.no{color:var(--text3);text-decoration:line-through;text-decoration-color:var(--text4)}
+/* Downloads grid */
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.dl-card{padding:28px 24px;border-radius:var(--radius);background:var(--card);border:1px solid var(--border);text-align:center;transition:all .3s var(--ease)}
+.dl-card:hover{background:var(--card-hover);border-color:var(--border2);transform:translateY(-4px)}
+.dl-card .dl-os{font-size:36px;margin-bottom:12px}
+.dl-card h4{font-size:15px;font-weight:700;margin-bottom:4px}
+.dl-card p{font-size:12px;color:var(--text3);margin-bottom:16px}
+.dl-card .btn{width:100%;justify-content:center}
 
-/* Addons row */
-.add-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:48px}
-.add-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px 22px;text-align:center;transition:all .3s var(--ease)}
-.add-box:hover{border-color:var(--border2);transform:translateY(-3px)}
-.add-box h4{font-size:15px;font-weight:700;margin-bottom:4px}
-.add-box .sub{font-size:11px;color:var(--text2);margin-bottom:14px;line-height:1.5}
-.add-box .val{font-size:24px;font-weight:800;color:var(--green)}
+/* Pricing */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.price-card{padding:32px 28px;border-radius:var(--radius);background:var(--card);border:1px solid var(--border);transition:all .3s var(--ease);position:relative}
+.price-card.featured{border-color:var(--accent);background:var(--accent-dim)}
+.price-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--green),var(--gold));border-radius:var(--radius) var(--radius) 0 0}
+.price-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.price-card .plan-name{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:8px}
+.price-card .plan-price{font-size:36px;font-weight:900;margin-bottom:4px}
+.price-card .plan-price small{font-size:14px;font-weight:500;color:var(--text3)}
+.price-card .plan-desc{font-size:13px;color:var(--text3);margin-bottom:20px}
+.price-card ul{list-style:none;margin-bottom:24px}
+.price-card ul li{font-size:13px;padding:6px 0;color:var(--text2);display:flex;align-items:center;gap:8px}
+.price-card ul li::before{content:'✓';color:var(--green);font-weight:700;font-size:12px}
+.price-card .btn{width:100%;justify-content:center}
 
-/* Payment bar */
-.pay-info{margin-top:48px;padding:22px 28px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;text-align:center}
-.pay-info .ttl{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px}
-.pay-info .mth{font-size:12px;color:var(--text3)}
+/* Features list */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.feat-item{display:flex;gap:14px;padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border);transition:all .3s var(--ease)}
+.feat-item:hover{background:var(--card-hover);transform:translateY(-2px)}
+.feat-item .fi-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--accent-dim);flex-shrink:0}
+.feat-item h4{font-size:14px;font-weight:700;margin-bottom:2px}
+.feat-item p{font-size:12px;color:var(--text3);line-height:1.5}
 
-/* ═══════════════════════════════════════════════════════════════
-   CONTACTS
-   ═══════════════════════════════════════════════════════════════ */
-.contact-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.c-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px 24px;text-align:center;transition:all .3s var(--ease)}
-.c-card:hover{border-color:var(--border2);transform:translateY(-3px)}
-.c-card .ci{font-size:28px;margin-bottom:14px}
-.c-card h4{font-size:15px;font-weight:700;margin-bottom:8px}
-.c-card p{font-size:13px;color:var(--text2);line-height:1.6}
-.c-card a{color:var(--accent2);font-weight:500;transition:color .2s}
-.c-card a:hover{color:var(--accent3)}
+/* Legal */
+.legal-item{border-bottom:1px solid var(--border);overflow:hidden}
+.legal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 0;cursor:pointer;font-size:15px;font-weight:600;color:var(--text2);transition:color .2s}
+.legal-header:hover{color:var(--text)}
+.legal-header .arrow{transition:transform .3s;font-size:12px}
+.legal-item.open .legal-header .arrow{transform:rotate(180deg)}
+.legal-body{max-height:0;overflow:hidden;transition:max-height .4s var(--ease)}
+.legal-item.open .legal-body{max-height:600px}
+.legal-body-inner{padding:0 0 20px;font-size:13px;color:var(--text3);line-height:1.7}
 
-/* ═══════════════════════════════════════════════════════════════
-   LEGAL ACCORDION
-   ═══════════════════════════════════════════════════════════════ */
-.legal-section{border-top:1px solid var(--border);padding-top:100px;margin-top:48px}
-.leg{border-bottom:1px solid var(--border)}
-.leg-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:22px 0;background:none;border:none;color:var(--text);font-family:var(--sans);font-size:15px;font-weight:600;cursor:pointer;text-align:left;transition:color .2s}
-.leg-btn:hover{color:var(--accent2)}
-.leg-btn svg{width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;flex-shrink:0;transition:transform .3s var(--ease)}
-.leg.on .leg-btn svg{transform:rotate(180deg)}
-.leg-body{max-height:0;overflow:hidden;transition:max-height .4s var(--ease)}
-.leg.on .leg-body{max-height:2000px}
-.leg-content{padding:0 0 28px;font-size:13px;color:var(--text2);line-height:1.85}
-.leg-content h3{font-size:13px;font-weight:600;color:var(--text);margin:20px 0 8px}
-.leg-content h3:first-child{margin-top:0}
-.leg-content ul{padding-left:20px;margin:8px 0}
-.leg-content li{margin-bottom:5px}
-.leg-content a{color:var(--accent2)}
-
-/* ═══════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    FOOTER
-   ═══════════════════════════════════════════════════════════════ */
-footer{border-top:1px solid var(--border);padding:40px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.foot-left{display:flex;align-items:center;gap:10px}
-.foot-left img{width:24px;height:24px;border-radius:6px;opacity:.5}
-.foot-left span{font-size:11px;color:var(--text3)}
-.foot-right{display:flex;gap:24px}
-.foot-right a{font-size:12px;color:var(--text3);transition:color .2s}
-.foot-right a:hover{color:var(--text2)}
+   ════════════════════════════════════════════════════════════════ */
+footer{border-top:1px solid var(--border);padding:48px 0 32px}
+.footer-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;margin-bottom:40px;flex-wrap:wrap}
+.footer-col h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:14px}
+.footer-col a{display:block;font-size:13px;color:var(--text2);padding:4px 0;transition:color .2s;cursor:pointer}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--text3)}
 
-/* ═══════════════════════════════════════════════════════════════
-   REVEAL ANIMATION
-   ═══════════════════════════════════════════════════════════════ */
-.rv{opacity:0;transform:translateY(30px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.rv.v{opacity:1;transform:none}
-.rv-d1{transition-delay:.1s}.rv-d2{transition-delay:.2s}.rv-d3{transition-delay:.3s}
+/* ════════════════════════════════════════════════════════════════
+   COOKIE CONSENT
+   ════════════════════════════════════════════════════════════════ */
+.cookie-bar{position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--bg3);border-top:1px solid var(--border2);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;transform:translateY(100%);transition:transform .4s var(--ease)}
+.cookie-bar.show{transform:none}
+.cookie-bar p{font-size:13px;color:var(--text2);flex:1}
+.cookie-bar .btn{flex-shrink:0}
 
-/* ═══════════════════════════════════════════════════════════════
-   STAGGER ANIMATIONS
-   ═══════════════════════════════════════════════════════════════ */
-.rv-s1{transition-delay:.05s}.rv-s2{transition-delay:.1s}.rv-s3{transition-delay:.15s}
-.rv-s4{transition-delay:.2s}.rv-s5{transition-delay:.25s}.rv-s6{transition-delay:.3s}
+/* ════════════════════════════════════════════════════════════════
+   AUTH MODAL
+   ════════════════════════════════════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .3s var(--ease)}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:40px 36px;max-width:400px;width:100%;box-shadow:var(--shadow);transform:scale(.95);transition:transform .3s var(--ease)}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal h2{font-size:22px;font-weight:800;margin-bottom:6px}
+.modal .modal-sub{font-size:13px;color:var(--text3);margin-bottom:28px}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:18px;transition:all .2s}
+.modal-close:hover{background:var(--card);color:var(--text)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.form-group input{width:100%;padding:12px 16px;border-radius:10px;background:var(--card);border:1px solid var(--border2);color:var(--text);font-size:14px;transition:all .2s;outline:none;font-family:var(--sans)}
+.form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.form-group input::placeholder{color:var(--text3)}
+.form-msg{font-size:12px;margin-top:8px;min-height:18px}
+.form-msg.err{color:var(--red)}
+.form-msg.ok{color:var(--green)}
 
-/* Hover lift for all cards */
-.proj-chip:hover,.add-box:hover,.c-card:hover,.about-col:hover,.proj-feat:hover{
-  transform:translateY(-3px);transition:all .25s var(--ease)}
+/* ════════════════════════════════════════════════════════════════
+   SCROLL ANIMATIONS
+   ════════════════════════════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.visible{opacity:1;transform:none}
+.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}.reveal-d4{transition-delay:.4s}
 
-/* Animated underline on section tags */
-.sec-tag{position:relative;display:inline-block}
-.sec-tag::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--accent2);transition:width .6s var(--ease)}
-.sec-tag.v::after{width:100%}
-
-/* Glow effect on featured price card */
-.price-box.featured{box-shadow:0 0 0 0 rgba(124,106,239,0);transition:box-shadow .4s var(--ease),border-color .3s,transform .3s var(--ease)}
-.price-box.featured:hover{box-shadow:0 0 40px rgba(124,106,239,.08)}
-
-/* ═══════════════════════════════════════════════════════════════
-   MOBILE FIX — prevent orb overflow
-   ═══════════════════════════════════════════════════════════════ */
-html{overflow-x:hidden}
-body{overflow-x:hidden;-webkit-overflow-scrolling:touch}
-
-/* ═══════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    RESPONSIVE
-   ═══════════════════════════════════════════════════════════════ */
-@media(max-width:1024px){
-  .proj-feats{grid-template-columns:1fr 1fr}
-  .about-cols{grid-template-columns:1fr 1fr}
-  .hero-stats{gap:40px}
+   ════════════════════════════════════════════════════════════════ */
+@media(max-width:900px){
+  .about-grid{grid-template-columns:1fr 1fr}
+  .nav-center{display:none}
+  .hamburger{display:flex}
+  .pd-hero{flex-direction:column;text-align:center}
 }
-@media(max-width:768px){
-  :root{--bg:#040406}
+@media(max-width:600px){
+  .about-grid{grid-template-columns:1fr}
+  .project-card{flex-direction:column;text-align:center;gap:16px}
+  .project-card .p-arrow{display:none}
+  .hero h1{font-size:36px}
+  .hero p{font-size:15px}
   nav{padding:12px 16px}
-  .nav-brand span{font-size:13px}
-  .nav-links{display:none}
   .wrap{padding:0 16px}
-  section{padding:48px 0}
-  .hero{padding:80px 16px 40px;min-height:auto}
-  .hero-badge{font-size:10px;padding:5px 14px;margin-bottom:24px}
-  .hero h1{font-size:clamp(32px,10vw,44px)}
-  .hero-sub{font-size:14px;margin-bottom:28px}
-  .hero-actions{gap:8px;flex-direction:column;width:100%}
-  .btn{padding:12px 20px;font-size:13px;width:100%;justify-content:center}
-  .hero-stats{flex-direction:row;gap:24px;margin-top:36px}
-  .hero-stat .num{font-size:22px}
-  .hero-stat .lbl{font-size:9px}
-  .scroll-hint{display:none}
-  .sec-tag{font-size:10px;margin-bottom:10px}
-  .sec-h{font-size:clamp(22px,6vw,30px);margin-bottom:12px}
-  .sec-desc{font-size:13px;margin-bottom:28px}
-  .about-text{font-size:clamp(16px,4.5vw,20px)}
-  .about-cols{grid-template-columns:1fr;margin-top:28px}
-  .about-col{padding:24px 20px}
-  .proj-inner{padding:24px 16px}
-  .proj-top{gap:12px;margin-bottom:16px}
-  .proj-logo{width:48px;height:48px;border-radius:12px}
-  .proj-name{font-size:18px}
-  .proj-body{font-size:13px;margin-bottom:20px}
-  .proj-chips{gap:5px;margin-bottom:24px}
-  .proj-chip{font-size:10px;padding:4px 10px}
-  .proj-feats{grid-template-columns:1fr 1fr}
-  .proj-feat{padding:20px 16px}
-  .proj-feat h5{font-size:12px}
-  .proj-feat p{font-size:11px}
-  .price-row{grid-template-columns:1fr;gap:12px}
-  .price-box{padding:28px 20px}
-  .price-amount{font-size:28px}
-  .price-list li{font-size:12px;padding:7px 0}
-  .add-row{grid-template-columns:1fr;gap:8px}
-  .add-box{padding:20px 16px}
-  .contact-row{grid-template-columns:1fr;gap:10px}
-  .c-card{padding:24px 18px}
-  .leg-btn{font-size:13px;padding:16px 0}
-  footer{flex-direction:column;text-align:center;gap:12px;padding:24px 0}
-  .foot-right{flex-wrap:wrap;justify-content:center;gap:16px}
-  /* Hide large orbs on mobile to prevent overflow */
-  .orb-1{width:400px;height:400px;top:-10%;left:-30%}
-  .orb-2{width:300px;height:300px;bottom:-10%;right:-25%}
-  .orb-3{display:none}
-  .grid-bg{opacity:.3}
-}
-@media(max-width:480px){
-  nav{padding:12px 14px}
-  .nav-links{gap:10px}
-  .nav-links a{font-size:11px}
-  .hero{padding:100px 14px 60px}
-  .hero h1{font-size:clamp(32px,11vw,44px)}
-  .hero-badge{font-size:10px;padding:6px 14px}
-  .wrap{padding:0 14px}
-  .proj-inner{padding:24px 16px}
-  .proj-chips{gap:6px}
-  .proj-chip{font-size:10px;padding:5px 10px}
-  .price-box{padding:28px 18px}
-  .orb-1,.orb-2{filter:blur(80px);opacity:.5}
+  section{padding:60px 0}
+  .pricing-grid{grid-template-columns:1fr}
+  .dl-grid{grid-template-columns:1fr}
+  .footer-grid{flex-direction:column;gap:24px}
+  .footer-bottom{flex-direction:column;gap:8px;text-align:center}
+  .pd-tabs{gap:2px}
+  .pd-tabs button{padding:8px 14px;font-size:12px}
 }
 </style>
 </head>
 <body>
 
+<!-- Background -->
 <div class="noise"></div>
 <div class="grid-bg"></div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
 
-<!-- ═══════════ NAVIGATION ═══════════ -->
-<nav id="nav">
-  <a href="#" class="nav-brand">
+<!-- ═══════════════════════════════════════════════════════════
+     NAVIGATION
+     ═══════════════════════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-brand" onclick="goHome()">
     <img src="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png" alt="MrDogez">
     <span>MrDogez</span>
-  </a>
-  <div class="nav-links">
-    <a href="#about">О нас</a>
-    <a href="#projects">Проекты</a>
-    <a href="#pricing">Тарифы</a>
-    <a href="#contacts">Контакты</a>
-    <a href="#legal">Документы</a>
+  </div>
+  <div class="nav-center" id="navLinks">
+    <a onclick="goHome()" data-i18n="nav_home">Главная</a>
+    <a onclick="scrollToId('about')" data-i18n="nav_about">О нас</a>
+    <a onclick="scrollToId('projects')" data-i18n="nav_projects">Проекты</a>
+  </div>
+  <div class="nav-right">
+    <div class="lang-sel" id="langSel">
+      <button class="lang-btn" onclick="toggleLang()"><span id="langLabel">RU</span> <span style="font-size:10px">▾</span></button>
+      <div class="lang-dd" id="langDd">
+        <button onclick="setLang('ru')" class="active">🇷🇺 Русский</button>
+        <button onclick="setLang('en')">🇬🇧 English</button>
+        <button onclick="setLang('ua')">🇺🇦 Українська</button>
+      </div>
+    </div>
+    <button class="nav-btn" onclick="toggleTheme()" id="themeBtn" title="Theme">🌙</button>
+    <button class="nav-btn" onclick="openAuth()" id="authBtn" title="Account">👤</button>
+    <div class="hamburger" id="burger" onclick="toggleMobile()">
+      <span></span><span></span><span></span>
+    </div>
   </div>
 </nav>
 
-<div class="wrap">
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="goHome();closeMobile()" data-i18n="nav_home">Главная</a>
+  <a onclick="scrollToId('about');closeMobile()" data-i18n="nav_about">О нас</a>
+  <a onclick="scrollToId('projects');closeMobile()" data-i18n="nav_projects">Проекты</a>
+  <a onclick="openAuth();closeMobile()" data-i18n="nav_account">Аккаунт</a>
+  <a onclick="showPage('contacts');closeMobile()" data-i18n="nav_contacts">Контакты</a>
+</div>
 
-<!-- ═══════════ HERO ═══════════ -->
-<section class="hero">
-  <div class="hero-badge"><span class="dot"></span>Software Development Studio</div>
-  <h1>Создаём<br><span class="glow">будущее</span></h1>
-  <p class="hero-sub">Разрабатываем программное обеспечение, которое решает реальные задачи. Безопасность, производительность, свобода в интернете.</p>
-  <div class="hero-actions">
-    <a href="#projects" class="btn btn-primary">Наши проекты</a>
-    <a href="#about" class="btn btn-secondary">О нас</a>
-  </div>
-  <div class="hero-stats">
-    <div class="hero-stat"><div class="num">27</div><div class="lbl">Стратегий обхода</div></div>
-    <div class="hero-stat"><div class="num">20+</div><div class="lbl">DNS серверов</div></div>
-    <div class="hero-stat"><div class="num">5.0</div><div class="lbl">Версия</div></div>
-  </div>
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
-  </div>
-</section>
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE: HOME
+     ═══════════════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
 
-<!-- ═══════════ ABOUT ═══════════ -->
-<section id="about">
-  <div class="sec-tag rv" style="display:inline-block">О нас</div>
-  <div class="about-text rv">
-    Мы — <em>независимая студия разработки</em>, создающая инструменты для <em>свободного интернета</em>. Верим, что технологии должны <em>защищать</em>, а не ограничивать. Каждый наш продукт — это шаг к более <em>открытому</em> цифровому миру.
-  </div>
-  <div class="about-cols rv">
-    <div class="about-col"><div class="ico">&#x1f6e0;</div><h4>Разработка</h4><p>Windows-приложения, серверные решения, автоматизация. Python, C++, JavaScript.</p></div>
-    <div class="about-col"><div class="ico">&#x1f512;</div><h4>Безопасность</h4><p>Шифрование, MITM-защита, приватность данных. Все пароли хешированы.</p></div>
-    <div class="about-col"><div class="ico">&#x1f310;</div><h4>Свобода</h4><p>Обход блокировок, VPN-туннели, DPI bypass. Доступ к любому контенту.</p></div>
-    <div class="about-col"><div class="ico">&#x1f4a1;</div><h4>Инновации</h4><p>ISP-кэширование, MITM-детекция, параллельный racing прокси. Передовые технологии.</p></div>
-  </div>
-</section>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge reveal"><span class="dot"></span> <span data-i18n="hero_badge">Open Source & Privacy First</span></div>
+    <h1 class="reveal"><span data-i18n="hero_t1">Инструменты для</span><br><span class="grad" data-i18n="hero_t2">свободного интернета</span></h1>
+    <p class="reveal" data-i18n="hero_desc">Создаю программы, которые помогают обходить блокировки, защищать трафик и сохранять приватность. Без рекламы. Без слежки.</p>
+    <div class="hero-btns reveal">
+      <a class="btn btn-primary" onclick="scrollToId('projects')" data-i18n="hero_btn1">Смотреть проекты</a>
+      <a class="btn btn-ghost" href="https://github.com/MrDogez" target="_blank">GitHub →</a>
+    </div>
 
-<!-- ═══════════ PROJECTS ═══════════ -->
-<section id="projects">
-  <div class="sec-tag rv" style="display:inline-block">Проекты</div>
-  <div class="sec-h rv">Наши <span class="thin">продукты</span></div>
-  <div class="sec-desc rv">Инструменты, которыми мы гордимся</div>
+    <!-- Scroll indicator -->
+    <div style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.3">
+      <div style="width:1px;height:40px;background:linear-gradient(transparent,var(--text3));animation:scroll-line 2s ease-in-out infinite"></div>
+    </div>
+    <style>@keyframes scroll-line{0%,100%{opacity:.2;transform:scaleY(.5)}50%{opacity:1;transform:scaleY(1)}}</style>
+  </section>
 
-  <div class="proj-card rv">
-    <div class="proj-accent"></div>
-    <div class="proj-inner">
-      <div class="proj-top">
-        <img src="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png" alt="MrDogez Ultimate" class="proj-logo">
-        <div>
-          <div class="proj-name">MrDogez Ultimate</div>
-          <div class="proj-tag"><span class="dot-green"></span>v5.0 &bull; Windows 10/11</div>
+  <!-- About -->
+  <section id="about">
+    <div class="wrap">
+      <div class="section-label reveal" data-i18n="about_label">О ПРОЕКТЕ</div>
+      <div class="section-title reveal" data-i18n="about_title">Зачем всё это?</div>
+      <div class="section-desc reveal" data-i18n="about_desc">Я верю, что интернет должен быть свободным. Каждый инструмент — шаг к открытому цифровому миру.</div>
+
+      <div class="about-grid">
+        <div class="about-card reveal reveal-d1">
+          <div class="icon">🔒</div>
+          <h3 data-i18n="ab1_t">Приватность</h3>
+          <p data-i18n="ab1_d">Никакой телеметрии, логов и трекеров. Ваш трафик — только ваше дело. Весь код можно проверить.</p>
+        </div>
+        <div class="about-card reveal reveal-d2">
+          <div class="icon" style="background:var(--green-dim);border-color:rgba(29,209,161,.12)">⚡</div>
+          <h3 data-i18n="ab2_t">Скорость</h3>
+          <p data-i18n="ab2_d">Интеллектуальный подбор прокси, параллельное тестирование и кэширование для мгновенного подключения.</p>
+        </div>
+        <div class="about-card reveal reveal-d3">
+          <div class="icon" style="background:rgba(247,183,49,.06);border-color:rgba(247,183,49,.12)">🛡</div>
+          <h3 data-i18n="ab3_t">Безопасность</h3>
+          <p data-i18n="ab3_d">MITM-защита, шифрование WireGuard, DNS-over-HTTPS. Многоуровневая защита от перехвата.</p>
         </div>
       </div>
-      <p class="proj-body">Комплексное решение для обхода интернет-блокировок и защищённого VPN-подключения. 27 стратегий DPI bypass, Cloudflare WARP туннель с интеллектуальным подбором прокси, DNS-over-HTTPS, система мониторинга сети. Подключение за секунды с ISP-кэшированием и MITM-защитой.</p>
-      <div class="proj-chips">
-        <span class="proj-chip">DPI Bypass</span>
-        <span class="proj-chip">WARP Tunnel</span>
-        <span class="proj-chip">20+ DNS</span>
-        <span class="proj-chip">SOCKS5 Bridge</span>
-        <span class="proj-chip">Auto-TUN</span>
-        <span class="proj-chip">Watchdog</span>
-        <span class="proj-chip">Smart Routing</span>
-        <span class="proj-chip">MITM Protection</span>
-        <span class="proj-chip">Speed Boost</span>
-        <span class="proj-chip">Premium</span>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects">
+    <div class="wrap">
+      <div class="section-label reveal" data-i18n="proj_label">ПРОЕКТЫ</div>
+      <div class="section-title reveal" data-i18n="proj_title">Наши инструменты</div>
+      <div class="section-desc reveal" style="margin-bottom:40px" data-i18n="proj_desc">Каждый проект решает конкретную проблему. Нажмите «Подробнее» чтобы узнать больше.</div>
+
+      <!-- MrDogez Ultimate -->
+      <div class="project-card reveal" onclick="showPage('mdu')">
+        <div class="p-icon"><img src="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png" alt=""></div>
+        <div class="p-info">
+          <h3>MrDogez Ultimate <span class="badge">v5.0</span></h3>
+          <p data-i18n="mdu_short">Комплексное решение для обхода интернет-блокировок и защищённого VPN-подключения. 27 стратегий DPI bypass, Cloudflare WARP туннель, MITM-защита.</p>
+          <div class="p-tags">
+            <span>DPI Bypass</span><span>WARP</span><span>WireGuard</span><span>Windows</span><span>Premium</span>
+          </div>
+        </div>
+        <div class="p-arrow">→</div>
       </div>
-      <a href="#pricing" class="btn btn-primary" style="font-size:13px;padding:14px 28px">Тарифы и цены &#8594;</a>
 
-      <div class="proj-feats">
-        <div class="proj-feat"><div class="fi">&#x26a1;</div><h5>27 стратегий DPI</h5><p>Fake TLS, multi-split, ECH-bypass, badack-increment — обход любых блокировок провайдера</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f310;</div><h5>WARP Tunnel</h5><p>Cloudflare WARP с автоматическим endpoint racing и ISP-кэшированием</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f512;</div><h5>DNS-over-HTTPS</h5><p>20+ серверов, шифрование запросов, zero-leak политика</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f680;</div><h5>Мгновенный старт</h5><p>ISP-кэш + кэш прокси. Повторное подключение за 10 секунд</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f6e1;</div><h5>MITM защита</h5><p>TLS-верификация, чёрный список перехватчиков, только чистые прокси</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f4ca;</div><h5>Мониторинг</h5><p>Пинг сервисов, качество соединения, трафик в реальном времени</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f504;</div><h5>Auto-Reconnect</h5><p>Hot-swap на backup прокси без разрыва. Watchdog 24/7</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f513;</div><h5>Разблокировка</h5><p>YouTube, Discord, Telegram, Instagram, Twitter и тысячи сайтов</p></div>
-        <div class="proj-feat"><div class="fi">&#x2699;</div><h5>Split Tunneling</h5><p>Гибкая маршрутизация — выбирай что идёт через VPN</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f4b0;</div><h5>Premium подписка</h5><p>Безлимит скорость, 20 прокси, авто-TUN, гео-фильтр EU</p></div>
-        <div class="proj-feat"><div class="fi">&#x23f1;</div><h5>Быстрый старт</h5><p>ISP-кэш + кэш прокси. Повторное подключение за 10 секунд</p></div>
-        <div class="proj-feat"><div class="fi">&#x1f4e7;</div><h5>Email уведомления</h5><p>Покупки, истечение подписки, вход в аккаунт — всё на почту</p></div>
+      <!-- Placeholder for future projects -->
+      <div class="project-card reveal" style="opacity:.5;cursor:default" onclick="return false">
+        <div class="p-icon" style="font-size:28px">🔧</div>
+        <div class="p-info">
+          <h3 data-i18n="soon_title">Новый проект <span class="badge" style="background:rgba(247,183,49,.08);color:var(--gold);border-color:rgba(247,183,49,.15)">Скоро</span></h3>
+          <p data-i18n="soon_desc">Следующий инструмент уже в разработке. Следите за обновлениями.</p>
+        </div>
+        <div class="p-arrow">→</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE: MrDogez Ultimate (detail)
+     ═══════════════════════════════════════════════════════════ -->
+<div id="page-mdu" class="page">
+  <div class="wrap">
+
+    <!-- Back button -->
+    <div style="padding-top:20px"><a onclick="goHome()" style="font-size:13px;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:color .2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">← <span data-i18n="back">Назад</span></a></div>
+
+    <!-- Hero -->
+    <div class="pd-hero">
+      <div class="pd-icon"><img src="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png" alt=""></div>
+      <div class="pd-meta">
+        <h1>MrDogez Ultimate</h1>
+        <div class="pd-sub" data-i18n="mdu_sub">Обход блокировок + защищённый VPN</div>
+        <div class="pd-version"><span class="dot"></span> v5.0 • Windows 10/11</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="pd-tabs" id="mduTabs">
+      <button class="active" onclick="mduTab('overview')" data-i18n="tab_overview">Обзор</button>
+      <button onclick="mduTab('features')" data-i18n="tab_features">Возможности</button>
+      <button onclick="mduTab('pricing')" data-i18n="tab_pricing">Тарифы</button>
+      <button onclick="mduTab('download')" data-i18n="tab_download">Скачать</button>
+      <button onclick="mduTab('legal')" data-i18n="tab_legal">Документы</button>
+    </div>
+
+    <!-- Tab: Overview -->
+    <div class="pd-tab-content active" id="tab-overview">
+      <div style="max-width:700px">
+        <h2 style="font-size:24px;font-weight:800;margin-bottom:16px" data-i18n="ov_title">Что это?</h2>
+        <p style="color:var(--text2);line-height:1.8;margin-bottom:24px" data-i18n="ov_desc1">MrDogez Ultimate — приложение для Windows, которое помогает обходить интернет-блокировки используя 27 стратегий DPI bypass и защищённый Cloudflare WARP туннель на протоколе WireGuard.</p>
+        <p style="color:var(--text2);line-height:1.8;margin-bottom:32px" data-i18n="ov_desc2">Интеллектуальная система автоматически определяет вашего провайдера, подбирает оптимальный метод подключения и защищает от MITM-атак. Поддержка бесплатных SOCKS5 и V2Ray прокси с параллельным тестированием.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <div style="text-align:center;padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border)">
+            <div style="font-size:32px;font-weight:900;color:var(--accent2)">27</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px" data-i18n="ov_s1">Стратегий DPI</div>
+          </div>
+          <div style="text-align:center;padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border)">
+            <div style="font-size:32px;font-weight:900;color:var(--green)">20+</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px" data-i18n="ov_s2">DNS серверов</div>
+          </div>
+          <div style="text-align:center;padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border)">
+            <div style="font-size:32px;font-weight:900;color:var(--gold)">3</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px" data-i18n="ov_s3">Типа туннелей</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Features -->
+    <div class="pd-tab-content" id="tab-features">
+      <div class="feat-grid">
+        <div class="feat-item"><div class="fi-icon">🛡</div><div><h4>DPI Bypass</h4><p data-i18n="f1">27 стратегий обхода блокировок с авто-подбором</p></div></div>
+        <div class="feat-item"><div class="fi-icon" style="background:var(--green-dim)">🌐</div><div><h4>WARP Tunnel</h4><p data-i18n="f2">Cloudflare WARP через WireGuard протокол</p></div></div>
+        <div class="feat-item"><div class="fi-icon" style="background:rgba(247,183,49,.06)">⚡</div><div><h4 data-i18n="f3t">Умное подключение</h4><p data-i18n="f3">ISP-кэширование, параллельный подбор прокси</p></div></div>
+        <div class="feat-item"><div class="fi-icon">🔒</div><div><h4 data-i18n="f4t">MITM защита</h4><p data-i18n="f4">TLS-верификация, чёрный список MITM-прокси</p></div></div>
+        <div class="feat-item"><div class="fi-icon" style="background:var(--green-dim)">📊</div><div><h4 data-i18n="f5t">Мониторинг</h4><p data-i18n="f5">Статистика трафика, пинг, качество соединения</p></div></div>
+        <div class="feat-item"><div class="fi-icon" style="background:rgba(247,183,49,.06)">🔄</div><div><h4 data-i18n="f6t">Авто-реконнект</h4><p data-i18n="f6">Hot-swap мгновенное переподключение</p></div></div>
+        <div class="feat-item"><div class="fi-icon">🌍</div><div><h4>DNS-over-HTTPS</h4><p data-i18n="f7">20+ защищённых DNS серверов</p></div></div>
+        <div class="feat-item"><div class="fi-icon" style="background:var(--green-dim)">🧩</div><div><h4>SOCKS5 & V2Ray</h4><p data-i18n="f8">Бесплатные прокси с параллельным тестом</p></div></div>
+        <div class="feat-item"><div class="fi-icon" style="background:rgba(247,183,49,.06)">🏆</div><div><h4 data-i18n="f9t">Premium</h4><p data-i18n="f9">Безлимит скорости, трафик, VIP-серверы</p></div></div>
+      </div>
+    </div>
+
+    <!-- Tab: Pricing -->
+    <div class="pd-tab-content" id="tab-pricing">
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="plan-name" data-i18n="plan_free">Бесплатно</div>
+          <div class="plan-price">0₽</div>
+          <div class="plan-desc" data-i18n="plan_free_d">Базовый доступ навсегда</div>
+          <ul>
+            <li data-i18n="pf1">DPI Bypass (27 стратегий)</li>
+            <li data-i18n="pf2">WARP подключение</li>
+            <li data-i18n="pf3">5 ГБ трафика/мес</li>
+            <li data-i18n="pf4">Скорость до 1 МБ/с</li>
+            <li data-i18n="pf5">20+ DNS серверов</li>
+            <li data-i18n="pf6">3 профиля WARP</li>
+          </ul>
+          <a class="btn btn-ghost" data-i18n="plan_free_btn" onclick="mduTab('download')">Скачать бесплатно</a>
+        </div>
+        <div class="price-card featured">
+          <div class="plan-name" style="color:var(--accent2)" data-i18n="plan_prem">Premium</div>
+          <div class="plan-price">10₽ <small data-i18n="plan_per">/ 30 дней</small></div>
+          <div class="plan-desc" data-i18n="plan_prem_d">Максимальные возможности</div>
+          <ul>
+            <li data-i18n="pp1">Всё из бесплатного</li>
+            <li data-i18n="pp2">Безлимит скорости</li>
+            <li data-i18n="pp3">Безлимит трафика</li>
+            <li data-i18n="pp4">20 параллельных прокси</li>
+            <li data-i18n="pp5">VIP-серверы EU</li>
+            <li data-i18n="pp6">Авто-TUN режим</li>
+            <li data-i18n="pp7">Приоритетная поддержка</li>
+          </ul>
+          <a class="btn btn-primary" data-i18n="plan_prem_btn" onclick="openAuth('buy')">Купить Premium</a>
+        </div>
+      </div>
+
+      <!-- Addons -->
+      <h3 style="font-size:18px;font-weight:700;margin:40px 0 16px" data-i18n="addons_title">Дополнения</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+        <div style="padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">📦</div>
+          <div style="font-size:14px;font-weight:700">+5 ГБ</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px" data-i18n="addon_traffic">Пакет трафика</div>
+          <div style="font-size:18px;font-weight:800;color:var(--accent2)">10₽</div>
+        </div>
+        <div style="padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">📦</div>
+          <div style="font-size:14px;font-weight:700">+20 ГБ</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px" data-i18n="addon_traffic">Пакет трафика</div>
+          <div style="font-size:18px;font-weight:800;color:var(--accent2)">10₽</div>
+        </div>
+        <div style="padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">💎</div>
+          <div style="font-size:14px;font-weight:700">+100 ГБ</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px" data-i18n="addon_traffic">Пакет трафика</div>
+          <div style="font-size:18px;font-weight:800;color:var(--gold)">10₽</div>
+        </div>
+        <div style="padding:20px;border-radius:14px;background:var(--card);border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">⚡</div>
+          <div style="font-size:14px;font-weight:700" data-i18n="addon_boost">Буст скорости</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px" data-i18n="addon_boost_d">30 дней</div>
+          <div style="font-size:18px;font-weight:800;color:var(--accent2)">10₽</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Download -->
+    <div class="pd-tab-content" id="tab-download">
+      <div class="dl-grid">
+        <div class="dl-card">
+          <div class="dl-os">🪟</div>
+          <h4>Windows</h4>
+          <p>Windows 10/11 (x64)</p>
+          <a class="btn btn-primary" href="#" data-i18n="dl_btn">Скачать v5.0</a>
+        </div>
+        <div class="dl-card" style="opacity:.5">
+          <div class="dl-os">🤖</div>
+          <h4>Android</h4>
+          <p>Android 8.0+</p>
+          <button class="btn btn-ghost" disabled data-i18n="dl_soon">Скоро</button>
+        </div>
+        <div class="dl-card" style="opacity:.5">
+          <div class="dl-os">🍎</div>
+          <h4>macOS</h4>
+          <p>macOS 12+</p>
+          <button class="btn btn-ghost" disabled data-i18n="dl_soon">Скоро</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Legal -->
+    <div class="pd-tab-content" id="tab-legal">
+      <div style="max-width:700px">
+        <div class="legal-item" onclick="toggleLegal(this)">
+          <div class="legal-header"><span data-i18n="leg1_t">Пользовательское соглашение</span><span class="arrow">▼</span></div>
+          <div class="legal-body"><div class="legal-body-inner" data-i18n="leg1_b">Используя MrDogez Ultimate, вы соглашаетесь с условиями использования. Программа предоставляется «как есть» без каких-либо гарантий. Разработчик не несёт ответственности за использование программы в нарушение законодательства вашей страны. Все пользователи несут личную ответственность за соблюдение применимых законов.</div></div>
+        </div>
+        <div class="legal-item" onclick="toggleLegal(this)">
+          <div class="legal-header"><span data-i18n="leg2_t">Политика конфиденциальности</span><span class="arrow">▼</span></div>
+          <div class="legal-body"><div class="legal-body-inner" data-i18n="leg2_b">MrDogez Ultimate не собирает персональные данные, не ведёт логов трафика и не передаёт информацию третьим лицам. Мы храним только email и хэш пароля для авторизации. Весь трафик шифруется WireGuard и не может быть перехвачен.</div></div>
+        </div>
+        <div class="legal-item" onclick="toggleLegal(this)">
+          <div class="legal-header"><span data-i18n="leg3_t">Политика возврата</span><span class="arrow">▼</span></div>
+          <div class="legal-body"><div class="legal-body-inner" data-i18n="leg3_b">Возврат средств возможен в течение 24 часов после покупки, если услуга не была использована. Для запроса возврата свяжитесь через Telegram. Цифровые товары (трафик, буст скорости) возврату не подлежат после активации.</div></div>
+        </div>
+        <div class="legal-item" onclick="toggleLegal(this)">
+          <div class="legal-header"><span data-i18n="leg4_t">Условия подписки Premium</span><span class="arrow">▼</span></div>
+          <div class="legal-body"><div class="legal-body-inner" data-i18n="leg4_b">Premium-подписка активна 30 дней с момента оплаты. Автоматическое продление не производится. После истечения срока аккаунт возвращается на бесплатный тариф. Неиспользованные дни не компенсируются.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE: Contacts
+     ═══════════════════════════════════════════════════════════ -->
+<div id="page-contacts" class="page">
+  <div class="wrap" style="max-width:600px">
+    <div style="padding-top:20px"><a onclick="goHome()" style="font-size:13px;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:color .2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">← <span data-i18n="back">Назад</span></a></div>
+    <div style="padding:60px 0">
+      <div class="section-label" data-i18n="contacts_label">КОНТАКТЫ</div>
+      <div class="section-title" style="margin-bottom:32px" data-i18n="contacts_title">Связаться</div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <a href="https://t.me/MrDogez" target="_blank" style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-radius:14px;background:var(--card);border:1px solid var(--border);transition:all .2s">
+          <span style="font-size:24px">💬</span>
+          <div><div style="font-size:14px;font-weight:700">Telegram</div><div style="font-size:12px;color:var(--text3)">@MrDogez</div></div>
+        </a>
+        <a href="https://github.com/MrDogez" target="_blank" style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-radius:14px;background:var(--card);border:1px solid var(--border);transition:all .2s">
+          <span style="font-size:24px">🐙</span>
+          <div><div style="font-size:14px;font-weight:700">GitHub</div><div style="font-size:12px;color:var(--text3)">MrDogez</div></div>
+        </a>
+        <a href="mailto:danil.guslyakov.11@bk.ru" style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-radius:14px;background:var(--card);border:1px solid var(--border);transition:all .2s">
+          <span style="font-size:24px">📧</span>
+          <div><div style="font-size:14px;font-weight:700">Email</div><div style="font-size:12px;color:var(--text3)">danil.guslyakov.11@bk.ru</div></div>
+        </a>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- ═══════════ PRICING ═══════════ -->
-<section id="pricing">
-  <div class="sec-tag rv" style="display:inline-block">Тарифы</div>
-  <div class="sec-h rv">Планы <span class="thin">и цены</span></div>
-  <div class="sec-desc rv">MrDogez Ultimate — выберите подходящий план</div>
-
-  <div class="price-row rv">
-    <div class="price-box">
-      <div class="price-title">Бесплатный</div>
-      <div class="price-amount">0 &#8381; <span>/ навсегда</span></div>
-      <ul class="price-list">
-        <li class="ok">DPI bypass — 27 стратегий</li>
-        <li class="ok">WARP подключение</li>
-        <li class="ok">5 прокси параллельно</li>
-        <li class="ok">3 профиля WARP</li>
-        <li class="ok">5 ГБ трафика / мес</li>
-        <li class="ok">Базовые DNS</li>
-        <li class="no">Скорость до 1 МБ/с</li>
-        <li class="no">Авто-TUN</li>
-        <li class="no">Гео-фильтр EU</li>
-      </ul>
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER (shown on all pages)
+     ═══════════════════════════════════════════════════════════ -->
+<footer id="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4 data-i18n="ft_nav">Навигация</h4>
+        <a onclick="goHome()" data-i18n="nav_home">Главная</a>
+        <a onclick="scrollToId('projects')" data-i18n="nav_projects">Проекты</a>
+        <a onclick="showPage('mdu')" data-i18n="ft_mdu">MrDogez Ultimate</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="ft_legal">Документы</h4>
+        <a onclick="showPage('mdu');setTimeout(()=>mduTab('legal'),100)" data-i18n="leg1_t">Пользовательское соглашение</a>
+        <a onclick="showPage('mdu');setTimeout(()=>mduTab('legal'),100)" data-i18n="leg2_t">Политика конфиденциальности</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="ft_links">Ссылки</h4>
+        <a href="https://github.com/MrDogez" target="_blank">GitHub</a>
+        <a href="https://t.me/MrDogez" target="_blank">Telegram</a>
+        <a onclick="showPage('contacts')" data-i18n="nav_contacts">Контакты</a>
+      </div>
     </div>
-    <div class="price-box featured">
-      <div class="featured-tag">Premium</div>
-      <div class="price-title">Premium</div>
-      <div class="price-amount">199 &#8381; <span>/ 30 дней</span></div>
-      <ul class="price-list">
-        <li class="ok">Всё из бесплатного плана</li>
-        <li class="ok">20 параллельных прокси</li>
-        <li class="ok">Безлимитный трафик</li>
-        <li class="ok">Безлимитная скорость</li>
-        <li class="ok">Безлимитные профили</li>
-        <li class="ok">Авто-TUN режим</li>
-        <li class="ok">Гео-фильтр EU</li>
-        <li class="ok">Мониторинг качества</li>
-        <li class="ok">Разблокировка РФ</li>
-        <li class="ok">Все DNS серверы</li>
-      </ul>
+    <div class="footer-bottom">
+      <span>© 2025–2026 MrDogez. All rights reserved.</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite"></span> <span data-i18n="ft_status">Все системы работают</span></span>
     </div>
-  </div>
-
-  <div class="add-row">
-    <div class="add-box rv rv-s1"><h4>+5 ГБ трафика</h4><div class="sub">Дополнительный трафик к текущему плану</div><div class="val">49 &#8381;</div></div>
-    <div class="add-box rv rv-s2"><h4>+20 ГБ трафика</h4><div class="sub">Популярный выбор</div><div class="val">149 &#8381;</div></div>
-    <div class="add-box rv rv-s3"><h4>Буст скорости</h4><div class="sub">Снятие лимита 1 МБ/с на 30 дней</div><div class="val">99 &#8381;</div></div>
-  </div>
-
-  <div class="pay-info rv">
-    <div class="ttl">Способы оплаты</div>
-    <div class="mth">Банковские карты (Visa, MasterCard, МИР) &bull; СБП &bull; ЮMoney &bull; Криптовалюта</div>
-  </div>
-</section>
-
-<!-- ═══════════ CONTACTS ═══════════ -->
-<section id="contacts">
-  <div class="sec-tag rv" style="display:inline-block">Контакты</div>
-  <div class="sec-h rv">Свяжитесь <span class="thin">с нами</span></div>
-  <div class="sec-desc rv">Поддержка и обратная связь</div>
-
-  <div class="contact-row">
-    <div class="c-card rv rv-s1"><div class="ci">&#x1f4ac;</div><h4>Поддержка</h4><p><a href="https://t.me/MrDogez">@MrDogez</a><br><span style="font-size:10px;color:var(--text3)">Telegram &bull; ответ до 24ч</span></p></div>
-    <div class="c-card rv rv-s2"><div class="ci">&#x1f4e2;</div><h4>Канал</h4><p><a href="https://t.me/MrDogezProject">@MrDogezProject</a><br><span style="font-size:10px;color:var(--text3)">Новости и обновления</span></p></div>
-    <div class="c-card rv rv-s3"><div class="ci">&#x1f4e7;</div><h4>Email</h4><p><a href="mailto:mrdogezproject@gmail.com">mrdogezproject@gmail.com</a></p></div>
-  </div>
-</section>
-
-<!-- ═══════════ LEGAL ═══════════ -->
-<section id="legal" class="legal-section">
-  <div class="sec-tag rv" style="display:inline-block">Документы</div>
-  <div class="sec-h rv" style="margin-bottom:40px">Правовая <span class="thin">информация</span></div>
-
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Описание услуг<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
-    <p>MrDogez Project — программное обеспечение для оптимизации сетевого подключения на платформе Windows. Сервис предоставляет инструменты для улучшения качества интернет-соединения, обхода ограничений и защиты приватности.</p>
-    <h3>Состав услуг</h3>
-    <ul>
-      <li>DPI Bypass — оптимизация маршрутизации трафика (27 стратегий: Fake TLS, multi-split, ECH-bypass, badack-increment и другие)</li>
-      <li>WARP Tunnel — защищённое подключение через сеть Cloudflare с автоматическим подбором endpoint</li>
-      <li>DNS-over-HTTPS — шифрование DNS-запросов для повышения приватности (20+ серверов)</li>
-      <li>Мониторинг сети — отслеживание качества подключения, пинг сервисов, статистика трафика</li>
-      <li>Автоматическое управление — watchdog, авто-переподключение, hot-swap прокси, ISP-кэширование</li>
-      <li>MITM-защита — автоматическое обнаружение и блокировка перехватывающих прокси</li>
-      <li>Premium-подписка — расширенные возможности (безлимитная скорость, 20 параллельных прокси, Авто-TUN)</li>
-    </ul>
-    <h3>Способ предоставления</h3>
-    <p>Услуги предоставляются в электронном виде посредством программного обеспечения, устанавливаемого на компьютер пользователя. Доставка физических товаров не осуществляется. Доступ к платным функциям активируется автоматически после подтверждения оплаты платёжной системой.</p>
-    <h3>Тарифные планы</h3>
-    <ul>
-      <li>Бесплатный — базовый DPI bypass, 5 ГБ трафика/мес, скорость до 1 МБ/с, 3 профиля, базовые DNS</li>
-      <li>Premium (199 ₽/30 дней) — безлимитный трафик и скорость, 20 прокси, Авто-TUN, гео-фильтр EU, все DNS</li>
-      <li>Дополнительный трафик: +5 ГБ (49 ₽), +20 ГБ (149 ₽)</li>
-      <li>Буст скорости (99 ₽/30 дней) — снятие ограничения скорости без Premium</li>
-    </ul>
-    <h3>Системные требования</h3>
-    <ul>
-      <li>Операционная система: Windows 10 / 11 (x64)</li>
-      <li>Подключение к интернету</li>
-      <li>Права администратора (для некоторых функций DPI bypass)</li>
-    </ul>
-  </div></div></div>
-
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Условия возврата и отмены платежа<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
-    <p>Возврат денежных средств осуществляется в соответствии с законодательством РФ и настоящими условиями.</p>
-    <h3>Основания для возврата</h3>
-    <ul>
-      <li>Услуга не была предоставлена по техническим причинам со стороны сервиса</li>
-      <li>Произошло двойное или ошибочное списание средств</li>
-      <li>Запрос на возврат подан в течение 24 часов с момента оплаты при условии, что услуга не была активирована или использована</li>
-      <li>Существенное несоответствие предоставленной услуги заявленному описанию</li>
-    </ul>
-    <h3>Порядок оформления возврата</h3>
-    <p>1. Направьте заявку в поддержку: <a href="https://t.me/MrDogez">@MrDogez</a> (Telegram) или <a href="mailto:mrdogezproject@gmail.com">mrdogezproject@gmail.com</a>.</p>
-    <p>2. Укажите: email аккаунта, дату и сумму платежа, причину возврата.</p>
-    <p>3. Срок рассмотрения: до 3 рабочих дней.</p>
-    <p>4. Возврат средств производится тем же способом оплаты в срок до 10 рабочих дней после одобрения.</p>
-    <h3>Возврат не осуществляется</h3>
-    <ul>
-      <li>Если с момента оплаты прошло более 24 часов и услуга была активирована</li>
-      <li>При нарушении пользователем условий использования</li>
-      <li>Если пользователь использовал более 50% оплаченного трафика</li>
-      <li>При отказе предоставить информацию для идентификации платежа</li>
-    </ul>
-    <h3>Частичный возврат</h3>
-    <p>При частичном использовании услуги возможен частичный возврат пропорционально неиспользованному периоду. Решение принимается индивидуально.</p>
-  </div></div></div>
-
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Политика конфиденциальности<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
-    <p>MrDogez Project обрабатывает персональные данные в соответствии с ФЗ от 27.07.2006 № 152-ФЗ «О персональных данных».</p>
-    <h3>1. Собираемые данные</h3>
-    <ul>
-      <li>Email адрес — для регистрации, авторизации, восстановления доступа и уведомлений</li>
-      <li>Данные об использовании трафика — для учёта в рамках тарифного плана</li>
-      <li>Техническая информация — тип ОС, версия приложения (для диагностики)</li>
-      <li>Данные о платежах — обрабатываются платёжной системой, мы не храним данные банковских карт</li>
-    </ul>
-    <h3>2. Цели обработки</h3>
-    <ul>
-      <li>Предоставление доступа к сервису и его функциям</li>
-      <li>Учёт оплаченных услуг и тарифных планов</li>
-      <li>Техническая поддержка пользователей</li>
-      <li>Улучшение качества сервиса</li>
-    </ul>
-    <h3>3. Хранение и защита</h3>
-    <p>Персональные данные хранятся на устройстве пользователя и на защищённых серверах. Пароли хранятся исключительно в захешированном виде (PBKDF2-SHA256). Применяются технические меры защиты от несанкционированного доступа.</p>
-    <h3>4. Передача третьим лицам</h3>
-    <p>Персональные данные не продаются, не передаются и не раскрываются третьим лицам, за исключением случаев, предусмотренных законодательством РФ.</p>
-    <h3>5. Права пользователя</h3>
-    <ul>
-      <li>Получить информацию об обрабатываемых данных</li>
-      <li>Запросить исправление или удаление своих данных</li>
-      <li>Отозвать согласие на обработку</li>
-    </ul>
-    <p>Для реализации прав: <a href="mailto:mrdogezproject@gmail.com">mrdogezproject@gmail.com</a></p>
-  </div></div></div>
-
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Публичная оферта<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
-    <p>Настоящий документ является публичной офертой в соответствии со ст. 437 ГК РФ.</p>
-    <h3>1. Предмет договора</h3>
-    <p>Исполнитель (MrDogez Project) предоставляет Заказчику доступ к функциям Сервиса на условиях выбранного тарифного плана. Перечень функций указан в разделе «Тарифы».</p>
-    <h3>2. Порядок оплаты</h3>
-    <p>Оплата производится через платёжные системы. Стоимость указана в рублях РФ. Доступ предоставляется автоматически после подтверждения. Исполнитель вправе изменять цены с предварительным уведомлением.</p>
-    <h3>3. Обязанности сторон</h3>
-    <p>Исполнитель обязуется: обеспечить доступ к оплаченным функциям, осуществлять поддержку, уведомлять об изменениях. Заказчик обязуется: использовать сервис по назначению, не передавать аккаунт третьим лицам, не использовать в противоправных целях.</p>
-    <h3>4. Ответственность</h3>
-    <p>Сервис предоставляется «как есть» (as is). Исполнитель не несёт ответственности за работу интернет-провайдеров, временную недоступность по независящим причинам, действия третьих лиц.</p>
-    <h3>5. Акцепт</h3>
-    <p>Оплата является полным и безоговорочным акцептом настоящей оферты. Совершая оплату, Заказчик подтверждает согласие с условиями оферты, политикой конфиденциальности и условиями возврата.</p>
-    <h3>6. Срок действия</h3>
-    <p>Оферта действует бессрочно до момента её отзыва. Продолжение использования сервиса после изменений означает согласие с новыми условиями.</p>
-    <h3>7. Разрешение споров</h3>
-    <p>Споры разрешаются путём переговоров. При невозможности — в соответствии с законодательством РФ.</p>
-  </div></div></div>
-
-  <div class="leg rv"><button class="leg-btn" onclick="this.parentElement.classList.toggle('on')">Условия использования<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="leg-body"><div class="leg-content">
-    <h3>Разрешённое использование</h3>
-    <ul>
-      <li>Личное некоммерческое использование на собственных устройствах</li>
-      <li>Оптимизация собственного интернет-подключения</li>
-      <li>Доступ к легальному контенту и сервисам</li>
-    </ul>
-    <h3>Запрещённое использование</h3>
-    <ul>
-      <li>Использование в противоправных целях</li>
-      <li>Распространение вредоносного ПО через сервис</li>
-      <li>Попытки обхода системы тарификации</li>
-      <li>Передача доступа к аккаунту третьим лицам</li>
-      <li>Реверс-инжиниринг и декомпиляция ПО</li>
-    </ul>
-    <h3>Приостановка доступа</h3>
-    <p>Исполнитель оставляет за собой право приостановить доступ без предварительного уведомления при нарушении условий использования.</p>
-  </div></div></div>
-</section>
-
-<!-- ═══════════ FOOTER ═══════════ -->
-<footer>
-  <div class="foot-left">
-    <img src="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png" alt="">
-    <span>&copy; 2026 MrDogez Project</span>
-  </div>
-  <div class="foot-right">
-    <a href="#about">О нас</a>
-    <a href="#projects">Проекты</a>
-    <a href="#pricing">Тарифы</a>
-    <a href="#contacts">Контакты</a>
-    <a href="https://t.me/MrDogezProject">Telegram</a>
   </div>
 </footer>
 
+<!-- ═══════════════════════════════════════════════════════════
+     AUTH MODAL
+     ═══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeAuth()">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <h2 id="authTitle" data-i18n="auth_login">Вход</h2>
+    <div class="modal-sub" id="authSub" data-i18n="auth_login_sub">Войдите чтобы управлять подпиской и покупками</div>
+    <div id="authForm">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="authEmail" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label data-i18n="auth_pass">Пароль</label>
+        <input type="password" id="authPass" placeholder="••••••••">
+      </div>
+      <div class="form-msg" id="authMsg"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="authSubmit()" id="authSubmitBtn" data-i18n="auth_login">Вход</button>
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text3)">
+        <span id="authToggleText" data-i18n="auth_no_acc">Нет аккаунта?</span>
+        <a style="color:var(--accent2);cursor:pointer;font-weight:600" onclick="toggleAuthMode()" id="authToggleBtn" data-i18n="auth_register">Регистрация</a>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ═══════════ SCRIPTS ═══════════ -->
+<!-- ═══════════════════════════════════════════════════════════
+     COOKIE CONSENT
+     ═══════════════════════════════════════════════════════════ -->
+<div class="cookie-bar" id="cookieBar">
+  <p data-i18n="cookie_text">Мы используем cookies для улучшения работы сайта. Продолжая, вы соглашаетесь с нашей политикой конфиденциальности.</p>
+  <button class="btn btn-primary" style="padding:10px 24px;font-size:13px" onclick="acceptCookies()" data-i18n="cookie_btn">Принять</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════════════════ -->
 <script>
-// Nav scroll effect
-var nav=document.getElementById('nav');
-window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',scrollY>60)});
+/* ════ i18n ════════════════════════════════════════════════════ */
+const I18N = {
+  ru: {
+    nav_home:'Главная',nav_about:'О нас',nav_projects:'Проекты',nav_account:'Аккаунт',nav_contacts:'Контакты',
+    hero_badge:'Open Source & Privacy First',hero_t1:'Инструменты для',hero_t2:'свободного интернета',
+    hero_desc:'Создаю программы, которые помогают обходить блокировки, защищать трафик и сохранять приватность. Без рекламы. Без слежки.',
+    hero_btn1:'Смотреть проекты',
+    about_label:'О ПРОЕКТЕ',about_title:'Зачем всё это?',about_desc:'Я верю, что интернет должен быть свободным. Каждый инструмент — шаг к открытому цифровому миру.',
+    ab1_t:'Приватность',ab1_d:'Никакой телеметрии, логов и трекеров. Ваш трафик — только ваше дело.',
+    ab2_t:'Скорость',ab2_d:'Интеллектуальный подбор прокси, параллельное тестирование и кэширование.',
+    ab3_t:'Безопасность',ab3_d:'MITM-защита, шифрование WireGuard, DNS-over-HTTPS.',
+    proj_label:'ПРОЕКТЫ',proj_title:'Наши инструменты',proj_desc:'Каждый проект решает конкретную проблему. Нажмите «Подробнее» чтобы узнать больше.',
+    mdu_short:'Комплексное решение для обхода интернет-блокировок и защищённого VPN-подключения. 27 стратегий DPI bypass, Cloudflare WARP туннель, MITM-защита.',
+    soon_title:'Новый проект',soon_desc:'Следующий инструмент уже в разработке. Следите за обновлениями.',
+    back:'Назад',mdu_sub:'Обход блокировок + защищённый VPN',
+    tab_overview:'Обзор',tab_features:'Возможности',tab_pricing:'Тарифы',tab_download:'Скачать',tab_legal:'Документы',
+    ov_title:'Что это?',
+    ov_desc1:'MrDogez Ultimate — приложение для Windows, которое помогает обходить интернет-блокировки используя 27 стратегий DPI bypass и защищённый Cloudflare WARP туннель на протоколе WireGuard.',
+    ov_desc2:'Интеллектуальная система автоматически определяет вашего провайдера, подбирает оптимальный метод подключения и защищает от MITM-атак.',
+    ov_s1:'Стратегий DPI',ov_s2:'DNS серверов',ov_s3:'Типа туннелей',
+    f1:'27 стратегий обхода блокировок с авто-подбором',f2:'Cloudflare WARP через WireGuard протокол',
+    f3t:'Умное подключение',f3:'ISP-кэширование, параллельный подбор прокси',
+    f4t:'MITM защита',f4:'TLS-верификация, чёрный список MITM-прокси',
+    f5t:'Мониторинг',f5:'Статистика трафика, пинг, качество соединения',
+    f6t:'Авто-реконнект',f6:'Hot-swap мгновенное переподключение',
+    f7:'20+ защищённых DNS серверов',f8:'Бесплатные прокси с параллельным тестом',
+    f9t:'Premium',f9:'Безлимит скорости, трафик, VIP-серверы',
+    plan_free:'Бесплатно',plan_free_d:'Базовый доступ навсегда',plan_free_btn:'Скачать бесплатно',
+    pf1:'DPI Bypass (27 стратегий)',pf2:'WARP подключение',pf3:'5 ГБ трафика/мес',pf4:'Скорость до 1 МБ/с',pf5:'20+ DNS серверов',pf6:'3 профиля WARP',
+    plan_prem:'Premium',plan_per:'/ 30 дней',plan_prem_d:'Максимальные возможности',plan_prem_btn:'Купить Premium',
+    pp1:'Всё из бесплатного',pp2:'Безлимит скорости',pp3:'Безлимит трафика',pp4:'20 параллельных прокси',pp5:'VIP-серверы EU',pp6:'Авто-TUN режим',pp7:'Приоритетная поддержка',
+    addons_title:'Дополнения',addon_traffic:'Пакет трафика',addon_boost:'Буст скорости',addon_boost_d:'30 дней',
+    dl_btn:'Скачать v5.0',dl_soon:'Скоро',
+    leg1_t:'Пользовательское соглашение',leg2_t:'Политика конфиденциальности',leg3_t:'Политика возврата',leg4_t:'Условия подписки Premium',
+    leg1_b:'Используя MrDogez Ultimate, вы соглашаетесь с условиями использования. Программа предоставляется «как есть» без каких-либо гарантий. Разработчик не несёт ответственности за использование программы в нарушение законодательства вашей страны.',
+    leg2_b:'MrDogez Ultimate не собирает персональные данные, не ведёт логов трафика и не передаёт информацию третьим лицам. Мы храним только email и хэш пароля для авторизации.',
+    leg3_b:'Возврат средств возможен в течение 24 часов после покупки, если услуга не была использована. Для запроса возврата свяжитесь через Telegram.',
+    leg4_b:'Premium-подписка активна 30 дней с момента оплаты. Автоматическое продление не производится. После истечения срока аккаунт возвращается на бесплатный тариф.',
+    contacts_label:'КОНТАКТЫ',contacts_title:'Связаться',
+    ft_nav:'Навигация',ft_legal:'Документы',ft_links:'Ссылки',ft_mdu:'MrDogez Ultimate',ft_status:'Все системы работают',
+    auth_login:'Вход',auth_login_sub:'Войдите чтобы управлять подпиской и покупками',
+    auth_pass:'Пароль',auth_no_acc:'Нет аккаунта?',auth_register:'Регистрация',auth_has_acc:'Уже есть аккаунт?',
+    auth_reg:'Регистрация',auth_reg_sub:'Создайте аккаунт для покупок и управления подпиской',
+    cookie_text:'Мы используем cookies для улучшения работы сайта. Продолжая, вы соглашаетесь с нашей политикой конфиденциальности.',
+    cookie_btn:'Принять',
+  },
+  en: {
+    nav_home:'Home',nav_about:'About',nav_projects:'Projects',nav_account:'Account',nav_contacts:'Contacts',
+    hero_badge:'Open Source & Privacy First',hero_t1:'Tools for a',hero_t2:'free internet',
+    hero_desc:'I build software that helps bypass censorship, protect traffic and preserve privacy. No ads. No tracking.',
+    hero_btn1:'View projects',
+    about_label:'ABOUT',about_title:'Why all this?',about_desc:'I believe the internet should be free. Every tool is a step towards an open digital world.',
+    ab1_t:'Privacy',ab1_d:'No telemetry, no logs, no trackers. Your traffic is your business.',
+    ab2_t:'Speed',ab2_d:'Smart proxy selection, parallel testing and ISP caching for instant connections.',
+    ab3_t:'Security',ab3_d:'MITM protection, WireGuard encryption, DNS-over-HTTPS.',
+    proj_label:'PROJECTS',proj_title:'Our tools',proj_desc:'Each project solves a specific problem. Click "Details" to learn more.',
+    mdu_short:'Complete solution for bypassing internet blocks and secure VPN connections. 27 DPI bypass strategies, Cloudflare WARP tunnel, MITM protection.',
+    soon_title:'New project',soon_desc:'The next tool is already in development. Stay tuned.',
+    back:'Back',mdu_sub:'Bypass blocks + secure VPN',
+    tab_overview:'Overview',tab_features:'Features',tab_pricing:'Pricing',tab_download:'Download',tab_legal:'Legal',
+    ov_title:'What is it?',
+    ov_desc1:'MrDogez Ultimate is a Windows app that helps bypass internet blocks using 27 DPI bypass strategies and a secure Cloudflare WARP tunnel over WireGuard protocol.',
+    ov_desc2:'The smart system automatically detects your ISP, selects the optimal connection method and protects against MITM attacks.',
+    ov_s1:'DPI strategies',ov_s2:'DNS servers',ov_s3:'Tunnel types',
+    f1:'27 bypass strategies with auto-selection',f2:'Cloudflare WARP over WireGuard',
+    f3t:'Smart Connect',f3:'ISP caching, parallel proxy selection',
+    f4t:'MITM Protection',f4:'TLS verification, MITM proxy blacklist',
+    f5t:'Monitoring',f5:'Traffic stats, ping, connection quality',
+    f6t:'Auto-reconnect',f6:'Instant hot-swap reconnection',
+    f7:'20+ secure DNS servers',f8:'Free proxies with parallel testing',
+    f9t:'Premium',f9:'Unlimited speed, traffic, VIP servers',
+    plan_free:'Free',plan_free_d:'Basic access forever',plan_free_btn:'Download free',
+    pf1:'DPI Bypass (27 strategies)',pf2:'WARP connection',pf3:'5 GB traffic/month',pf4:'Speed up to 1 MB/s',pf5:'20+ DNS servers',pf6:'3 WARP profiles',
+    plan_prem:'Premium',plan_per:'/ 30 days',plan_prem_d:'Maximum capabilities',plan_prem_btn:'Buy Premium',
+    pp1:'Everything from Free',pp2:'Unlimited speed',pp3:'Unlimited traffic',pp4:'20 parallel proxies',pp5:'VIP EU servers',pp6:'Auto-TUN mode',pp7:'Priority support',
+    addons_title:'Add-ons',addon_traffic:'Traffic pack',addon_boost:'Speed boost',addon_boost_d:'30 days',
+    dl_btn:'Download v5.0',dl_soon:'Coming soon',
+    leg1_t:'Terms of Service',leg2_t:'Privacy Policy',leg3_t:'Refund Policy',leg4_t:'Premium Subscription Terms',
+    leg1_b:'By using MrDogez Ultimate, you agree to the terms of use. The software is provided "as is" without warranties. The developer is not liable for use violating your country\'s laws.',
+    leg2_b:'MrDogez Ultimate does not collect personal data, keep traffic logs, or share information with third parties. We only store email and password hash for authorization.',
+    leg3_b:'Refunds are available within 24 hours of purchase if the service has not been used. Contact via Telegram for refund requests.',
+    leg4_b:'Premium subscription is active for 30 days from purchase. No auto-renewal. After expiry, the account returns to the free plan.',
+    contacts_label:'CONTACTS',contacts_title:'Get in touch',
+    ft_nav:'Navigation',ft_legal:'Legal',ft_links:'Links',ft_mdu:'MrDogez Ultimate',ft_status:'All systems operational',
+    auth_login:'Sign in',auth_login_sub:'Sign in to manage subscriptions and purchases',
+    auth_pass:'Password',auth_no_acc:'No account?',auth_register:'Sign up',auth_has_acc:'Already have an account?',
+    auth_reg:'Sign up',auth_reg_sub:'Create an account for purchases and subscription management',
+    cookie_text:'We use cookies to improve the website. By continuing, you agree to our privacy policy.',
+    cookie_btn:'Accept',
+  },
+  ua: {
+    nav_home:'Головна',nav_about:'Про нас',nav_projects:'Проєкти',nav_account:'Акаунт',nav_contacts:'Контакти',
+    hero_badge:'Open Source & Privacy First',hero_t1:'Інструменти для',hero_t2:'вільного інтернету',
+    hero_desc:'Створюю програми, які допомагають обходити блокування, захищати трафік та зберігати приватність. Без реклами. Без стеження.',
+    hero_btn1:'Дивитись проєкти',
+    about_label:'ПРО ПРОЄКТ',about_title:'Навіщо це все?',about_desc:'Я вірю, що інтернет має бути вільним. Кожен інструмент — крок до відкритого цифрового світу.',
+    ab1_t:'Приватність',ab1_d:'Жодної телеметрії, логів та трекерів. Ваш трафік — тільки ваша справа.',
+    ab2_t:'Швидкість',ab2_d:'Інтелектуальний підбір проксі, паралельне тестування та кешування.',
+    ab3_t:'Безпека',ab3_d:'MITM-захист, шифрування WireGuard, DNS-over-HTTPS.',
+    proj_label:'ПРОЄКТИ',proj_title:'Наші інструменти',proj_desc:'Кожен проєкт вирішує конкретну проблему. Натисніть «Детальніше» щоб дізнатися більше.',
+    mdu_short:'Комплексне рішення для обходу інтернет-блокувань та захищеного VPN-підключення. 27 стратегій DPI bypass, Cloudflare WARP тунель, MITM-захист.',
+    soon_title:'Новий проєкт',soon_desc:'Наступний інструмент вже в розробці. Слідкуйте за оновленнями.',
+    back:'Назад',mdu_sub:'Обхід блокувань + захищений VPN',
+    tab_overview:'Огляд',tab_features:'Можливості',tab_pricing:'Тарифи',tab_download:'Завантажити',tab_legal:'Документи',
+    ov_title:'Що це?',
+    ov_desc1:'MrDogez Ultimate — додаток для Windows, який допомагає обходити інтернет-блокування використовуючи 27 стратегій DPI bypass та захищений Cloudflare WARP тунель на протоколі WireGuard.',
+    ov_desc2:'Інтелектуальна система автоматично визначає вашого провайдера, підбирає оптимальний метод підключення та захищає від MITM-атак.',
+    ov_s1:'Стратегій DPI',ov_s2:'DNS серверів',ov_s3:'Типи тунелів',
+    f1:'27 стратегій обходу блокувань з авто-підбором',f2:'Cloudflare WARP через WireGuard протокол',
+    f3t:'Розумне підключення',f3:'ISP-кешування, паралельний підбір проксі',
+    f4t:'MITM захист',f4:'TLS-верифікація, чорний список MITM-проксі',
+    f5t:'Моніторинг',f5:'Статистика трафіку, пінг, якість з\'єднання',
+    f6t:'Авто-реконект',f6:'Hot-swap миттєве перепідключення',
+    f7:'20+ захищених DNS серверів',f8:'Безкоштовні проксі з паралельним тестом',
+    f9t:'Premium',f9:'Безліміт швидкості, трафік, VIP-сервери',
+    plan_free:'Безкоштовно',plan_free_d:'Базовий доступ назавжди',plan_free_btn:'Завантажити безкоштовно',
+    pf1:'DPI Bypass (27 стратегій)',pf2:'WARP підключення',pf3:'5 ГБ трафіку/міс',pf4:'Швидкість до 1 МБ/с',pf5:'20+ DNS серверів',pf6:'3 профілі WARP',
+    plan_prem:'Premium',plan_per:'/ 30 днів',plan_prem_d:'Максимальні можливості',plan_prem_btn:'Купити Premium',
+    pp1:'Все з безкоштовного',pp2:'Безліміт швидкості',pp3:'Безліміт трафіку',pp4:'20 паралельних проксі',pp5:'VIP-сервери EU',pp6:'Авто-TUN режим',pp7:'Пріоритетна підтримка',
+    addons_title:'Доповнення',addon_traffic:'Пакет трафіку',addon_boost:'Буст швидкості',addon_boost_d:'30 днів',
+    dl_btn:'Завантажити v5.0',dl_soon:'Скоро',
+    leg1_t:'Угода користувача',leg2_t:'Політика конфіденційності',leg3_t:'Політика повернення',leg4_t:'Умови підписки Premium',
+    leg1_b:'Використовуючи MrDogez Ultimate, ви погоджуєтесь з умовами використання. Програма надається «як є» без будь-яких гарантій.',
+    leg2_b:'MrDogez Ultimate не збирає персональні дані, не веде логів трафіку і не передає інформацію третім особам.',
+    leg3_b:'Повернення коштів можливе протягом 24 годин після покупки, якщо послуга не була використана.',
+    leg4_b:'Premium-підписка активна 30 днів з моменту оплати. Автоматичне продовження не здійснюється.',
+    contacts_label:'КОНТАКТИ',contacts_title:'Зв\'язатися',
+    ft_nav:'Навігація',ft_legal:'Документи',ft_links:'Посилання',ft_mdu:'MrDogez Ultimate',ft_status:'Всі системи працюють',
+    auth_login:'Вхід',auth_login_sub:'Увійдіть щоб керувати підпискою та покупками',
+    auth_pass:'Пароль',auth_no_acc:'Немає акаунту?',auth_register:'Реєстрація',auth_has_acc:'Вже є акаунт?',
+    auth_reg:'Реєстрація',auth_reg_sub:'Створіть акаунт для покупок та керування підпискою',
+    cookie_text:'Ми використовуємо cookies для покращення роботи сайту. Продовжуючи, ви погоджуєтесь з нашою політикою конфіденційності.',
+    cookie_btn:'Прийняти',
+  }
+};
 
-// Scroll reveal
-var observer=new IntersectionObserver(function(entries){
-  entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('v');observer.unobserve(e.target)}});
-},{threshold:.06,rootMargin:'0px 0px -40px 0px'});
-document.querySelectorAll('.rv').forEach(function(el){observer.observe(el)});
+let currentLang = localStorage.getItem('mrd_lang') || 'ru';
 
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(function(a){
-  a.addEventListener('click',function(e){
-    var t=document.querySelector(this.getAttribute('href'));
-    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}
+function applyLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('mrd_lang', lang);
+  document.documentElement.lang = lang === 'ua' ? 'uk' : lang;
+  document.getElementById('langLabel').textContent = lang.toUpperCase();
+  // Update active button
+  document.querySelectorAll('#langDd button').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(lang === 'ua' ? 'україн' : lang === 'en' ? 'english' : 'русск'));
   });
+  // Apply translations
+  const dict = I18N[lang] || I18N.ru;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) {
+      if (el.tagName === 'INPUT') el.placeholder = dict[key];
+      else el.textContent = dict[key];
+    }
+  });
+}
+function setLang(l) { applyLang(l); closeLangDd(); }
+function toggleLang() { document.getElementById('langSel').classList.toggle('open'); }
+function closeLangDd() { document.getElementById('langSel').classList.remove('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('.lang-sel')) closeLangDd(); });
+
+/* ════ Theme ═══════════════════════════════════════════════════ */
+let currentTheme = localStorage.getItem('mrd_theme') || 'dark';
+function applyTheme(t) {
+  currentTheme = t;
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('themeBtn').textContent = t === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('mrd_theme', t);
+}
+function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+
+/* ════ SPA Navigation ═════════════════════════════════════════ */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) { page.classList.add('active'); window.scrollTo({top: 0, behavior: 'smooth'}); }
+  // Re-trigger reveals
+  setTimeout(initReveals, 100);
+}
+function goHome() { showPage('home'); }
+function scrollToId(id) {
+  showPage('home');
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({behavior: 'smooth'});
+  }, 50);
+}
+
+/* ════ MrDogez Ultimate tabs ══════════════════════════════════ */
+function mduTab(name) {
+  document.querySelectorAll('#page-mdu .pd-tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#mduTabs button').forEach(b => b.classList.remove('active'));
+  const tab = document.getElementById('tab-' + name);
+  if (tab) tab.classList.add('active');
+  // Highlight button
+  const btns = document.querySelectorAll('#mduTabs button');
+  const names = ['overview','features','pricing','download','legal'];
+  const idx = names.indexOf(name);
+  if (idx >= 0 && btns[idx]) btns[idx].classList.add('active');
+}
+
+/* ════ Legal accordions ═══════════════════════════════════════ */
+function toggleLegal(el) { el.classList.toggle('open'); }
+
+/* ════ Mobile menu ════════════════════════════════════════════ */
+function toggleMobile() {
+  const m = document.getElementById('mobileMenu');
+  const b = document.getElementById('burger');
+  m.classList.toggle('open');
+  b.classList.toggle('open');
+}
+function closeMobile() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('burger').classList.remove('open');
+}
+
+/* ════ Auth modal ═════════════════════════════════════════════ */
+let authMode = 'login';
+function openAuth(action) {
+  document.getElementById('authModal').classList.add('open');
+  authMode = 'login';
+  updateAuthUI();
+}
+function closeAuth() { document.getElementById('authModal').classList.remove('open'); }
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  updateAuthUI();
+}
+function updateAuthUI() {
+  const d = I18N[currentLang] || I18N.ru;
+  if (authMode === 'login') {
+    document.getElementById('authTitle').textContent = d.auth_login;
+    document.getElementById('authSub').textContent = d.auth_login_sub;
+    document.getElementById('authSubmitBtn').textContent = d.auth_login;
+    document.getElementById('authToggleText').textContent = d.auth_no_acc + ' ';
+    document.getElementById('authToggleBtn').textContent = d.auth_register;
+  } else {
+    document.getElementById('authTitle').textContent = d.auth_reg;
+    document.getElementById('authSub').textContent = d.auth_reg_sub;
+    document.getElementById('authSubmitBtn').textContent = d.auth_reg;
+    document.getElementById('authToggleText').textContent = d.auth_has_acc + ' ';
+    document.getElementById('authToggleBtn').textContent = d.auth_login;
+  }
+  document.getElementById('authMsg').textContent = '';
+}
+function authSubmit() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pass = document.getElementById('authPass').value;
+  const msg = document.getElementById('authMsg');
+  if (!email || !pass) { msg.className = 'form-msg err'; msg.textContent = 'Fill all fields'; return; }
+  // TODO: connect to real auth API
+  msg.className = 'form-msg ok';
+  msg.textContent = authMode === 'login' ? 'Logged in!' : 'Registered!';
+  localStorage.setItem('mrd_web_user', email);
+  setTimeout(closeAuth, 1500);
+}
+
+/* ════ Cookies ════════════════════════════════════════════════ */
+function acceptCookies() {
+  localStorage.setItem('mrd_cookies', '1');
+  document.getElementById('cookieBar').classList.remove('show');
+}
+
+/* ════ Scroll effects ═════════════════════════════════════════ */
+function initReveals() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+  }, {threshold: 0.1});
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => obs.observe(el));
+}
+
+/* Nav scroll */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// Parallax orbs on scroll
-window.addEventListener('scroll',function(){
-  var y=scrollY;
-  document.querySelector('.orb-1').style.transform='translateY('+y*.06+'px)';
-  document.querySelector('.orb-2').style.transform='translateY('+-y*.04+'px)';
-});
+/* ════ Init ═══════════════════════════════════════════════════ */
+applyTheme(currentTheme);
+applyLang(currentLang);
+initReveals();
+// Cookie bar
+if (!localStorage.getItem('mrd_cookies')) {
+  setTimeout(() => document.getElementById('cookieBar').classList.add('show'), 1500);
+}
 </script>
 </body>
 </html>
