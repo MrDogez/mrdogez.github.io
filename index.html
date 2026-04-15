@@ -73,7 +73,8 @@ nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;disp
 .nb span{font-size:14px;font-weight:700;letter-spacing:-.02em}
 .nl{display:flex;gap:1px;flex:1;justify-content:center}
 .nl a{font-size:12.5px;color:var(--tx3);font-weight:500;padding:6px 13px;border-radius:9px;transition:all .15s;cursor:pointer;white-space:nowrap}
-.nl a:hover,.nl a.on{color:var(--tx);background:var(--sf2)}
+.nl a:hover{color:var(--tx);background:var(--sf2)}
+.nl a.on{color:var(--tx)}
 .nr{display:flex;align-items:center;gap:3px;flex-shrink:0}
 .nbtn{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .12s}
 .nbtn:hover{background:var(--sf2);color:var(--tx)}
@@ -241,12 +242,12 @@ nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;disp
 
 /* Legal */
 .leg{border-bottom:1px solid var(--bd)}
-.leg-h{display:flex;align-items:center;justify-content:space-between;padding:18px 0;cursor:pointer;font-size:14px;font-weight:600;color:var(--tx2);transition:color .15s}
+.leg-h{display:flex;align-items:center;justify-content:space-between;padding:20px 0;cursor:pointer;font-size:17px;font-weight:600;color:var(--tx2);transition:color .15s}
 .leg-h:hover{color:var(--tx)}
 .leg-h svg{width:14px;height:14px;transition:transform .3s var(--e);color:var(--tx3)}
 .leg.open .leg-h svg{transform:rotate(180deg)}
 .leg-b{max-height:0;overflow:hidden;transition:max-height .4s var(--e)}
-.leg.open .leg-b{max-height:400px}
+.leg.open .leg-b{max-height:2000px}
 .leg-bi{padding:0 0 18px;font-size:13px;color:var(--tx3);line-height:1.75}
 
 /* Addons */
@@ -300,10 +301,50 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
 .fmsg{font-size:10.5px;margin-top:5px;min-height:14px}
 .fmsg.err{color:var(--rd)}.fmsg.ok{color:var(--gn)}
 
-/* ═══ REVEAL ═══ */
-.rv{opacity:0;transform:translateY(20px);transition:opacity .6s var(--e),transform .6s var(--e)}
+/* ═══ REVEAL & ANIMATIONS ═══ */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .7s var(--e),transform .7s var(--e)}
 .rv.vis{opacity:1;transform:none}
-.rv-d1{transition-delay:.06s}.rv-d2{transition-delay:.12s}.rv-d3{transition-delay:.18s}.rv-d4{transition-delay:.24s}
+.rv-d1{transition-delay:.08s}.rv-d2{transition-delay:.16s}.rv-d3{transition-delay:.24s}.rv-d4{transition-delay:.32s}
+/* Slide from left */
+.rv-l{opacity:0;transform:translateX(-30px);transition:opacity .7s var(--e),transform .7s var(--e)}
+.rv-l.vis{opacity:1;transform:none}
+/* Slide from right */
+.rv-r{opacity:0;transform:translateX(30px);transition:opacity .7s var(--e),transform .7s var(--e)}
+.rv-r.vis{opacity:1;transform:none}
+/* Scale up */
+.rv-s{opacity:0;transform:scale(.92);transition:opacity .7s var(--e),transform .7s var(--e)}
+.rv-s.vis{opacity:1;transform:none}
+/* Glow pulse on hover for cards */
+.glow-hover{transition:all .35s var(--e)}
+.glow-hover:hover{box-shadow:0 0 40px -10px rgba(124,106,239,.2),0 16px 48px -12px rgba(0,0,0,.15)}
+/* Tilt on hover */
+@media(hover:hover){
+  .tilt{transition:transform .2s var(--e)}
+  .tilt:hover{transform:perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-3px)}
+}
+/* Typing cursor animation */
+.typing::after{content:'|';animation:blink-cursor .8s step-end infinite;color:var(--ac2);font-weight:300}
+@keyframes blink-cursor{0%,100%{opacity:1}50%{opacity:0}}
+/* Gradient text animation */
+.grad-text{background:linear-gradient(90deg,var(--ac2),var(--gn),var(--gd),var(--ac2));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:grad-shift 4s linear infinite}
+@keyframes grad-shift{0%{background-position:0% center}100%{background-position:200% center}}
+/* Smooth icon spin on hover */
+.spin-hover:hover .ico svg{animation:spin-once .5s var(--e)}
+@keyframes spin-once{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+/* Stagger children animation */
+.stagger>*{opacity:0;transform:translateY(16px);animation:stagger-in .5s var(--e) forwards}
+.stagger.vis>*:nth-child(1){animation-delay:.05s}
+.stagger.vis>*:nth-child(2){animation-delay:.1s}
+.stagger.vis>*:nth-child(3){animation-delay:.15s}
+.stagger.vis>*:nth-child(4){animation-delay:.2s}
+.stagger.vis>*:nth-child(5){animation-delay:.25s}
+.stagger.vis>*:nth-child(6){animation-delay:.3s}
+.stagger.vis>*:nth-child(7){animation-delay:.35s}
+.stagger.vis>*:nth-child(8){animation-delay:.4s}
+.stagger.vis>*:nth-child(9){animation-delay:.45s}
+@keyframes stagger-in{to{opacity:1;transform:none}}
+/* Number counter animation */
+.counter{display:inline-block}
 
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:768px){
@@ -413,9 +454,9 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
       </div>
 
       <div class="ab-grid">
-        <div class="ab-card rv rv-d1"><div class="ico ico-ac"><i data-lucide="eye-off"></i></div><h3 data-i="ab1_t">Приватность</h3><p data-i="ab1_d">Никакой телеметрии, логов и трекеров. Ваш трафик не покидает ваше устройство без вашего ведома. Весь код открыт для аудита.</p></div>
-        <div class="ab-card rv rv-d2"><div class="ico ico-gn"><i data-lucide="gauge"></i></div><h3 data-i="ab2_t">Производительность</h3><p data-i="ab2_d">Интеллектуальный подбор серверов, параллельное тестирование, ISP-кэширование. Подключение за секунды, не минуты.</p></div>
-        <div class="ab-card rv rv-d3"><div class="ico ico-gd"><i data-lucide="shield-check"></i></div><h3 data-i="ab3_t">Защита</h3><p data-i="ab3_d">MITM-детекция в реальном времени, шифрование WireGuard, DNS-over-HTTPS. Многоуровневая защита от перехвата трафика.</p></div>
+        <div class="ab-card rv rv-d1 glow-hover tilt spin-hover"><div class="ico ico-ac"><i data-lucide="eye-off"></i></div><h3 data-i="ab1_t">Приватность</h3><p data-i="ab1_d">Никакой телеметрии, логов и трекеров. Ваш трафик не покидает ваше устройство без вашего ведома. Весь код открыт для аудита.</p></div>
+        <div class="ab-card rv rv-d2 glow-hover tilt spin-hover"><div class="ico ico-gn"><i data-lucide="gauge"></i></div><h3 data-i="ab2_t">Производительность</h3><p data-i="ab2_d">Интеллектуальный подбор серверов, параллельное тестирование, ISP-кэширование. Подключение за секунды, не минуты.</p></div>
+        <div class="ab-card rv rv-d3 glow-hover tilt spin-hover"><div class="ico ico-gd"><i data-lucide="shield-check"></i></div><h3 data-i="ab3_t">Защита</h3><p data-i="ab3_d">MITM-детекция в реальном времени, шифрование WireGuard, DNS-over-HTTPS. Многоуровневая защита от перехвата трафика.</p></div>
       </div>
     </div>
   </section>
@@ -426,10 +467,10 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
       <div class="slbl rv" data-i="hw_lbl">КАК ЭТО РАБОТАЕТ</div>
       <div class="stl rv" data-i="hw_tl">От нажатия кнопки до защищённого соединения</div>
       <div class="hw-steps">
-        <div class="hw-step rv rv-d1"><div class="ico ico-bl"><i data-lucide="search"></i></div><h4 data-i="hw1_t">Анализ</h4><p data-i="hw1_d">Система определяет вашего провайдера и проверяет какие методы блокировки он использует</p></div>
-        <div class="hw-step rv rv-d2"><div class="ico ico-ac"><i data-lucide="git-branch"></i></div><h4 data-i="hw2_t">Подбор</h4><p data-i="hw2_d">Параллельно тестируются десятки прокси и стратегий обхода для поиска самого быстрого</p></div>
-        <div class="hw-step rv rv-d3"><div class="ico ico-gn"><i data-lucide="plug-zap"></i></div><h4 data-i="hw3_t">Подключение</h4><p data-i="hw3_d">Лучший метод автоматически активируется. Весь трафик шифруется WireGuard</p></div>
-        <div class="hw-step rv rv-d4"><div class="ico ico-gd"><i data-lucide="shield"></i></div><h4 data-i="hw4_t">Защита</h4><p data-i="hw4_d">MITM-мониторинг в реальном времени. При обнаружении угрозы — мгновенное переключение</p></div>
+        <div class="hw-step rv rv-d1 glow-hover"><div class="ico ico-bl"><i data-lucide="search"></i></div><h4 data-i="hw1_t">Анализ</h4><p data-i="hw1_d">Система определяет вашего провайдера и проверяет какие методы блокировки он использует</p></div>
+        <div class="hw-step rv rv-d2 glow-hover"><div class="ico ico-ac"><i data-lucide="git-branch"></i></div><h4 data-i="hw2_t">Подбор</h4><p data-i="hw2_d">Параллельно тестируются десятки прокси и стратегий обхода для поиска самого быстрого</p></div>
+        <div class="hw-step rv rv-d3 glow-hover"><div class="ico ico-gn"><i data-lucide="plug-zap"></i></div><h4 data-i="hw3_t">Подключение</h4><p data-i="hw3_d">Лучший метод автоматически активируется. Весь трафик шифруется WireGuard</p></div>
+        <div class="hw-step rv rv-d4 glow-hover"><div class="ico ico-gd"><i data-lucide="shield"></i></div><h4 data-i="hw4_t">Защита</h4><p data-i="hw4_d">MITM-мониторинг в реальном времени. При обнаружении угрозы — мгновенное переключение</p></div>
       </div>
     </div>
   </section>
@@ -481,13 +522,29 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
 
     <!-- Overview -->
     <div class="tc on" id="t-ov">
-      <div style="max-width:620px">
-        <h2 style="font-size:22px;font-weight:800;margin-bottom:12px;letter-spacing:-.02em" data-i="ov_t">Что такое MrDogez Ultimate?</h2>
-        <p style="color:var(--tx2);line-height:1.8;margin-bottom:16px;font-size:14px" data-i="ov_d1">Это приложение для Windows, которое автоматически обходит интернет-блокировки. Внутри — 27 стратегий DPI bypass, защищённый Cloudflare WARP туннель на протоколе WireGuard и интеллектуальная система подбора оптимального метода подключения.</p>
-        <p style="color:var(--tx2);line-height:1.8;margin-bottom:16px;font-size:14px" data-i="ov_d2">Программа определяет вашего провайдера, проверяет какие методы блокировки используются, и автоматически подбирает лучший способ подключения. MITM-защита в реальном времени предотвращает перехват трафика.</p>
-        <p style="color:var(--tx2);line-height:1.8;font-size:14px" data-i="ov_d3">Поддерживается SOCKS5 и V2Ray прокси с параллельным тестированием, ISP-кэширование для мгновенного повторного подключения и Hot-swap авто-реконнект при обрыве соединения.</p>
+      <div style="max-width:720px">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:16px;letter-spacing:-.02em" data-i="ov_t">Что такое MrDogez Ultimate?</h2>
+
+        <p style="color:var(--tx2);line-height:1.85;margin-bottom:18px;font-size:15px">MrDogez Ultimate — это комплексное десктопное приложение для Windows 10/11, разработанное для автоматического обхода интернет-блокировок и обеспечения защищённого VPN-подключения. Программа объединяет в себе 27 уникальных стратегий DPI bypass, шифрованный Cloudflare WARP туннель на протоколе WireGuard и интеллектуальную систему автоматического подбора оптимального метода соединения.</p>
+
+        <h3 style="font-size:17px;font-weight:700;margin:28px 0 12px;letter-spacing:-.01em">Как работает подключение?</h3>
+        <p style="color:var(--tx2);line-height:1.85;margin-bottom:14px;font-size:15px">При нажатии кнопки «Подключить» запускается многоэтапный процесс. Сначала система определяет вашего интернет-провайдера (ISP) и проверяет кэш предыдущих подключений — если ранее с этим провайдером уже был найден рабочий метод, он применяется мгновенно (fast-path). Если кэша нет, запускается параллельное тестирование: одновременно проверяются WARP Direct, Cloudflare Workers, V2Ray и SOCKS5 прокси.</p>
+        <p style="color:var(--tx2);line-height:1.85;margin-bottom:14px;font-size:15px">Параллельный подбор (racing) тестирует до 20 серверов одновременно, измеряя скорость, задержку и стабильность каждого. Победитель — самый быстрый и стабильный сервер — автоматически активируется. Весь процесс занимает от 3 до 15 секунд в зависимости от провайдера.</p>
+
+        <h3 style="font-size:17px;font-weight:700;margin:28px 0 12px;letter-spacing:-.01em">DPI Bypass — 27 стратегий</h3>
+        <p style="color:var(--tx2);line-height:1.85;margin-bottom:14px;font-size:15px">Deep Packet Inspection (DPI) — это технология, которую интернет-провайдеры используют для анализа и блокировки определённого трафика. MrDogez Ultimate содержит 27 стратегий обхода DPI, каждая из которых работает по-разному: фрагментация TCP-пакетов, модификация SNI, изменение TTL, HTTP-обфускация и другие методы. Программа автоматически подбирает стратегию, подходящую для вашего провайдера.</p>
+
+        <h3 style="font-size:17px;font-weight:700;margin:28px 0 12px;letter-spacing:-.01em">WARP Tunnel и шифрование</h3>
+        <p style="color:var(--tx2);line-height:1.85;margin-bottom:14px;font-size:15px">Cloudflare WARP — это VPN-сервис от Cloudflare, одной из крупнейших в мире сетевых компаний. MrDogez Ultimate использует протокол WireGuard для создания зашифрованного туннеля между вашим устройством и серверами Cloudflare. WireGuard — это современный VPN-протокол, который обеспечивает шифрование военного уровня при минимальной нагрузке на систему. Все ваши данные защищены от перехвата, даже в публичных Wi-Fi сетях.</p>
+
+        <h3 style="font-size:17px;font-weight:700;margin:28px 0 12px;letter-spacing:-.01em">MITM-защита</h3>
+        <p style="color:var(--tx2);line-height:1.85;margin-bottom:14px;font-size:15px">Man-in-the-Middle (MITM) — это атака, при которой злоумышленник перехватывает трафик между вашим устройством и сервером. MrDogez Ultimate проверяет TLS-сертификаты каждого прокси-сервера перед подключением. Если сертификат не соответствует ожидаемому (признак MITM-прокси), сервер немедленно блокируется и добавляется в чёрный список. Система работает в реальном времени и защищает от подмены трафика.</p>
+
+        <h3 style="font-size:17px;font-weight:700;margin:28px 0 12px;letter-spacing:-.01em">Прокси и протоколы</h3>
+        <p style="color:var(--tx2);line-height:1.85;font-size:15px">Помимо WARP, поддерживаются SOCKS5 и V2Ray прокси. При подключении система параллельно тестирует десятки бесплатных прокси-серверов, измеряет скорость скачивания на каждом и автоматически выбирает лучший. Прокси с подозрительными сертификатами отфильтровываются. ISP-кэширование запоминает результаты для вашего провайдера, чтобы следующее подключение было мгновенным. Hot-swap авто-реконнект при обрыве соединения мгновенно переключает на следующий рабочий сервер без потери связи.</p>
       </div>
-      <div class="stats3">
+
+      <div class="stats3" style="margin-top:36px">
         <div class="st3"><div class="n" style="color:var(--ac2)">27</div><div class="l" data-i="ov_s1">Стратегий DPI bypass</div></div>
         <div class="st3"><div class="n" style="color:var(--gn)">20+</div><div class="l" data-i="ov_s2">DNS серверов</div></div>
         <div class="st3"><div class="n" style="color:var(--gd)">3</div><div class="l" data-i="ov_s3">Типа туннелей</div></div>
@@ -561,11 +618,57 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
 
     <!-- Legal -->
     <div class="tc" id="t-lg">
-      <div style="max-width:620px">
-        <div class="leg" onclick="this.classList.toggle('open')"><div class="leg-h"><span data-i="l1t">Пользовательское соглашение</span><i data-lucide="chevron-down"></i></div><div class="leg-b"><div class="leg-bi" data-i="l1b">Используя MrDogez Ultimate, вы принимаете настоящие условия. Программное обеспечение предоставляется «как есть» (as is) без каких-либо явных или подразумеваемых гарантий. Разработчик не несёт ответственности за любые прямые или косвенные убытки, связанные с использованием программы. Пользователи несут личную ответственность за соблюдение законодательства своей юрисдикции. Запрещено использование программы для незаконной деятельности, нарушения прав третьих лиц или причинения вреда.</div></div></div>
-        <div class="leg" onclick="this.classList.toggle('open')"><div class="leg-h"><span data-i="l2t">Политика конфиденциальности</span><i data-lucide="chevron-down"></i></div><div class="leg-b"><div class="leg-bi" data-i="l2b">MrDogez Ultimate придерживается принципа минимального сбора данных. Мы не собираем, не храним и не передаём третьим лицам персональные данные пользователей, включая IP-адреса, историю посещений, DNS-запросы и содержимое трафика. Для функционирования системы авторизации хранится только адрес электронной почты и криптографический хэш пароля (bcrypt). Все сетевые соединения шифруются протоколом WireGuard. Аналитика, рекламные трекеры и телеметрия отсутствуют полностью.</div></div></div>
-        <div class="leg" onclick="this.classList.toggle('open')"><div class="leg-h"><span data-i="l3t">Политика возврата средств</span><i data-lucide="chevron-down"></i></div><div class="leg-b"><div class="leg-bi" data-i="l3b">Возврат денежных средств возможен в полном объёме в течение 24 часов с момента оплаты при условии, что приобретённая услуга не была активирована или использована. Для инициирования возврата свяжитесь с нами через Telegram (@MrDogez) с указанием email аккаунта и номера транзакции. Цифровые товары (пакеты трафика, буст скорости) после активации возврату не подлежат. Срок обработки возврата — до 3 рабочих дней.</div></div></div>
-        <div class="leg" onclick="this.classList.toggle('open')"><div class="leg-h"><span data-i="l4t">Условия подписки Premium</span><i data-lucide="chevron-down"></i></div><div class="leg-b"><div class="leg-bi" data-i="l4b">Подписка Premium активируется на 30 календарных дней с момента подтверждения оплаты. Автоматическое продление подписки не производится — по истечении срока аккаунт автоматически переводится на бесплатный тариф без потери данных. Неиспользованные дни подписки не компенсируются и не переносятся. Повторная покупка Premium продлевает подписку от текущей даты. Стоимость подписки может быть изменена, при этом действующие подписки остаются без изменений до истечения оплаченного периода.</div></div></div>
+      <div style="max-width:720px">
+
+        <div class="leg" onclick="this.classList.toggle('open')">
+          <div class="leg-h"><span data-i="l1t">Пользовательское соглашение</span><i data-lucide="chevron-down"></i></div>
+          <div class="leg-b"><div class="leg-bi">
+            <p style="margin-bottom:12px"><strong>1. Общие положения.</strong> Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует порядок использования программного обеспечения MrDogez Ultimate (далее — «Программа»). Установкой, копированием или иным использованием Программы вы подтверждаете своё согласие с условиями настоящего Соглашения. Если вы не согласны с условиями, прекратите использование Программы и удалите её с вашего устройства.</p>
+            <p style="margin-bottom:12px"><strong>2. Предоставление лицензии.</strong> Разработчик предоставляет вам ограниченную, неисключительную, непередаваемую лицензию на использование Программы на одном устройстве. Данная лицензия не подразумевает передачу прав интеллектуальной собственности. Вы не вправе декомпилировать, дизассемблировать, модифицировать, распространять или создавать производные произведения на основе Программы без письменного разрешения разработчика.</p>
+            <p style="margin-bottom:12px"><strong>3. Отказ от гарантий.</strong> Программа предоставляется на условиях «как есть» (as is) без каких-либо явных или подразумеваемых гарантий, включая, но не ограничиваясь, гарантиями товарной пригодности, пригодности для конкретной цели и ненарушения прав третьих лиц. Разработчик не гарантирует бесперебойную или безошибочную работу Программы.</p>
+            <p style="margin-bottom:12px"><strong>4. Ограничение ответственности.</strong> Разработчик не несёт ответственности за любые прямые, косвенные, случайные, специальные или штрафные убытки, возникающие в связи с использованием или невозможностью использования Программы, включая упущенную выгоду, потерю данных или перебои в работе, даже если разработчик был предупреждён о возможности таких убытков.</p>
+            <p style="margin-bottom:12px"><strong>5. Ответственность пользователя.</strong> Пользователь несёт полную личную ответственность за соблюдение законодательства своей юрисдикции при использовании Программы. Запрещается использовать Программу для незаконной деятельности, нарушения прав третьих лиц, распространения вредоносного ПО, осуществления атак на компьютерные системы или иных действий, причиняющих вред.</p>
+            <p style="margin-bottom:12px"><strong>6. Изменение условий.</strong> Разработчик оставляет за собой право изменять условия настоящего Соглашения в любое время. Продолжение использования Программы после внесения изменений означает ваше согласие с обновлёнными условиями.</p>
+            <p><strong>7. Применимое право.</strong> Настоящее Соглашение регулируется и толкуется в соответствии с законодательством. Все споры подлежат разрешению в порядке, установленном действующим законодательством.</p>
+          </div></div>
+        </div>
+
+        <div class="leg" onclick="this.classList.toggle('open')">
+          <div class="leg-h"><span data-i="l2t">Политика конфиденциальности</span><i data-lucide="chevron-down"></i></div>
+          <div class="leg-b"><div class="leg-bi">
+            <p style="margin-bottom:12px"><strong>1. Сбор данных.</strong> MrDogez Ultimate придерживается принципа минимального сбора данных (data minimization). Мы не собираем, не храним и не обрабатываем следующие данные: IP-адреса пользователей, история посещённых веб-сайтов, DNS-запросы и ответы, содержимое сетевого трафика, данные геолокации, идентификаторы устройства, данные об использовании приложений.</p>
+            <p style="margin-bottom:12px"><strong>2. Данные авторизации.</strong> Для функционирования системы учётных записей мы храним: адрес электронной почты (email), криптографический хэш пароля (bcrypt с солью), дату регистрации и статус подписки. Пароли никогда не хранятся в открытом виде. Восстановление пароля осуществляется через отправку кода подтверждения на указанный email.</p>
+            <p style="margin-bottom:12px"><strong>3. Шифрование.</strong> Все сетевые соединения, устанавливаемые Программой, шифруются с использованием протокола WireGuard (Noise Protocol Framework, Curve25519, ChaCha20, Poly1305, BLAKE2s). DNS-запросы передаются через DNS-over-HTTPS (DoH), что предотвращает их перехват и подмену на уровне провайдера.</p>
+            <p style="margin-bottom:12px"><strong>4. Отсутствие аналитики.</strong> В Программе полностью отсутствуют: системы аналитики и телеметрии, рекламные SDK и трекеры, скрипты отслеживания поведения, механизмы передачи данных третьим лицам. Мы не используем Google Analytics, Firebase, Amplitude или аналогичные сервисы.</p>
+            <p style="margin-bottom:12px"><strong>5. Хранение данных.</strong> Пользовательские данные хранятся в зашифрованной базе данных SQLite на устройстве пользователя. Резервная копия (email и хэш пароля) может быть синхронизирована через GitHub в зашифрованном виде (XOR + SHA256) для возможности восстановления аккаунта на другом устройстве.</p>
+            <p style="margin-bottom:12px"><strong>6. Права пользователя.</strong> Вы имеете право: запросить полную копию всех хранящихся о вас данных, потребовать удаления вашего аккаунта и всех связанных данных, отозвать согласие на обработку данных в любой момент. Для реализации этих прав свяжитесь с нами через Telegram (@MrDogez).</p>
+            <p><strong>7. Обновление политики.</strong> Мы можем обновлять данную политику для отражения изменений в практиках обработки данных. О существенных изменениях будет сообщено через приложение или email. Последнее обновление: апрель 2026 года.</p>
+          </div></div>
+        </div>
+
+        <div class="leg" onclick="this.classList.toggle('open')">
+          <div class="leg-h"><span data-i="l3t">Политика возврата средств</span><i data-lucide="chevron-down"></i></div>
+          <div class="leg-b"><div class="leg-bi">
+            <p style="margin-bottom:12px"><strong>1. Право на возврат.</strong> Мы стремимся к максимальной удовлетворённости наших пользователей. Если приобретённая услуга не оправдала ваших ожиданий, вы можете запросить полный возврат денежных средств в течение 24 часов с момента оплаты при условии, что услуга не была активирована или использована.</p>
+            <p style="margin-bottom:12px"><strong>2. Процедура возврата.</strong> Для инициирования возврата свяжитесь с нами через Telegram (@MrDogez) или по электронной почте, указав: email адрес вашего аккаунта, номер транзакции или дату платежа, причину запроса возврата. Мы обработаем ваш запрос в течение 1–3 рабочих дней.</p>
+            <p style="margin-bottom:12px"><strong>3. Ограничения.</strong> Возврат не производится в следующих случаях: с момента оплаты прошло более 24 часов; подписка Premium была активирована и использовалась; цифровые товары (пакеты трафика, буст скорости) были активированы на аккаунте; обнаружены признаки злоупотребления системой возвратов.</p>
+            <p style="margin-bottom:12px"><strong>4. Способ возврата.</strong> Возврат производится тем же способом, которым была произведена оплата. Срок зачисления средств зависит от платёжной системы и может составлять от 1 до 10 рабочих дней.</p>
+            <p><strong>5. Спорные ситуации.</strong> В случае возникновения спорных ситуаций мы готовы рассмотреть каждый случай индивидуально. Наша цель — найти справедливое решение для обеих сторон.</p>
+          </div></div>
+        </div>
+
+        <div class="leg" onclick="this.classList.toggle('open')">
+          <div class="leg-h"><span data-i="l4t">Условия подписки Premium</span><i data-lucide="chevron-down"></i></div>
+          <div class="leg-b"><div class="leg-bi">
+            <p style="margin-bottom:12px"><strong>1. Срок действия.</strong> Подписка Premium активируется на 30 календарных дней с момента подтверждения оплаты платёжной системой. Датой начала подписки считается момент зачисления средств, а не момент инициирования платежа.</p>
+            <p style="margin-bottom:12px"><strong>2. Автоматическое продление.</strong> Автоматическое продление подписки НЕ производится. По истечении 30 дней аккаунт автоматически переводится на бесплатный тариф. Все данные аккаунта сохраняются. Для продления подписки необходимо совершить новую покупку.</p>
+            <p style="margin-bottom:12px"><strong>3. Преимущества Premium.</strong> Подписка Premium включает: снятие ограничения скорости (безлимит вместо 1 МБ/с), безлимитный трафик (вместо 5 ГБ/мес), доступ к 20 параллельным потокам подбора прокси (вместо 5), VIP-серверы Европейского Союза с минимальным пингом, режим Auto-TUN (весь системный трафик через VPN), приоритетная техническая поддержка.</p>
+            <p style="margin-bottom:12px"><strong>4. Неиспользованные дни.</strong> Неиспользованные дни подписки не компенсируются, не переносятся на следующий период и не конвертируются в иные формы вознаграждения. Если вы приобретаете Premium при активной подписке, новый 30-дневный период начинается от текущей даты.</p>
+            <p style="margin-bottom:12px"><strong>5. Изменение стоимости.</strong> Разработчик оставляет за собой право изменять стоимость подписки. При этом все текущие активные подписки сохраняют свои условия до конца оплаченного периода. Об изменении цен будет сообщено заблаговременно через приложение и/или email.</p>
+            <p><strong>6. Техническая поддержка.</strong> Пользователи Premium получают приоритетную техническую поддержку через Telegram (@MrDogez). Среднее время ответа для Premium-пользователей — до 4 часов в рабочее время.</p>
+          </div></div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -648,6 +751,43 @@ function uAuth(){const d=D[cLn]||D.ru;if(aMode==='login'){document.getElementByI
 function aSubmit(){const e=document.getElementById('aE').value.trim(),p=document.getElementById('aP').value,m=document.getElementById('aMsg');if(!e||!p){m.className='fmsg err';m.textContent='Заполните все поля';return;}m.className='fmsg ok';m.textContent=aMode==='login'?'✓':'✓';localStorage.setItem('mrd_u',e);setTimeout(cA,1000);}
 function aCk(){localStorage.setItem('mrd_ck','1');document.getElementById('ckB').classList.remove('show');}
 function iRv(){const o=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');o.unobserve(e.target);}});},{threshold:.06,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.rv:not(.vis)').forEach(e=>o.observe(e));}
+
+/* Counter animation */
+function animateCounters(){
+  document.querySelectorAll('.ab-stat .num, .st3 .n').forEach(el=>{
+    const text=el.textContent.trim();
+    const match=text.match(/^([\d.]+)(\+?)$/);
+    if(!match)return;
+    const target=parseFloat(match[1]);
+    const suffix=match[2]||'';
+    const isFloat=text.includes('.');
+    const dur=1200;
+    const start=performance.now();
+    el.textContent='0'+ suffix;
+    function tick(now){
+      const t=Math.min((now-start)/dur,1);
+      const ease=1-Math.pow(1-t,3);
+      const val=target*ease;
+      el.textContent=(isFloat?val.toFixed(1):Math.floor(val))+suffix;
+      if(t<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+/* Observe stats for counter trigger */
+const cObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){animateCounters();cObs.disconnect();}});},{threshold:.3});
+document.querySelectorAll('.ab-stats,.stats3').forEach(el=>cObs.observe(el));
+
+/* Parallax on mouse move for hero */
+document.querySelector('.hero').addEventListener('mousemove',e=>{
+  const rect=e.currentTarget.getBoundingClientRect();
+  const x=(e.clientX-rect.left)/rect.width-.5;
+  const y=(e.clientY-rect.top)/rect.height-.5;
+  document.querySelectorAll('.hfloat').forEach((el,i)=>{
+    const speed=(i+1)*8;
+    el.style.transform=`translate(${x*speed}px,${y*speed}px)`;
+  });
+});
 
 aTh(cTh);aL(cLn);
 requestAnimationFrame(()=>{lucide.createIcons();iRv();});
