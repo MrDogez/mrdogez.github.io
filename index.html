@@ -346,6 +346,72 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
 /* Number counter animation */
 .counter{display:inline-block}
 
+/* ═══ SCROLL PROGRESS BAR ═══ */
+.scroll-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--ac),var(--gn));z-index:999;width:0;transition:width .1s linear}
+
+/* ═══ BACK TO TOP ═══ */
+.btt{position:fixed;bottom:20px;right:20px;z-index:250;width:40px;height:40px;border-radius:12px;background:var(--sf2);border:1px solid var(--bd2);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;color:var(--tx3);opacity:0;visibility:hidden;transform:translateY(10px);transition:all .25s var(--e);cursor:pointer}
+.btt:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.btt.show{opacity:1;visibility:visible;transform:none}
+.btt svg{width:16px;height:16px}
+
+/* ═══ NEWS BANNER ═══ */
+.news-bar{position:fixed;top:0;left:0;right:0;z-index:210;padding:8px 16px;background:linear-gradient(90deg,var(--ac),#5a48d8,var(--gn));text-align:center;font-size:12px;font-weight:600;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transform:translateY(-100%);transition:transform .4s var(--e)}
+.news-bar.show{transform:none}
+.news-bar a{color:#fff;text-decoration:underline;text-underline-offset:2px}
+.news-bar .nb-x{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:.7;transition:opacity .15s}
+.news-bar .nb-x:hover{opacity:1}
+.news-bar .nb-x svg{width:14px;height:14px}
+body.has-banner nav{top:44px}
+body.has-banner .hero{padding-top:112px}
+
+/* ═══ FAQ ═══ */
+.faq-item{border:1px solid var(--bd);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:all .25s var(--e)}
+.faq-item:hover{border-color:var(--bd2)}
+.faq-h{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;font-size:14px;font-weight:600;color:var(--tx2);transition:all .15s}
+.faq-h:hover{color:var(--tx)}
+.faq-h svg{width:14px;height:14px;transition:transform .3s var(--e);color:var(--tx3);flex-shrink:0}
+.faq-item.open .faq-h{color:var(--tx)}
+.faq-item.open .faq-h svg{transform:rotate(180deg)}
+.faq-b{max-height:0;overflow:hidden;transition:max-height .4s var(--e)}
+.faq-item.open .faq-b{max-height:300px}
+.faq-bi{padding:0 20px 16px;font-size:13px;color:var(--tx3);line-height:1.75}
+
+/* ═══ COMPARISON TABLE ═══ */
+.cmp{width:100%;border-collapse:collapse;margin-top:20px;border-radius:var(--r);overflow:hidden;border:1px solid var(--bd)}
+.cmp th,.cmp td{padding:12px 16px;text-align:left;font-size:13px;border-bottom:1px solid var(--bd)}
+.cmp th{background:var(--sf2);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3)}
+.cmp td{color:var(--tx2)}
+.cmp tr:last-child td{border-bottom:none}
+.cmp tr:hover td{background:var(--sf)}
+.cmp .yes{color:var(--gn);font-weight:600}
+.cmp .no{color:var(--tx4)}
+.cmp .hi-col{background:var(--acd);color:var(--tx)}
+
+/* ═══ CHANGELOG ═══ */
+.cl-item{display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--bd)}
+.cl-item:last-child{border-bottom:none}
+.cl-ver{flex-shrink:0;width:64px;text-align:center}
+.cl-ver .v{font-size:18px;font-weight:800;color:var(--ac2)}
+.cl-ver .d{font-size:10px;color:var(--tx4);margin-top:2px}
+.cl-body h4{font-size:14px;font-weight:700;margin-bottom:4px}
+.cl-body ul{list-style:none}
+.cl-body ul li{font-size:12.5px;color:var(--tx2);padding:2px 0;display:flex;align-items:flex-start;gap:6px}
+.cl-body ul li::before{content:'•';color:var(--ac2);font-weight:700;margin-top:1px}
+
+/* ═══ CONTACT FORM ═══ */
+.cf-form{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.cf-form textarea{width:100%;padding:10px 14px;border-radius:9px;background:var(--sf);border:1px solid var(--bd2);color:var(--tx);font-size:13px;font-family:var(--f);resize:vertical;min-height:100px;outline:none;transition:all .15s}
+.cf-form textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acd)}
+.cf-form textarea::placeholder{color:var(--tx4)}
+
+/* ═══ GRADIENT BORDER CARDS ═══ */
+.gb{position:relative;border-radius:var(--r);overflow:hidden}
+.gb::before{content:'';position:absolute;inset:-1px;border-radius:inherit;background:linear-gradient(135deg,var(--ac),var(--gn),var(--gd),var(--ac));background-size:300% 300%;animation:gbr 6s ease infinite;z-index:-1;opacity:0;transition:opacity .3s}
+.gb:hover::before{opacity:1}
+@keyframes gbr{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.gb-inner{background:var(--bg2);border-radius:calc(var(--r) - 1px);padding:24px 20px;height:100%}
+
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:768px){
   .ab-grid,.hw-steps{grid-template-columns:1fr 1fr}
@@ -357,6 +423,9 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
   .ftb{flex-direction:column;gap:5px;text-align:center}
   .pj{flex-direction:column;text-align:center;gap:12px}
   .pj .arr{display:none}
+  .cmp{font-size:12px}
+  .cmp th,.cmp td{padding:8px 10px}
+  .news-bar{font-size:11px;padding:6px 12px}
   section{padding:72px 0}
 }
 @media(max-width:480px){
@@ -502,6 +571,114 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
       </div>
     </div>
   </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="w">
+      <div class="slbl rv" data-i="faq_lbl">ВОПРОСЫ И ОТВЕТЫ</div>
+      <div class="stl rv" data-i="faq_tl">Частые вопросы</div>
+      <div class="sdesc rv" style="margin-bottom:32px" data-i="faq_desc">Ответы на самые популярные вопросы о наших продуктах.</div>
+
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span data-i="fq1_q">Это бесплатно?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi" data-i="fq1_a">Да, базовая версия MrDogez Ultimate полностью бесплатна и включает DPI bypass (27 стратегий), WARP подключение, 5 ГБ трафика в месяц и 20+ DNS серверов. Premium-подписка расширяет возможности: безлимитная скорость, безлимитный трафик, VIP-серверы и приоритетная поддержка.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span data-i="fq2_q">Это законно?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi" data-i="fq2_a">MrDogez Ultimate — это инструмент для защиты приватности и безопасности в интернете. Использование VPN и средств шифрования трафика является законным в большинстве стран. Пользователи несут ответственность за соблюдение законодательства своей юрисдикции.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span data-i="fq3_q">Как работает обход блокировок?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi" data-i="fq3_a">Программа использует комбинацию технологий: 27 стратегий DPI bypass (фрагментация пакетов, модификация SNI, изменение TTL), зашифрованный WARP туннель через WireGuard, и сеть бесплатных SOCKS5/V2Ray прокси. Система автоматически определяет вашего провайдера и подбирает оптимальный метод.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span data-i="fq4_q">Какие провайдеры поддерживаются?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi" data-i="fq4_a">MrDogez Ultimate работает с любым интернет-провайдером. Система ISP-кэширования запоминает какие методы работают на вашем провайдере, чтобы последующие подключения были мгновенными. Поддерживаются Ростелеком, МТС, Билайн, Мегафон, Tele2 и все остальные.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span data-i="fq5_q">Мои данные в безопасности?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi" data-i="fq5_a">Абсолютно. Мы не собираем никаких данных о вашем трафике, посещённых сайтах или DNS-запросах. Все соединения шифруются WireGuard. MITM-защита в реальном времени предотвращает перехват. Мы храним только email и хэш пароля для авторизации.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span data-i="fq6_q">Как оплатить Premium?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi" data-i="fq6_a">Оплата производится через приложение. Поддерживаются банковские карты РФ и СБП. После оплаты Premium активируется мгновенно на 30 дней. Автоматического продления нет — после истечения аккаунт переходит на бесплатный тариф.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span data-i="fq7_q">Можно вернуть деньги?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi" data-i="fq7_a">Да, полный возврат возможен в течение 24 часов с момента оплаты, если услуга не была использована. Свяжитесь через Telegram (@MrDogez) с email аккаунта и номером транзакции. Обработка занимает 1-3 рабочих дня.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span data-i="fq8_q">На каких устройствах работает?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi" data-i="fq8_a">Сейчас MrDogez Ultimate доступен для Windows 10 и Windows 11 (x64). Версии для Android и macOS находятся в разработке и будут доступны в ближайших обновлениях. Следите за новостями в Telegram.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Changelog -->
+  <section id="changelog">
+    <div class="w">
+      <div class="slbl rv" data-i="cl_lbl">ОБНОВЛЕНИЯ</div>
+      <div class="stl rv" data-i="cl_tl">История версий</div>
+      <div class="sdesc rv" style="margin-bottom:32px" data-i="cl_desc">Последние обновления и улучшения.</div>
+
+      <div class="cl-item rv">
+        <div class="cl-ver"><div class="v">5.0</div><div class="d">2026</div></div>
+        <div class="cl-body">
+          <h4 data-i="cl5_t">Глобальное обновление</h4>
+          <ul>
+            <li data-i="cl5_1">Система Premium с автоматической оплатой через СБП и карты</li>
+            <li data-i="cl5_2">Лимит скорости для бесплатных пользователей (1 МБ/с)</li>
+            <li data-i="cl5_3">Буст скорости как отдельная покупка</li>
+            <li data-i="cl5_4">MITM-защита с TLS-верификацией в реальном времени</li>
+            <li data-i="cl5_5">Smart Connect — ISP-кэширование и параллельный racing прокси</li>
+            <li data-i="cl5_6">8 типов email-уведомлений (регистрация, покупка, истечение)</li>
+            <li data-i="cl5_7">GitHub encrypted sync для восстановления аккаунта</li>
+            <li data-i="cl5_8">Телеграм-бот с админ-панелью и управлением пользователями</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cl-item rv">
+        <div class="cl-ver"><div class="v">4.0</div><div class="d">2025</div></div>
+        <div class="cl-body">
+          <h4 data-i="cl4_t">WARP Integration</h4>
+          <ul>
+            <li data-i="cl4_1">Cloudflare WARP туннель через WireGuard</li>
+            <li data-i="cl4_2">SOCKS5 и V2Ray прокси с параллельным тестированием</li>
+            <li data-i="cl4_3">Cloudflare Workers как fallback-прокси</li>
+            <li data-i="cl4_4">DNS-over-HTTPS с 20+ серверами</li>
+            <li data-i="cl4_5">Новый интерфейс на WebView2</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cl-item rv">
+        <div class="cl-ver"><div class="v">3.0</div><div class="d">2025</div></div>
+        <div class="cl-body">
+          <h4 data-i="cl3_t">DPI Bypass Engine</h4>
+          <ul>
+            <li data-i="cl3_1">27 стратегий обхода DPI</li>
+            <li data-i="cl3_2">Автоматический подбор стратегии по провайдеру</li>
+            <li data-i="cl3_3">Система профилей подключения</li>
+            <li data-i="cl3_4">Мониторинг качества соединения</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="padding:60px 0">
+    <div class="w">
+      <div class="rv-s rv" style="text-align:center;padding:48px 32px;border-radius:var(--r);background:var(--sf);border:1px solid var(--bd);position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ac),var(--gn),var(--gd));"></div>
+        <h2 style="font-size:clamp(22px,4vw,32px);font-weight:800;margin-bottom:8px;letter-spacing:-.03em" data-i="cta_t">Готовы попробовать?</h2>
+        <p style="color:var(--tx2);font-size:15px;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto" data-i="cta_d">Скачайте бесплатно и подключитесь за секунды. Без регистрации, без ограничений по времени.</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <a class="btn btn-p" onclick="showPg('mdu');setTimeout(()=>mT('dl'),100)"><i data-lucide="download" style="width:15px;height:15px"></i> <span data-i="cta_btn1">Скачать бесплатно</span></a>
+          <a class="btn btn-s" onclick="showPg('mdu')"><i data-lucide="info" style="width:15px;height:15px"></i> <span data-i="cta_btn2">Подробнее</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <!-- ═══ MDU PAGE ═══ -->
@@ -598,6 +775,26 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
           <a class="btn btn-p" style="width:100%" onclick="openAuth()" data-i="pl_pb">Купить Premium</a>
         </div>
       </div>
+      <!-- Comparison table -->
+      <h3 style="font-size:15px;font-weight:700;margin:32px 0 12px" data-i="cmp_t">Сравнение тарифов</h3>
+      <table class="cmp">
+        <thead><tr><th data-i="cmp_feat">Функция</th><th>Free</th><th class="hi-col">Premium</th></tr></thead>
+        <tbody>
+          <tr><td data-i="cmp_r1">Скорость</td><td class="no">До 1 МБ/с</td><td class="hi-col yes">Безлимит</td></tr>
+          <tr><td data-i="cmp_r2">Трафик</td><td class="no">5 ГБ/мес</td><td class="hi-col yes">Безлимит</td></tr>
+          <tr><td>DPI Bypass</td><td class="yes">27 стратегий</td><td class="hi-col yes">27 стратегий</td></tr>
+          <tr><td data-i="cmp_r4">WARP подключение</td><td class="yes">Да</td><td class="hi-col yes">Да</td></tr>
+          <tr><td data-i="cmp_r5">Параллельные прокси</td><td class="no">5</td><td class="hi-col yes">20</td></tr>
+          <tr><td data-i="cmp_r6">Профили WARP</td><td class="no">3</td><td class="hi-col yes">Безлимит</td></tr>
+          <tr><td>DNS-over-HTTPS</td><td class="yes">20+ серверов</td><td class="hi-col yes">20+ серверов</td></tr>
+          <tr><td data-i="cmp_r8">Auto-TUN режим</td><td class="no">Нет</td><td class="hi-col yes">Да</td></tr>
+          <tr><td data-i="cmp_r9">VIP-серверы EU</td><td class="no">Нет</td><td class="hi-col yes">Да</td></tr>
+          <tr><td data-i="cmp_r10">Приоритетная поддержка</td><td class="no">Нет</td><td class="hi-col yes">Да</td></tr>
+          <tr><td data-i="cmp_r11">MITM-защита</td><td class="yes">Да</td><td class="hi-col yes">Да</td></tr>
+          <tr><td data-i="cmp_r12">Авто-реконнект</td><td class="yes">Да</td><td class="hi-col yes">Да</td></tr>
+        </tbody>
+      </table>
+
       <h3 style="font-size:15px;font-weight:700;margin:32px 0 4px" data-i="ao_t">Дополнения</h3>
       <div class="aog">
         <div class="ao"><div class="ico ico-bl"><i data-lucide="package"></i></div><h4>+5 ГБ</h4><div class="sm" data-i="ao_tr">Трафик</div><div class="price">100₽</div></div>
@@ -684,6 +881,16 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
       <a class="ct" href="https://t.me/MrDogez" target="_blank"><div class="ico ico-bl"><i data-lucide="send"></i></div><div><h4>Telegram</h4><p>@MrDogez</p></div></a>
       <a class="ct" href="https://github.com/MrDogez" target="_blank"><div class="ico ico-ac"><i data-lucide="github"></i></div><div><h4>GitHub</h4><p>MrDogez</p></div></a>
       <a class="ct" href="mailto:danil.guslyakov.11@bk.ru"><div class="ico ico-gd"><i data-lucide="mail"></i></div><div><h4>Email</h4><p>danil.guslyakov.11@bk.ru</p></div></a>
+
+      <!-- Contact form -->
+      <h3 style="font-size:16px;font-weight:700;margin:32px 0 4px" data-i="cf_t">Написать сообщение</h3>
+      <p style="font-size:13px;color:var(--tx3);margin-bottom:12px" data-i="cf_d">Отправьте сообщение напрямую через Telegram.</p>
+      <div class="cf-form">
+        <div class="fgrp"><label data-i="cf_name">Имя</label><input type="text" id="cfName" placeholder="Ваше имя"></div>
+        <div class="fgrp"><label data-i="cf_msg">Сообщение</label><textarea id="cfMsg" placeholder="Опишите ваш вопрос или предложение..."></textarea></div>
+        <button class="btn btn-p" onclick="sendCF()" style="align-self:flex-start"><i data-lucide="send" style="width:14px;height:14px"></i> <span data-i="cf_btn">Отправить</span></button>
+        <div class="fmsg" id="cfRes"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -716,6 +923,20 @@ footer{border-top:1px solid var(--bd);padding:44px 0 24px;position:relative;z-in
 
 <!-- ═══ COOKIE ═══ -->
 <div class="ck" id="ckB"><p data-i="ck_t">Мы используем cookies для улучшения работы сайта. Продолжая использование, вы соглашаетесь с политикой конфиденциальности.</p><button class="btn btn-p" style="padding:7px 16px;font-size:11px" onclick="aCk()" data-i="ck_b">Принять</button></div>
+
+<!-- Scroll progress -->
+<div class="scroll-bar" id="scrollBar"></div>
+
+<!-- Back to top -->
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i data-lucide="arrow-up"></i></button>
+
+<!-- News banner -->
+<div class="news-bar" id="newsBr">
+  <i data-lucide="sparkles" style="width:14px;height:14px"></i>
+  <span data-i="news_t">MrDogez Ultimate v5.0 уже доступен!</span>
+  <a onclick="showPg('mdu');setTimeout(()=>mT('dl'),100);closeNews()" style="cursor:pointer" data-i="news_btn">Скачать →</a>
+  <span class="nb-x" onclick="closeNews()"><i data-lucide="x"></i></span>
+</div>
 
 <script>
 const D={
@@ -789,9 +1010,43 @@ document.querySelector('.hero').addEventListener('mousemove',e=>{
   });
 });
 
+/* Contact form → opens Telegram */
+function sendCF(){
+  const name=document.getElementById('cfName').value.trim();
+  const msg=document.getElementById('cfMsg').value.trim();
+  const res=document.getElementById('cfRes');
+  if(!msg){res.className='fmsg err';res.textContent='Введите сообщение';return;}
+  const text=encodeURIComponent((name?name+': ':'')+msg);
+  window.open('https://t.me/MrDogez?text='+text,'_blank');
+  res.className='fmsg ok';res.textContent='Telegram открыт!';
+  document.getElementById('cfMsg').value='';
+}
+
+/* Scroll progress bar + back-to-top */
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=h>0?(window.scrollY/h)*100:0;
+  document.getElementById('scrollBar').style.width=pct+'%';
+  document.getElementById('btt').classList.toggle('show',window.scrollY>400);
+});
+
+/* News banner */
+function closeNews(){
+  document.getElementById('newsBr').classList.remove('show');
+  document.body.classList.remove('has-banner');
+  sessionStorage.setItem('mrd_news','1');
+}
+function showNews(){
+  if(!sessionStorage.getItem('mrd_news')){
+    document.getElementById('newsBr').classList.add('show');
+    document.body.classList.add('has-banner');
+  }
+}
+
 aTh(cTh);aL(cLn);
 requestAnimationFrame(()=>{lucide.createIcons();iRv();});
 if(!localStorage.getItem('mrd_ck'))setTimeout(()=>document.getElementById('ckB').classList.add('show'),2000);
+setTimeout(showNews,1000);
 </script>
 </body>
 </html>
