@@ -915,6 +915,23 @@ body.has-banner .hero{padding-top:112px}
     <div class="msub" id="aS" data-i="a_in_s">Войдите для управления подпиской</div>
     <div class="fgrp"><label>Email</label><input type="email" id="aE" placeholder="email@example.com"></div>
     <div class="fgrp"><label data-i="a_pw">Пароль</label><input type="password" id="aP" placeholder="••••••••"></div>
+    <!-- CAPTCHA -->
+    <div class="fgrp" id="captchaWrap">
+      <label data-i="a_captcha">Подтверждение</label>
+      <div id="captchaBox" style="border-radius:10px;border:1px solid var(--bd2);overflow:hidden">
+        <!-- Slider captcha -->
+        <div style="padding:12px 14px;background:var(--sf);display:flex;align-items:center;gap:10px">
+          <div style="width:20px;height:20px;border-radius:6px;background:var(--acd);display:flex;align-items:center;justify-content:center;flex-shrink:0" id="captchaIcon"><i data-lucide="shield-check" style="width:12px;height:12px;color:var(--ac2)"></i></div>
+          <div style="flex:1">
+            <div id="captchaQ" style="font-size:13px;font-weight:600;color:var(--tx2)"></div>
+          </div>
+        </div>
+        <div style="padding:10px 14px;background:var(--sf2)">
+          <input type="text" id="captchaA" placeholder="?" style="width:100%;padding:8px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--bd);color:var(--tx);font-size:15px;font-weight:700;text-align:center;outline:none;font-family:var(--f);letter-spacing:2px" autocomplete="off">
+        </div>
+        <div id="captchaStatus" style="padding:6px 14px;font-size:11px;text-align:center;min-height:24px"></div>
+      </div>
+    </div>
     <div class="fmsg" id="aMsg"></div>
     <button class="btn btn-p" style="width:100%;margin-top:4px" onclick="aSubmit()" id="aBtn" data-i="a_in">Вход</button>
     <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--tx3)"><span id="aTT" data-i="a_no">Нет аккаунта? </span><a style="color:var(--ac2);cursor:pointer;font-weight:600" onclick="tA()" id="aTB" data-i="a_reg">Регистрация</a></div>
@@ -964,12 +981,66 @@ function mT(n){document.querySelectorAll('#pg-mdu .tc').forEach(t=>t.classList.r
 function tM(){document.getElementById('mm').classList.toggle('open');}
 function cM(){document.getElementById('mm').classList.remove('open');}
 
+/* ═══ CAPTCHA ═══ */
+var _captchaAnswer=0;
+var _captchaSolved=false;
+var _captchaOps=['+','-','×'];
+function genCaptcha(){
+  _captchaSolved=false;
+  var op=_captchaOps[Math.floor(Math.random()*3)];
+  var a,b;
+  if(op==='+'){a=Math.floor(Math.random()*20)+1;b=Math.floor(Math.random()*20)+1;_captchaAnswer=a+b;}
+  else if(op==='-'){a=Math.floor(Math.random()*20)+10;b=Math.floor(Math.random()*a);_captchaAnswer=a-b;}
+  else{a=Math.floor(Math.random()*10)+1;b=Math.floor(Math.random()*10)+1;_captchaAnswer=a*b;}
+  var q=document.getElementById('captchaQ');
+  if(q) q.textContent=a+' '+op+' '+b+' = ?';
+  var inp=document.getElementById('captchaA');
+  if(inp){inp.value='';inp.style.borderColor='var(--bd)';}
+  var st=document.getElementById('captchaStatus');
+  if(st){st.textContent='';st.style.color='';}
+  var ic=document.getElementById('captchaIcon');
+  if(ic) ic.style.background='var(--acd)';
+}
+function checkCaptcha(){
+  var inp=document.getElementById('captchaA');
+  var st=document.getElementById('captchaStatus');
+  var ic=document.getElementById('captchaIcon');
+  if(!inp) return false;
+  var val=parseInt(inp.value.trim());
+  if(isNaN(val)){
+    if(st){st.textContent='Введите ответ';st.style.color='var(--rd)';}
+    inp.style.borderColor='var(--rd)';
+    return false;
+  }
+  if(val===_captchaAnswer){
+    _captchaSolved=true;
+    inp.style.borderColor='var(--gn)';
+    if(st){st.textContent='✓ Проверка пройдена';st.style.color='var(--gn)';}
+    if(ic) ic.style.background='var(--gnd)';
+    return true;
+  }else{
+    inp.style.borderColor='var(--rd)';
+    if(st){st.textContent='✗ Неверный ответ';st.style.color='var(--rd)';}
+    // Generate new captcha after wrong answer
+    setTimeout(genCaptcha,1500);
+    return false;
+  }
+}
+
 let aMode='login';
-function openAuth(){document.getElementById('authM').classList.add('open');aMode='login';uAuth();setTimeout(()=>lucide.createIcons(),50);}
+function openAuth(){document.getElementById('authM').classList.add('open');aMode='login';uAuth();genCaptcha();setTimeout(()=>lucide.createIcons(),50);}
 function cA(){document.getElementById('authM').classList.remove('open');}
-function tA(){aMode=aMode==='login'?'reg':'login';uAuth();}
+function tA(){aMode=aMode==='login'?'reg':'login';uAuth();genCaptcha();}
 function uAuth(){const d=D[cLn]||D.ru;if(aMode==='login'){document.getElementById('aT').textContent=d.a_in;document.getElementById('aS').textContent=d.a_in_s;document.getElementById('aBtn').textContent=d.a_in;document.getElementById('aTT').textContent=d.a_no;document.getElementById('aTB').textContent=d.a_reg;}else{document.getElementById('aT').textContent=d.a_up;document.getElementById('aS').textContent=d.a_up_s;document.getElementById('aBtn').textContent=d.a_up;document.getElementById('aTT').textContent=d.a_has;document.getElementById('aTB').textContent=d.a_in;}document.getElementById('aMsg').textContent='';}
-function aSubmit(){const e=document.getElementById('aE').value.trim(),p=document.getElementById('aP').value,m=document.getElementById('aMsg');if(!e||!p){m.className='fmsg err';m.textContent='Заполните все поля';return;}m.className='fmsg ok';m.textContent=aMode==='login'?'✓':'✓';localStorage.setItem('mrd_u',e);setTimeout(cA,1000);}
+function aSubmit(){
+  const e=document.getElementById('aE').value.trim(),p=document.getElementById('aP').value,m=document.getElementById('aMsg');
+  if(!e||!p){m.className='fmsg err';m.textContent='Заполните все поля';return;}
+  // Check captcha
+  if(!_captchaSolved){
+    if(!checkCaptcha()){m.className='fmsg err';m.textContent='Пройдите проверку';return;}
+  }
+  m.className='fmsg ok';m.textContent='✓';localStorage.setItem('mrd_u',e);setTimeout(cA,1000);
+}
 function aCk(){localStorage.setItem('mrd_ck','1');document.getElementById('ckB').classList.remove('show');}
 function iRv(){const o=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');o.unobserve(e.target);}});},{threshold:.06,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.rv:not(.vis)').forEach(e=>o.observe(e));}
 
@@ -1011,11 +1082,15 @@ document.querySelector('.hero').addEventListener('mousemove',e=>{
 });
 
 /* Contact form → opens Telegram */
+var _lastCfSend=0;
 function sendCF(){
+  const now=Date.now();
+  const res=document.getElementById('cfRes');
+  if(now-_lastCfSend<5000){res.className='fmsg err';res.textContent='Подождите 5 секунд';return;}
   const name=document.getElementById('cfName').value.trim();
   const msg=document.getElementById('cfMsg').value.trim();
-  const res=document.getElementById('cfRes');
   if(!msg){res.className='fmsg err';res.textContent='Введите сообщение';return;}
+  _lastCfSend=now;
   const text=encodeURIComponent((name?name+': ':'')+msg);
   window.open('https://t.me/MrDogez?text='+text,'_blank');
   res.className='fmsg ok';res.textContent='Telegram открыт!';
