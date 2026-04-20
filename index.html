@@ -449,7 +449,28 @@ body.has-banner .hero{padding-top:112px}
 .aurora::after{width:400px;height:400px;background:radial-gradient(circle,#10b981,transparent 70%);bottom:-10%;right:-5%;animation-delay:-10s}
 @keyframes aurora{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.1)}66%{transform:translate(-30px,40px) scale(.95)}}
 
-.term{background:#0a0a12;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(124,106,239,.3),0 0 0 1px rgba(255,255,255,.03) inset;max-width:760px;margin:32px auto 0;font-family:ui-monospace,Consolas,monospace}
+.term{background:#0a0a12;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(124,106,239,.3),0 0 0 1px rgba(255,255,255,.03) inset;max-width:720px;margin:20px auto 0;font-family:ui-monospace,Consolas,monospace;width:100%}
+.term-body{min-height:300px;max-height:360px;overflow-y:auto}
+
+/* Me/portfolio sections */
+.am-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-top:40px}
+.am-card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:26px 20px;text-align:center;transition:all .3s}
+.am-card:hover{border-color:rgba(124,106,239,.25);transform:translateY(-3px)}
+.am-n{font-size:32px;font-weight:900;letter-spacing:-.02em;color:var(--ac2);margin-bottom:6px}
+.am-l{font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.sk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:32px}
+.sk-col{background:rgba(18,18,28,.5);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:22px}
+.sk-col h4{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--tx)}
+.sk-col ul{list-style:none;padding:0}
+.sk-col li{font-size:13px;color:var(--tx3);padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.04)}
+.sk-col li:last-child{border:0}
+
+/* MDU tab facts strip */
+.mdu-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.mf{background:rgba(18,18,28,.5);border:1px solid rgba(255,255,255,.04);border-radius:12px;padding:16px;text-align:center}
+.mf-n{font-size:24px;font-weight:900;color:var(--ac2);letter-spacing:-.02em}
+.mf-l{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:4px}
+@media(max-width:600px){.mdu-facts{grid-template-columns:repeat(2,1fr)}}
 .term-bar{display:flex;align-items:center;gap:7px;padding:11px 14px;background:#1a1a26;border-bottom:1px solid rgba(255,255,255,.05)}
 .term-dot{width:11px;height:11px;border-radius:50%}
 .term-title{margin-left:auto;margin-right:auto;color:#666;font-size:11px;font-family:var(--f)}
@@ -637,140 +658,68 @@ body.has-banner .hero{padding-top:112px}
     </div>
   </section>
 
-  <!-- ═══════════════════ LIVE TERMINAL DEMO ═══════════════════ -->
-  <section id="demo" style="padding:80px 0;position:relative;overflow:hidden">
+  <!-- ═══════════════════ ABOUT ME (DEVELOPER) ═══════════════════ -->
+  <section id="aboutme" style="padding:90px 0;position:relative;overflow:hidden">
     <div class="aurora"></div>
+    <div class="w" style="max-width:860px">
+      <div class="slbl rv">ОБО МНЕ</div>
+      <div class="stl rv">Разработчик-одиночка</div>
+      <div class="sdesc rv" style="margin-bottom:36px">Создаю программы для людей. Без компании, без инвесторов, без рекламы — только я и код.</div>
+      <div class="am-grid rv">
+        <div class="am-card"><div class="am-n">5+</div><div class="am-l">лет в разработке</div></div>
+        <div class="am-card"><div class="am-n">1</div><div class="am-l">релизных продукт</div></div>
+        <div class="am-card"><div class="am-n">~150k</div><div class="am-l">строк кода написано</div></div>
+        <div class="am-card"><div class="am-n">Windows</div><div class="am-l">основная платформа</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ MY SKILLS ═══════════════════ -->
+  <section id="skills" style="padding:80px 0">
     <div class="w">
-      <div class="slbl rv" data-i="dm_lbl">РЕАЛЬНЫЙ ЗАПУСК</div>
-      <div class="stl rv" data-i="dm_tl">Посмотри как это работает</div>
-      <div class="sdesc rv" data-i="dm_desc">Типичная сессия — от запуска до защищённого соединения за 2 секунды.</div>
-      <div class="term rv" id="termDemo">
-        <div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><div class="term-title">mrdogez-ultimate — bash — 120×32</div></div>
-        <div class="term-body" id="termBody"></div>
+      <div class="slbl rv">МОЙ СТЕК</div>
+      <div class="stl rv">Технологии, с которыми работаю</div>
+      <div class="sk-grid">
+        <div class="sk-col rv">
+          <h4>💻 Языки</h4>
+          <ul><li>Python 3.14</li><li>C / C++ (Qt6)</li><li>JavaScript (vanilla)</li><li>HTML / CSS</li></ul>
+        </div>
+        <div class="sk-col rv">
+          <h4>🔧 Фреймворки</h4>
+          <ul><li>Qt6 (desktop UI)</li><li>WebView2 (веб-гибрид)</li><li>tkinter / PySide6</li><li>CMake</li></ul>
+        </div>
+        <div class="sk-col rv">
+          <h4>🌐 Сеть и VPN</h4>
+          <ul><li>WireGuard, AmneziaWG</li><li>WinDivert (kernel filter)</li><li>SOCKS5, V2Ray, Shadowsocks</li><li>DNS-over-HTTPS</li></ul>
+        </div>
+        <div class="sk-col rv">
+          <h4>☁️ Облако</h4>
+          <ul><li>Cloudflare Workers</li><li>CF KV / R2</li><li>GitHub Pages / Actions</li><li>Monee.pro интеграция</li></ul>
+        </div>
+        <div class="sk-col rv">
+          <h4>🔐 Безопасность</h4>
+          <ul><li>PBKDF2, ChaCha20</li><li>TLS 1.3, PFS</li><li>Integrity checks (SHA-256)</li><li>Anti-cheat системы</li></ul>
+        </div>
+        <div class="sk-col rv">
+          <h4>📦 Deployment</h4>
+          <ul><li>PyInstaller</li><li>Advanced Installer (MSI)</li><li>Windows Services</li><li>Code signing</li></ul>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════ LIVE STATS ═══════════════════ -->
-  <section id="live-stats" style="padding:70px 0;background:linear-gradient(135deg,rgba(124,106,239,.04),transparent)">
-    <div class="w">
-      <div class="slbl rv" data-i="ls_lbl">СТАТИСТИКА В РЕАЛЬНОМ ВРЕМЕНИ</div>
-      <div class="stl rv" data-i="ls_tl">Цифры, которые говорят сами</div>
-      <div class="live-grid">
-        <div class="live-card rv rv-d1 tilt"><div class="live-ic" style="background:rgba(124,106,239,.12);color:var(--ac2)"><i data-lucide="users"></i></div><div class="live-n" data-target="12400" data-suffix="+">0</div><div class="live-l" data-i="ls1">Активных пользователей</div></div>
-        <div class="live-card rv rv-d2 tilt"><div class="live-ic" style="background:rgba(16,185,129,.12);color:var(--gn)"><i data-lucide="globe"></i></div><div class="live-n" data-target="43" data-suffix="">0</div><div class="live-l" data-i="ls2">Стран доступно</div></div>
-        <div class="live-card rv rv-d3 tilt"><div class="live-ic" style="background:rgba(234,179,8,.12);color:var(--gd)"><i data-lucide="zap"></i></div><div class="live-n" data-target="27" data-suffix="">0</div><div class="live-l" data-i="ls3">DPI стратегий</div></div>
-        <div class="live-card rv rv-d4 tilt"><div class="live-ic" style="background:rgba(59,130,246,.12);color:var(--bl)"><i data-lucide="activity"></i></div><div class="live-n" data-target="99.8" data-suffix="%" data-float="1">0</div><div class="live-l" data-i="ls4">Аптайм сервиса</div></div>
-        <div class="live-card rv rv-d1 tilt"><div class="live-ic" style="background:rgba(239,68,68,.12);color:#ef4444"><i data-lucide="shield-check"></i></div><div class="live-n" data-target="847000" data-suffix="+">0</div><div class="live-l" data-i="ls5">Обойдённых блокировок</div></div>
-        <div class="live-card rv rv-d2 tilt"><div class="live-ic" style="background:rgba(124,106,239,.12);color:var(--ac2)"><i data-lucide="clock"></i></div><div class="live-n" data-target="1.8" data-suffix="с" data-float="1">0</div><div class="live-l" data-i="ls6">Среднее время подключения</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════ TECH STACK ═══════════════════ -->
-  <section id="tech" style="padding:90px 0;position:relative">
-    <div class="w">
-      <div class="slbl rv" data-i="tk_lbl">ПОД КАПОТОМ</div>
-      <div class="stl rv" data-i="tk_tl">Технологии, которые используются</div>
-      <div class="sdesc rv" style="margin-bottom:40px" data-i="tk_desc">Только проверенные open-source инструменты. Никаких проприетарных чёрных ящиков.</div>
-      <div class="tk-grid">
-        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🔐</div><h4>WireGuard</h4><p>Современный криптографический протокол VPN. Noise framework, Curve25519, ChaCha20-Poly1305.</p></div>
-        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🛡️</div><h4>WinDivert</h4><p>Пакетный фильтр уровня ядра Windows. Перехват и модификация трафика в режиме реального времени.</p></div>
-        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">☁️</div><h4>Cloudflare WARP</h4><p>Anycast сеть с тысячами POP-серверов. Маршрутизация через Argo Smart Routing для минимального пинга.</p></div>
-        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🎭</div><h4>AmneziaWG</h4><p>Fork WireGuard с junk-пакетами для обхода DPI. 7 готовых пресетов + кастомные параметры.</p></div>
-        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🌐</div><h4>DNS-over-HTTPS</h4><p>20+ защищённых DNS резолверов. Шифрование DNS-запросов предотвращает перехват провайдером.</p></div>
-        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">⚡</div><h4>sing-box</h4><p>Универсальный прокси-core с поддержкой SOCKS5, V2Ray, Shadowsocks. Fast-path и TCP BBR.</p></div>
-        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🦀</div><h4>winws</h4><p>Оптимизированный форк zapret на C. 27 стратегий fake/split/disorder для обхода DPI.</p></div>
-        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🔍</div><h4>Qt6 + WebView2</h4><p>Нативный UI с производительностью браузера. Минимум RAM, максимум отзывчивости.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════ SUPPORTED SERVICES ═══════════════════ -->
-  <section id="services" style="padding:80px 0">
-    <div class="w">
-      <div class="slbl rv" data-i="sv_lbl">ПОДДЕРЖИВАЕМЫЕ СЕРВИСЫ</div>
-      <div class="stl rv" data-i="sv_tl">Что разблокируем</div>
-      <div class="sdesc rv" style="margin-bottom:36px" data-i="sv_desc">Все популярные сервисы работают «из коробки». Автоподбор стратегии под каждый из них.</div>
-      <div class="sv-grid">
-        <div class="sv-item rv tilt"><span class="sv-em">📺</span><div><h5>YouTube</h5><p>4K без буферизации</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">💬</span><div><h5>Discord</h5><p>Голос + видео</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">✈️</span><div><h5>Telegram</h5><p>Все каналы + боты</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">🎮</span><div><h5>Steam / Epic</h5><p>Игры и DLC</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">🎵</span><div><h5>Spotify</h5><p>Оригинальные плейлисты</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">🎬</span><div><h5>Netflix</h5><p>Регион US/EU</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">🐦</span><div><h5>X (Twitter)</h5><p>Твиты и стримы</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">📷</span><div><h5>Instagram</h5><p>Reels, Stories, Live</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">💼</span><div><h5>LinkedIn</h5><p>Сообщения и посты</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">📖</span><div><h5>RuTracker</h5><p>Открытые разделы</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">🤖</span><div><h5>ChatGPT</h5><p>GPT-4 и Plus</p></div><span class="sv-ok">✓</span></div>
-        <div class="sv-item rv tilt"><span class="sv-em">🎨</span><div><h5>Midjourney</h5><p>Генерация без лимитов</p></div><span class="sv-ok">✓</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════ COMPARISON ═══════════════════ -->
-  <section id="compare" style="padding:90px 0;background:linear-gradient(135deg,rgba(16,185,129,.03),transparent)">
-    <div class="w" style="max-width:960px">
-      <div class="slbl rv" data-i="cp_lbl">СРАВНЕНИЕ</div>
-      <div class="stl rv" data-i="cp_tl">MrDogez vs другие VPN</div>
-      <div class="sdesc rv" style="margin-bottom:32px" data-i="cp_desc">Почему мы — если коротко.</div>
-      <div class="cmp rv">
-        <table class="cmp-t">
-          <thead>
-            <tr>
-              <th></th>
-              <th class="cmp-us"><strong>MrDogez Ultimate</strong></th>
-              <th>NordVPN</th>
-              <th>ExpressVPN</th>
-              <th>Mullvad</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>DPI Bypass (27 стратегий)</td><td class="cmp-us cmp-y">✓</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td></tr>
-            <tr><td>Работа в РФ без обхода</td><td class="cmp-us cmp-y">✓</td><td class="cmp-m">частично</td><td class="cmp-m">частично</td><td class="cmp-m">частично</td></tr>
-            <tr><td>Без регистрации аккаунта</td><td class="cmp-us cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-y">✓</td></tr>
-            <tr><td>Цена за 30 дней</td><td class="cmp-us cmp-y">249₽</td><td>990₽</td><td>1290₽</td><td>€5</td></tr>
-            <tr><td>Количество стран</td><td class="cmp-us cmp-y">43</td><td>60</td><td>105</td><td>38</td></tr>
-            <tr><td>Open Source клиент</td><td class="cmp-us cmp-y">✓</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-y">✓</td></tr>
-            <tr><td>Разблокировка YouTube 4K</td><td class="cmp-us cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-m">частично</td></tr>
-            <tr><td>WireGuard + junk packets</td><td class="cmp-us cmp-y">✓ (AmneziaWG)</td><td class="cmp-m">WG</td><td class="cmp-m">Lightway</td><td class="cmp-m">WG</td></tr>
-            <tr><td>Нет логов трафика</td><td class="cmp-us cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td></tr>
-            <tr><td>Обход DPI на уровне ядра</td><td class="cmp-us cmp-y">✓ (WinDivert)</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════ ROADMAP ═══════════════════ -->
-  <section id="roadmap" style="padding:90px 0">
+  <!-- ═══════════════════ JOURNEY / TIMELINE ═══════════════════ -->
+  <section id="journey" style="padding:90px 0;background:linear-gradient(135deg,rgba(124,106,239,.03),transparent)">
     <div class="w" style="max-width:820px">
-      <div class="slbl rv" data-i="rm_lbl">ДОРОЖНАЯ КАРТА</div>
-      <div class="stl rv" data-i="rm_tl">Что впереди</div>
+      <div class="slbl rv">ПУТЬ</div>
+      <div class="stl rv">Как всё начиналось</div>
       <div class="rm rv">
-        <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>v5.0 — WARP + 27 DPI стратегий</h4><span class="rm-d">Апрель 2026 — выпущено</span><p>Cloudflare WARP на WireGuard, AmneziaWG, 43 страны, SOCKS5/V2Ray с параллельным тестом, MITM-защита.</p></div></div>
-        <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>v5.1 — Antinoise Protocol</h4><span class="rm-d">Май 2026</span><p>Собственный протокол-имитатор HTTPS. Полностью неотличим от обычного веб-трафика на уровне DPI.</p></div></div>
-        <div class="rm-item now"><div class="rm-dot"></div><div class="rm-body"><h4>v5.2 — Mobile apps (Android / iOS)</h4><span class="rm-d">Лето 2026 — в разработке</span><p>Нативные приложения для Android (Kotlin) и iOS (Swift). Sync через облако. TV-версия для Android TV.</p></div></div>
-        <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>v6.0 — Multi-hop + Self-hosted</h4><span class="rm-d">Осень 2026</span><p>Цепочки 2-3 серверов для максимальной приватности. Возможность хостить свой relay-узел.</p></div></div>
-        <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>MrDogez Tools — новый проект</h4><span class="rm-d">Конец 2026</span><p>Набор утилит: клинер, оптимизатор Windows, менеджер паролей с zero-knowledge шифрованием.</p></div></div>
-        <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>MrDogez для Linux / macOS</h4><span class="rm-d">2027</span><p>Полноценные сборки под Linux (.deb, .rpm, AppImage) и macOS (Universal Binary для M1/Intel).</p></div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════ SECURITY ═══════════════════ -->
-  <section id="security" style="padding:90px 0;background:linear-gradient(135deg,rgba(234,179,8,.04),transparent)">
-    <div class="w">
-      <div class="slbl rv" data-i="sc_lbl">БЕЗОПАСНОСТЬ</div>
-      <div class="stl rv" data-i="sc_tl">Проверено и защищено</div>
-      <div class="sc-grid">
-        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="shield"></i><h4>Zero Logs Policy</h4></div><p>Мы физически не храним ваш трафик. Подтверждено регулярными аудитами open-source кодовой базы.</p></div>
-        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="key"></i><h4>PBKDF2 100k</h4></div><p>Пароли хешируются PBKDF2-SHA256 со 100 000 итераций + индивидуальная соль. Брутфорс экономически невыгоден.</p></div>
-        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="lock-keyhole"></i><h4>TLS 1.3 + Perfect Forward Secrecy</h4></div><p>Каждая сессия использует уникальные временные ключи. Компрометация одной сессии не компрометирует другие.</p></div>
-        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="code"></i><h4>Open Source</h4></div><p>Весь код приложения открыт на GitHub. Любой может провести аудит и убедиться в отсутствии backdoor.</p></div>
-        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="radio-tower"></i><h4>Kill Switch</h4></div><p>Если VPN-соединение внезапно оборвалось — весь трафик блокируется. Ни одного байта не уйдёт в открытую сеть.</p></div>
-        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="fingerprint"></i><h4>Anti-Cheat защита</h4></div><p>12 слоёв проверки целостности. Невозможно использовать взломанную или модифицированную версию приложения.</p></div>
+        <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>MrDogez Ultimate v1.0</h4><span class="rm-d">2024 — первый релиз</span><p>Простой DPI bypass tool. 5 стратегий. Чистый Python, консольный UI.</p></div></div>
+        <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>v3.0 — Qt6 интерфейс</h4><span class="rm-d">2025</span><p>Переход на Qt6 с нативным UI. Добавлены SOCKS5 прокси, параллельный тест, темы.</p></div></div>
+        <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>v4.0 — Cloudflare WARP</h4><span class="rm-d">Начало 2026</span><p>Интеграция WARP туннеля. Поддержка 43 стран через WireGuard.</p></div></div>
+        <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>v5.0 — 27 стратегий + MITM защита</h4><span class="rm-d">Апрель 2026</span><p>AmneziaWG, junk-пакеты, MITM-мониторинг, anti-cheat, облачная синхронизация аккаунтов.</p></div></div>
+        <div class="rm-item now"><div class="rm-dot"></div><div class="rm-body"><h4>MrDogez Tools — следующий проект</h4><span class="rm-d">В разработке — конец 2026</span><p>Набор утилит: клинер, оптимизатор Windows, менеджер паролей с zero-knowledge шифрованием.</p></div></div>
+        <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>Mobile + Linux / macOS</h4><span class="rm-d">2027</span><p>Нативные приложения для Android/iOS. Полноценные сборки под Unix.</p></div></div>
       </div>
     </div>
   </section>
@@ -923,7 +872,13 @@ body.has-banner .hero{padding-top:112px}
     <div class="tabs" id="mduT">
       <button class="on" onclick="mT('ov')" data-i="t_ov">Обзор</button>
       <button onclick="mT('ft')" data-i="t_ft">Возможности</button>
+      <button onclick="mT('dm')">Демо</button>
+      <button onclick="mT('tk')">Технологии</button>
+      <button onclick="mT('sv')">Сервисы</button>
       <button onclick="mT('pr')" data-i="t_pr">Тарифы</button>
+      <button onclick="mT('cm')">Сравнение</button>
+      <button onclick="mT('sc')">Безопасность</button>
+      <button onclick="mT('rm')">Roadmap</button>
       <button onclick="mT('dl')" data-i="t_dl">Скачать</button>
       <button onclick="mT('lg')" data-i="t_lg">Документы</button>
     </div>
@@ -971,6 +926,120 @@ body.has-banner .hero{padding-top:112px}
         <div class="fitem"><div class="ico ico-gn"><i data-lucide="server"></i></div><div><h4>DNS-over-HTTPS</h4><p data-i="f7">20+ защищённых DNS серверов для предотвращения подмены</p></div></div>
         <div class="fitem"><div class="ico ico-gd"><i data-lucide="network"></i></div><div><h4>SOCKS5 & V2Ray</h4><p data-i="f8">Бесплатные прокси с параллельным тестированием скорости</p></div></div>
         <div class="fitem"><div class="ico ico-bl"><i data-lucide="crown"></i></div><div><h4 data-i="f9t">Premium</h4><p data-i="f9">Безлимит скорости и трафика, VIP-серверы, приоритет</p></div></div>
+      </div>
+    </div>
+
+    <!-- Demo tab -->
+    <div class="tc" id="t-dm">
+      <div style="max-width:720px">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">Реальный запуск в терминале</h2>
+        <p style="color:var(--tx3);font-size:14px;margin-bottom:20px">Типичная сессия: от запуска до защищённого соединения за ~2 секунды.</p>
+        <div class="term" id="termDemo">
+          <div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><div class="term-title">mrdogez-ultimate — bash — 120×32</div></div>
+          <div class="term-body" id="termBody"></div>
+        </div>
+        <div class="mdu-facts" style="margin-top:32px">
+          <div class="mf"><div class="mf-n">27</div><div class="mf-l">DPI стратегий</div></div>
+          <div class="mf"><div class="mf-n">43</div><div class="mf-l">Страны WARP</div></div>
+          <div class="mf"><div class="mf-n">20+</div><div class="mf-l">DoH серверов</div></div>
+          <div class="mf"><div class="mf-n">12</div><div class="mf-l">Anti-cheat слоёв</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tech tab -->
+    <div class="tc" id="t-tk">
+      <div style="max-width:860px">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">Под капотом</h2>
+        <p style="color:var(--tx3);font-size:14px;margin-bottom:24px">Только проверенные open-source инструменты. Никаких проприетарных чёрных ящиков.</p>
+        <div class="tk-grid">
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🔐</div><h4>WireGuard</h4><p>Современный криптографический протокол VPN. Noise framework, Curve25519, ChaCha20-Poly1305.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🛡️</div><h4>WinDivert</h4><p>Пакетный фильтр уровня ядра Windows. Перехват и модификация трафика в режиме реального времени.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">☁️</div><h4>Cloudflare WARP</h4><p>Anycast сеть с тысячами POP-серверов. Маршрутизация через Argo Smart Routing для минимального пинга.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🎭</div><h4>AmneziaWG</h4><p>Fork WireGuard с junk-пакетами для обхода DPI. 7 готовых пресетов + кастомные параметры.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🌐</div><h4>DNS-over-HTTPS</h4><p>20+ защищённых DNS резолверов. Шифрование DNS-запросов предотвращает перехват провайдером.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">⚡</div><h4>sing-box</h4><p>Универсальный прокси-core с поддержкой SOCKS5, V2Ray, Shadowsocks. Fast-path и TCP BBR.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🦀</div><h4>winws</h4><p>Оптимизированный форк zapret на C. 27 стратегий fake/split/disorder для обхода DPI.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🔍</div><h4>Qt6 + WebView2</h4><p>Нативный UI с производительностью браузера. Минимум RAM, максимум отзывчивости.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services tab -->
+    <div class="tc" id="t-sv">
+      <div style="max-width:860px">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">Что разблокируем</h2>
+        <p style="color:var(--tx3);font-size:14px;margin-bottom:24px">Все популярные сервисы работают «из коробки». Автоподбор стратегии под каждый.</p>
+        <div class="sv-grid">
+          <div class="sv-item tilt"><span class="sv-em">📺</span><div><h5>YouTube</h5><p>4K без буферизации</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">💬</span><div><h5>Discord</h5><p>Голос + видео</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">✈️</span><div><h5>Telegram</h5><p>Все каналы + боты</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🎮</span><div><h5>Steam / Epic</h5><p>Игры и DLC</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🎵</span><div><h5>Spotify</h5><p>Оригинальные плейлисты</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🎬</span><div><h5>Netflix</h5><p>Регион US/EU</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🐦</span><div><h5>X (Twitter)</h5><p>Твиты и стримы</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">📷</span><div><h5>Instagram</h5><p>Reels, Stories, Live</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">💼</span><div><h5>LinkedIn</h5><p>Сообщения и посты</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">📖</span><div><h5>RuTracker</h5><p>Открытые разделы</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🤖</span><div><h5>ChatGPT</h5><p>GPT-4 и Plus</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🎨</span><div><h5>Midjourney</h5><p>Без лимитов</p></div><span class="sv-ok">✓</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison tab -->
+    <div class="tc" id="t-cm">
+      <div style="max-width:860px">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">MrDogez vs другие VPN</h2>
+        <p style="color:var(--tx3);font-size:14px;margin-bottom:24px">Что мы делаем лучше, а что хуже — честно.</p>
+        <div class="cmp">
+          <table class="cmp-t">
+            <thead><tr><th></th><th class="cmp-us"><strong>MrDogez Ultimate</strong></th><th>NordVPN</th><th>ExpressVPN</th><th>Mullvad</th></tr></thead>
+            <tbody>
+              <tr><td>DPI Bypass (27 стратегий)</td><td class="cmp-us cmp-y">✓</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td></tr>
+              <tr><td>Работа в РФ без обхода</td><td class="cmp-us cmp-y">✓</td><td class="cmp-m">частично</td><td class="cmp-m">частично</td><td class="cmp-m">частично</td></tr>
+              <tr><td>Без регистрации аккаунта</td><td class="cmp-us cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-y">✓</td></tr>
+              <tr><td>Цена за 30 дней</td><td class="cmp-us cmp-y">249₽</td><td>990₽</td><td>1290₽</td><td>€5</td></tr>
+              <tr><td>Количество стран</td><td class="cmp-us">43</td><td class="cmp-y">60</td><td class="cmp-y">105</td><td>38</td></tr>
+              <tr><td>Open Source клиент</td><td class="cmp-us cmp-y">✓</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-y">✓</td></tr>
+              <tr><td>Разблокировка YouTube 4K</td><td class="cmp-us cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-m">частично</td></tr>
+              <tr><td>WireGuard + junk packets</td><td class="cmp-us cmp-y">✓ AmneziaWG</td><td class="cmp-m">WG</td><td class="cmp-m">Lightway</td><td class="cmp-m">WG</td></tr>
+              <tr><td>Нет логов трафика</td><td class="cmp-us cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td></tr>
+              <tr><td>DPI Bypass на уровне ядра</td><td class="cmp-us cmp-y">✓ WinDivert</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security tab -->
+    <div class="tc" id="t-sc">
+      <div style="max-width:860px">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">Безопасность</h2>
+        <p style="color:var(--tx3);font-size:14px;margin-bottom:24px">Как мы защищаем приложение и ваши данные.</p>
+        <div class="sc-grid">
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="shield"></i><h4>Zero Logs Policy</h4></div><p>Физически не храним трафик. Подтверждено open-source аудитом кодовой базы.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="key"></i><h4>PBKDF2 · 100k iter</h4></div><p>Пароли хешируются PBKDF2-SHA256 со 100 000 итераций + индивидуальная соль.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="lock-keyhole"></i><h4>TLS 1.3 + PFS</h4></div><p>Perfect Forward Secrecy: компрометация одной сессии не ломает другие.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="code"></i><h4>Open Source</h4></div><p>Код открыт на GitHub. Любой может провести аудит и убедиться в отсутствии backdoor.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="radio-tower"></i><h4>Kill Switch</h4></div><p>Если VPN оборвался — весь трафик блокируется до реконнекта. Никаких утечек.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="fingerprint"></i><h4>Anti-Cheat · 12 слоёв</h4></div><p>Integrity проверки, debugger/VM detection, file tamper, memory patch и др.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roadmap tab -->
+    <div class="tc" id="t-rm">
+      <div style="max-width:720px">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">Roadmap MrDogez Ultimate</h2>
+        <p style="color:var(--tx3);font-size:14px;margin-bottom:24px">Что уже сделано и что впереди — именно по этому продукту.</p>
+        <div class="rm">
+          <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>v5.0 — Cloudflare WARP + 27 DPI</h4><span class="rm-d">Апрель 2026 — выпущено</span><p>AmneziaWG, 43 страны, SOCKS5/V2Ray, MITM-защита, 12-слойный анти-чит.</p></div></div>
+          <div class="rm-item now"><div class="rm-dot"></div><div class="rm-body"><h4>v5.1 — Antinoise Protocol</h4><span class="rm-d">Май 2026 — в разработке</span><p>Собственный протокол-имитатор HTTPS. Неотличим от обычного веб-трафика на DPI.</p></div></div>
+          <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>v5.2 — Mobile (Android / iOS)</h4><span class="rm-d">Лето 2026</span><p>Нативные приложения Kotlin / Swift. Cross-device sync. TV-версия.</p></div></div>
+          <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>v6.0 — Multi-hop + Self-hosted</h4><span class="rm-d">Осень 2026</span><p>Цепочки 2-3 серверов. Возможность хостить свой relay-узел.</p></div></div>
+          <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>Linux / macOS сборки</h4><span class="rm-d">2027</span><p>.deb, .rpm, AppImage + Universal Binary (M1/Intel).</p></div></div>
+        </div>
       </div>
     </div>
 
