@@ -1149,22 +1149,57 @@ const SHOP_ITEMS = [
   {key:'traffic_100',    name:'💎 +100 ГБ трафика',        price:199, desc:'Одноразово',                   color:'#8b5cf6'},
 ];
 
-function openShop(){
+async function openShop(){
   const tok = localStorage.getItem('mrd_tok');
   if(!tok){ cA(); alert('Сначала войдите в аккаунт'); document.getElementById('authM').classList.add('open'); return; }
   cA();
   const grid = document.getElementById('shopGrid');
-  grid.innerHTML = SHOP_ITEMS.map(it => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--gnd);border:1px solid var(--bd);border-radius:12px;gap:10px">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:14px;margin-bottom:2px">${it.name}</div>
-        <div style="font-size:12px;color:var(--tx3)">${it.desc}</div>
-      </div>
-      <button class="btn btn-p" style="padding:8px 14px;font-size:13px;background:${it.color};border-color:${it.color};white-space:nowrap" onclick="buyItem('${it.key}')">${it.price}₽</button>
-    </div>
-  `).join('');
-  document.getElementById('shopMsg').textContent = '';
+  grid.innerHTML = '<div style="text-align:center;color:var(--tx3);padding:20px">Загрузка...</div>';
   document.getElementById('shopM').classList.add('open');
+
+  // Pull fresh state from cloud
+  let prof = {};
+  try{
+    const r = await fetch(WORKER_URL+'/site_me?token='+tok);
+    const d = await r.json();
+    if(d.ok){ prof = d; localStorage.setItem('mrd_prof', JSON.stringify(d)); }
+    else { prof = JSON.parse(localStorage.getItem('mrd_prof') || '{}'); }
+  } catch(e) { prof = JSON.parse(localStorage.getItem('mrd_prof') || '{}'); }
+
+  const now = Math.floor(Date.now()/1000);
+  function itemStatus(it){
+    if(it.key==='premium_30' && prof.premium) return 'premium';
+    if(['traffic_5','traffic_20','traffic_100'].includes(it.key) && prof.premium) return 'premium_has_unlim';
+    if(it.key==='speed_boost' && prof.speed_boost_until && prof.speed_boost_until > now) return 'active';
+    if(it.key==='unlock_rf' && prof.unlock_rf) return 'active';
+    if(it.key==='unlim_profiles' && prof.unlim_profiles) return 'active';
+    return 'buy';
+  }
+  function ownedLabel(it){
+    const s = itemStatus(it);
+    if(s==='premium') return `Активен до ${new Date((prof.premium_until||0)*1000).toLocaleDateString('ru-RU')}`;
+    if(s==='premium_has_unlim') return 'Безлимит (Premium)';
+    if(s==='active') return it.key==='speed_boost'
+      ? 'Активен до ' + new Date((prof.speed_boost_until||0)*1000).toLocaleDateString('ru-RU')
+      : 'Активно навсегда';
+    return null;
+  }
+
+  grid.innerHTML = SHOP_ITEMS.map(it => {
+    const owned = ownedLabel(it);
+    const btn = owned
+      ? `<div style="padding:8px 14px;font-size:12px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.35);color:#10b981;border-radius:8px;white-space:nowrap;font-weight:600">✓ Куплено</div>`
+      : `<button class="btn btn-p" style="padding:8px 14px;font-size:13px;background:${it.color};border-color:${it.color};white-space:nowrap" onclick="buyItem('${it.key}')">${it.price}₽</button>`;
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--gnd);border:1px solid var(--bd);border-radius:12px;gap:10px${owned ? ';opacity:.75' : ''}">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px;margin-bottom:2px">${it.name}</div>
+          <div style="font-size:12px;color:${owned ? '#10b981' : 'var(--tx3)'}">${owned || it.desc}</div>
+        </div>
+        ${btn}
+      </div>`;
+  }).join('');
+  document.getElementById('shopMsg').textContent = '';
   lucide.createIcons();
 }
 
