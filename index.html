@@ -196,9 +196,9 @@ nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;disp
 
 /* Tabs */
 .tabs{display:flex;gap:2px;padding:3px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;margin-bottom:36px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tabs button{padding:8px 16px;border-radius:9px;font-size:12px;font-weight:600;color:var(--tx3);transition:all .15s;white-space:nowrap}
-.tabs button:hover{color:var(--tx2)}
-.tabs button.on{background:var(--ac);color:#fff;box-shadow:0 2px 8px rgba(124,106,239,.2)}
+.tabs button{padding:9px 16px;border-radius:10px;font-size:12px;font-weight:600;color:var(--tx3);transition:all .2s;white-space:nowrap;background:transparent;border:1px solid transparent}
+.tabs button:hover{color:var(--tx);background:rgba(255,255,255,.03)}
+.tabs button.on{background:linear-gradient(135deg,#7c6aef,#6c5adf);color:#fff;box-shadow:0 4px 14px -2px rgba(124,106,239,.55),inset 0 1px 0 rgba(255,255,255,.15);border-color:rgba(124,106,239,.4)}
 .tc{display:none;animation:fi .3s var(--e)}.tc.on{display:block}
 @keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
@@ -219,7 +219,8 @@ nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;disp
 
 /* Pricing */
 .prg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-.prc{padding:28px 22px;border-radius:var(--r);background:var(--sf);border:1px solid var(--bd);transition:all .3s var(--e);position:relative}
+.prc{padding:28px 22px;border-radius:var(--r);background:var(--sf);border:1px solid var(--bd);transition:all .3s var(--e);position:relative;display:flex;flex-direction:column}
+.prc ul{flex:1}
 .prc.hi{border-color:rgba(124,106,239,.25);background:var(--acd)}
 .prc.hi::before{content:'';position:absolute;top:0;left:20px;right:20px;height:2px;background:linear-gradient(90deg,var(--ac),var(--gn),var(--gd));border-radius:0 0 2px 2px}
 .prc:hover{transform:translateY(-3px);box-shadow:0 16px 48px -12px rgba(124,106,239,.1)}
@@ -596,7 +597,7 @@ body.has-banner .hero{padding-top:112px}
     <div class="hfloat hf4"><i data-lucide="zap" style="width:42px;height:42px"></i></div>
     <div class="htag"><i></i> <span data-i="h_tag">Open Source & Privacy First</span></div>
     <h1><span data-i="h_t1">Создаю</span> <em data-i="h_t2">программы</em><br><span data-i="h_t3">для людей</span></h1>
-    <p data-i="h_desc">Разработка полезного софта: от VPN и обхода блокировок до утилит и инструментов повседневного использования. Без рекламы и слежки.</p>
+    <p data-i="h_desc">Делаю независимый софт — десктопные приложения, утилиты, инструменты, веб-сервисы. От первой строчки кода до релизного продукта. Без рекламы, трекеров и инвесторов.</p>
     <div class="hbtns">
       <a class="btn btn-p" onclick="sTo('projects')"><i data-lucide="layers" style="width:15px;height:15px"></i> <span data-i="h_btn1">Смотреть проекты</span></a>
       <a class="btn btn-s" href="https://github.com/MrDogez" target="_blank"><i data-lucide="github" style="width:15px;height:15px"></i> GitHub</a>
@@ -754,42 +755,58 @@ body.has-banner .hero{padding-top:112px}
 
   <!-- FAQ -->
   <section id="faq">
-    <div class="w">
-      <div class="slbl rv" data-i="faq_lbl">ВОПРОСЫ И ОТВЕТЫ</div>
-      <div class="stl rv" data-i="faq_tl">Частые вопросы</div>
-      <div class="sdesc rv" style="margin-bottom:32px" data-i="faq_desc">Ответы на самые популярные вопросы о наших продуктах.</div>
+    <div class="w" style="max-width:820px">
+      <div class="slbl rv">ЧАСТЫЕ ВОПРОСЫ</div>
+      <div class="stl rv">Всё о проектах и авторе</div>
+      <div class="sdesc rv" style="margin-bottom:32px">Ответы на самые распространённые вопросы о MrDogez Project — как об авторе, так и о конкретных продуктах.</div>
 
       <div class="faq-item rv" onclick="this.classList.toggle('open')">
-        <div class="faq-h"><span data-i="fq1_q">Это бесплатно?</span><i data-lucide="chevron-down"></i></div>
-        <div class="faq-b"><div class="faq-bi" data-i="fq1_a">Да, базовая версия MrDogez Ultimate полностью бесплатна и включает DPI bypass (27 стратегий), WARP подключение, 5 ГБ трафика в месяц и 20+ DNS серверов. Premium-подписка расширяет возможности: безлимитная скорость, безлимитный трафик, VIP-серверы и приоритетная поддержка.</div></div>
+        <div class="faq-h"><span>Кто такой MrDogez?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Я независимый разработчик, создаю программы под Windows уже более 5 лет. Специализируюсь на системном ПО, сетевых инструментах, приложениях для приватности и повседневных утилитах. Пишу на Python, C/C++, JavaScript. Работаю один — без компании, инвесторов и маркетологов. Все мои проекты — это решение реальных проблем, с которыми я сам сталкивался.</div></div>
       </div>
       <div class="faq-item rv" onclick="this.classList.toggle('open')">
-        <div class="faq-h"><span data-i="fq2_q">Это законно?</span><i data-lucide="chevron-down"></i></div>
-        <div class="faq-b"><div class="faq-bi" data-i="fq2_a">MrDogez Ultimate — это инструмент для защиты приватности и безопасности в интернете. Использование VPN и средств шифрования трафика является законным в большинстве стран. Пользователи несут ответственность за соблюдение законодательства своей юрисдикции.</div></div>
+        <div class="faq-h"><span>Что такое MrDogez Project?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">MrDogez Project — это бренд под которым я выпускаю все свои программы. Не студия, не команда, а единое имя для моих продуктов. Каждый продукт — отдельное приложение со своим функционалом и ценой. Сейчас релизный только MrDogez Ultimate (VPN + обход блокировок), но в разработке Tools (набор утилит), Mobile-версии и многое другое.</div></div>
       </div>
       <div class="faq-item rv" onclick="this.classList.toggle('open')">
-        <div class="faq-h"><span data-i="fq3_q">Как работает обход блокировок?</span><i data-lucide="chevron-down"></i></div>
-        <div class="faq-b"><div class="faq-bi" data-i="fq3_a">Программа использует комбинацию технологий: 27 стратегий DPI bypass (фрагментация пакетов, модификация SNI, изменение TTL), зашифрованный WARP туннель через WireGuard, и сеть бесплатных SOCKS5/V2Ray прокси. Система автоматически определяет вашего провайдера и подбирает оптимальный метод.</div></div>
+        <div class="faq-h"><span>Есть ли реклама или трекеры?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Нет — и никогда не будет. Во всех моих программах категорически отсутствуют: сторонняя реклама (баннеры, попапы, интеграции), аналитика и телеметрия (Google Analytics, Firebase, Amplitude и т.п.), трекеры поведения, пиксели ремаркетинга. Приватность — фундаментальный принцип, не маркетинговый лозунг. Это проверяется открытым кодом на GitHub.</div></div>
       </div>
       <div class="faq-item rv" onclick="this.classList.toggle('open')">
-        <div class="faq-h"><span data-i="fq4_q">Какие провайдеры поддерживаются?</span><i data-lucide="chevron-down"></i></div>
-        <div class="faq-b"><div class="faq-bi" data-i="fq4_a">MrDogez Ultimate работает с любым интернет-провайдером. Система ISP-кэширования запоминает какие методы работают на вашем провайдере, чтобы последующие подключения были мгновенными. Поддерживаются Ростелеком, МТС, Билайн, Мегафон, Tele2 и все остальные.</div></div>
+        <div class="faq-h"><span>На чём разрабатываются приложения?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Основной стек: <b>Python 3.14</b> для бэкенда и логики, <b>C++ + Qt6</b> для нативного UI, <b>JavaScript / HTML / CSS</b> для веб-частей и WebView2-гибридов, <b>Cloudflare Workers</b> для облачной инфраструктуры. Для сборки использую PyInstaller, Advanced Installer (MSI), CMake. Под VPN-протоколы — WireGuard, AmneziaWG, WinDivert. Всё документировано в открытых репозиториях.</div></div>
       </div>
       <div class="faq-item rv" onclick="this.classList.toggle('open')">
-        <div class="faq-h"><span data-i="fq5_q">Мои данные в безопасности?</span><i data-lucide="chevron-down"></i></div>
-        <div class="faq-b"><div class="faq-bi" data-i="fq5_a">Абсолютно. Мы не собираем никаких данных о вашем трафике, посещённых сайтах или DNS-запросах. Все соединения шифруются WireGuard. MITM-защита в реальном времени предотвращает перехват. Мы храним только email и хэш пароля для авторизации.</div></div>
+        <div class="faq-h"><span>Работают ли приложения на Mac / Linux / Android?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Сейчас основная платформа — <b>Windows 10/11 x64</b>. В разработке находятся: мобильные приложения для Android (Kotlin) и iOS (Swift) с синхронизацией через облако и поддержкой Android TV — планируются на лето 2026. Полноценные сборки под Linux (.deb, .rpm, AppImage) и macOS (Universal Binary для Apple Silicon + Intel) — запланированы на 2027 год.</div></div>
       </div>
       <div class="faq-item rv" onclick="this.classList.toggle('open')">
-        <div class="faq-h"><span data-i="fq6_q">Как оплатить Premium?</span><i data-lucide="chevron-down"></i></div>
-        <div class="faq-b"><div class="faq-bi" data-i="fq6_a">Оплата производится через приложение. Поддерживаются банковские карты РФ и СБП. После оплаты Premium активируется мгновенно на 30 дней. Автоматического продления нет — после истечения аккаунт переходит на бесплатный тариф.</div></div>
+        <div class="faq-h"><span>Как происходит оплата?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Все платежи обрабатываются через <b>Monee.pro</b> — российский агрегатор с лицензией. Поддерживаются банковские карты РФ (Visa, Mastercard, МИР), СБП (Система Быстрых Платежей) и электронные кошельки. Мы <b>не видим и не храним</b> данные карт — это обрабатывает только платёжная система. После успешной оплаты товар активируется автоматически в течение 1-2 минут через облако.</div></div>
       </div>
       <div class="faq-item rv" onclick="this.classList.toggle('open')">
-        <div class="faq-h"><span data-i="fq7_q">Можно вернуть деньги?</span><i data-lucide="chevron-down"></i></div>
-        <div class="faq-b"><div class="faq-bi" data-i="fq7_a">Да, полный возврат возможен в течение 24 часов с момента оплаты, если услуга не была использована. Свяжитесь через Telegram (@MrDogez) с email аккаунта и номером транзакции. Обработка занимает 1-3 рабочих дня.</div></div>
+        <div class="faq-h"><span>Можно ли вернуть деньги?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Да, возврат возможен в течение <b>24 часов</b> для подписок и расходных товаров (Premium, пакеты трафика, буст), и <b>48 часов</b> для постоянных функций (Разблокировка РФ, Безлимит профилей) — при условии что услуга не активирована или не использовалась. Для возврата напишите в Telegram <a href="https://t.me/MrDogez" style="color:var(--ac2)">@MrDogez</a> с email аккаунта и номером транзакции. Обработка 1-3 рабочих дня. Деньги возвращаются тем же способом оплаты.</div></div>
       </div>
       <div class="faq-item rv" onclick="this.classList.toggle('open')">
-        <div class="faq-h"><span data-i="fq8_q">На каких устройствах работает?</span><i data-lucide="chevron-down"></i></div>
-        <div class="faq-b"><div class="faq-bi" data-i="fq8_a">Сейчас MrDogez Ultimate доступен для Windows 10 и Windows 11 (x64). Версии для Android и macOS находятся в разработке и будут доступны в ближайших обновлениях. Следите за новостями в Telegram.</div></div>
+        <div class="faq-h"><span>Что если мой аккаунт заблокируют?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Блокировка — крайняя мера, применяемая только при систематическом нарушении правил (использование читов, модификация файлов, обратная разработка, совместное использование аккаунта с нескольких IP). Все приобретённые цифровые товары при блокировке аннулируются без возврата — это условие указано в Пользовательском соглашении. Подробнее о системе античит — в разделе Документы на странице продукта.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span>Как связаться с поддержкой?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Основной канал связи — <b>Telegram</b>: <a href="https://t.me/MrDogez" style="color:var(--ac2)">@MrDogez</a> (личка автора) или <a href="https://t.me/MrDogezProject" style="color:var(--ac2)">@MrDogezProject</a> (канал новостей). Также работает <a href="https://t.me/MrDogez_bot" style="color:var(--ac2)">@MrDogez_bot</a> для автоматических уведомлений о покупках и событиях аккаунта. Среднее время ответа — до 24 часов в рабочее время.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span>Можно ли сотрудничать / заказать разработку?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Сейчас я сфокусирован на своих продуктах и не беру сторонние заказы. Однако открыт для предложений о: сотрудничестве по открытому коду (pull requests на GitHub), обсуждении технических вопросов и консультации, интеграции моих проектов в ваши сервисы через API. Пишите в <a href="https://t.me/MrDogez" style="color:var(--ac2)">@MrDogez</a> — обсудим.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span>Есть ли бесплатные версии?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Да. MrDogez Ultimate имеет полностью функциональную <b>бесплатную версию</b> с DPI bypass (27 стратегий), WARP подключением, 5 ГБ трафика/мес и 20+ DNS серверов. Платные только дополнения: безлимит, VIP-сервера, буст скорости. Будущие проекты (Tools) планируются по модели <b>freemium</b> — основные функции бесплатно, премиум-фичи за небольшую подписку.</div></div>
+      </div>
+      <div class="faq-item rv" onclick="this.classList.toggle('open')">
+        <div class="faq-h"><span>Где посмотреть исходный код?</span><i data-lucide="chevron-down"></i></div>
+        <div class="faq-b"><div class="faq-bi">Исходный код сайта и некоторые компоненты проектов доступны на GitHub: <a href="https://github.com/MrDogez" style="color:var(--ac2)">github.com/MrDogez</a>. Ядро MrDogez Ultimate (серверная логика, античит, платежи) частично открыто для аудита. Публичные репозитории: mrdogez.github.io (этот сайт), часть утилит. Полностью проприетарные части закрыты по соображениям безопасности.</div></div>
       </div>
     </div>
   </section>
@@ -872,12 +889,8 @@ body.has-banner .hero{padding-top:112px}
     <div class="tabs" id="mduT">
       <button class="on" onclick="mT('ov')" data-i="t_ov">Обзор</button>
       <button onclick="mT('ft')" data-i="t_ft">Возможности</button>
-      <button onclick="mT('dm')">Демо</button>
-      <button onclick="mT('tk')">Технологии</button>
-      <button onclick="mT('sv')">Сервисы</button>
       <button onclick="mT('pr')" data-i="t_pr">Тарифы</button>
       <button onclick="mT('cm')">Сравнение</button>
-      <button onclick="mT('sc')">Безопасность</button>
       <button onclick="mT('rm')">Roadmap</button>
       <button onclick="mT('dl')" data-i="t_dl">Скачать</button>
       <button onclick="mT('lg')" data-i="t_lg">Документы</button>
@@ -927,65 +940,70 @@ body.has-banner .hero{padding-top:112px}
         <div class="fitem"><div class="ico ico-gd"><i data-lucide="network"></i></div><div><h4>SOCKS5 & V2Ray</h4><p data-i="f8">Бесплатные прокси с параллельным тестированием скорости</p></div></div>
         <div class="fitem"><div class="ico ico-bl"><i data-lucide="crown"></i></div><div><h4 data-i="f9t">Premium</h4><p data-i="f9">Безлимит скорости и трафика, VIP-серверы, приоритет</p></div></div>
       </div>
-    </div>
 
-    <!-- Demo tab -->
-    <div class="tc" id="t-dm">
-      <div style="max-width:720px">
-        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">Реальный запуск в терминале</h2>
-        <p style="color:var(--tx3);font-size:14px;margin-bottom:20px">Типичная сессия: от запуска до защищённого соединения за ~2 секунды.</p>
+      <!-- Live terminal demo inside Features tab -->
+      <div style="max-width:720px;margin-top:48px">
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:8px">Как выглядит запуск</h3>
+        <p style="color:var(--tx3);font-size:13px;margin-bottom:16px">Типичная сессия: от запуска до защищённого соединения за ~2 секунды.</p>
         <div class="term" id="termDemo">
           <div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><div class="term-title">mrdogez-ultimate — bash — 120×32</div></div>
           <div class="term-body" id="termBody"></div>
         </div>
-        <div class="mdu-facts" style="margin-top:32px">
-          <div class="mf"><div class="mf-n">27</div><div class="mf-l">DPI стратегий</div></div>
-          <div class="mf"><div class="mf-n">43</div><div class="mf-l">Страны WARP</div></div>
-          <div class="mf"><div class="mf-n">20+</div><div class="mf-l">DoH серверов</div></div>
-          <div class="mf"><div class="mf-n">12</div><div class="mf-l">Anti-cheat слоёв</div></div>
-        </div>
       </div>
-    </div>
 
-    <!-- Tech tab -->
-    <div class="tc" id="t-tk">
-      <div style="max-width:860px">
-        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">Под капотом</h2>
-        <p style="color:var(--tx3);font-size:14px;margin-bottom:24px">Только проверенные open-source инструменты. Никаких проприетарных чёрных ящиков.</p>
+      <!-- Tech stack -->
+      <div style="margin-top:56px">
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px">Под капотом — технологии</h3>
+        <p style="color:var(--tx3);font-size:13px;margin-bottom:20px">Только проверенные open-source инструменты.</p>
         <div class="tk-grid">
-          <div class="tk-card glow-hover tilt"><div class="tk-ico">🔐</div><h4>WireGuard</h4><p>Современный криптографический протокол VPN. Noise framework, Curve25519, ChaCha20-Poly1305.</p></div>
-          <div class="tk-card glow-hover tilt"><div class="tk-ico">🛡️</div><h4>WinDivert</h4><p>Пакетный фильтр уровня ядра Windows. Перехват и модификация трафика в режиме реального времени.</p></div>
-          <div class="tk-card glow-hover tilt"><div class="tk-ico">☁️</div><h4>Cloudflare WARP</h4><p>Anycast сеть с тысячами POP-серверов. Маршрутизация через Argo Smart Routing для минимального пинга.</p></div>
-          <div class="tk-card glow-hover tilt"><div class="tk-ico">🎭</div><h4>AmneziaWG</h4><p>Fork WireGuard с junk-пакетами для обхода DPI. 7 готовых пресетов + кастомные параметры.</p></div>
-          <div class="tk-card glow-hover tilt"><div class="tk-ico">🌐</div><h4>DNS-over-HTTPS</h4><p>20+ защищённых DNS резолверов. Шифрование DNS-запросов предотвращает перехват провайдером.</p></div>
-          <div class="tk-card glow-hover tilt"><div class="tk-ico">⚡</div><h4>sing-box</h4><p>Универсальный прокси-core с поддержкой SOCKS5, V2Ray, Shadowsocks. Fast-path и TCP BBR.</p></div>
-          <div class="tk-card glow-hover tilt"><div class="tk-ico">🦀</div><h4>winws</h4><p>Оптимизированный форк zapret на C. 27 стратегий fake/split/disorder для обхода DPI.</p></div>
-          <div class="tk-card glow-hover tilt"><div class="tk-ico">🔍</div><h4>Qt6 + WebView2</h4><p>Нативный UI с производительностью браузера. Минимум RAM, максимум отзывчивости.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🔐</div><h4>WireGuard</h4><p>Современный VPN-протокол. Curve25519, ChaCha20-Poly1305.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🛡️</div><h4>WinDivert</h4><p>Kernel-фильтр Windows. Перехват и модификация трафика.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">☁️</div><h4>Cloudflare WARP</h4><p>Anycast сеть, Argo Smart Routing, минимальный пинг.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🎭</div><h4>AmneziaWG</h4><p>WireGuard с junk-пакетами для обхода DPI.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🌐</div><h4>DNS-over-HTTPS</h4><p>20+ защищённых резолверов вместо открытых DNS.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">⚡</div><h4>sing-box</h4><p>SOCKS5 / V2Ray / Shadowsocks с TCP BBR.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🦀</div><h4>winws</h4><p>Форк zapret. 27 стратегий fake/split/disorder.</p></div>
+          <div class="tk-card glow-hover tilt"><div class="tk-ico">🔍</div><h4>Qt6 + WebView2</h4><p>Нативный UI + HTML. Минимум RAM, максимум отзыв-ти.</p></div>
         </div>
       </div>
-    </div>
 
-    <!-- Services tab -->
-    <div class="tc" id="t-sv">
-      <div style="max-width:860px">
-        <h2 style="font-size:22px;font-weight:800;margin-bottom:10px">Что разблокируем</h2>
-        <p style="color:var(--tx3);font-size:14px;margin-bottom:24px">Все популярные сервисы работают «из коробки». Автоподбор стратегии под каждый.</p>
+      <!-- Supported services -->
+      <div style="margin-top:56px">
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px">Что разблокируем</h3>
+        <p style="color:var(--tx3);font-size:13px;margin-bottom:20px">Все популярные сервисы работают «из коробки».</p>
         <div class="sv-grid">
           <div class="sv-item tilt"><span class="sv-em">📺</span><div><h5>YouTube</h5><p>4K без буферизации</p></div><span class="sv-ok">✓</span></div>
           <div class="sv-item tilt"><span class="sv-em">💬</span><div><h5>Discord</h5><p>Голос + видео</p></div><span class="sv-ok">✓</span></div>
-          <div class="sv-item tilt"><span class="sv-em">✈️</span><div><h5>Telegram</h5><p>Все каналы + боты</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">✈️</span><div><h5>Telegram</h5><p>Все каналы</p></div><span class="sv-ok">✓</span></div>
           <div class="sv-item tilt"><span class="sv-em">🎮</span><div><h5>Steam / Epic</h5><p>Игры и DLC</p></div><span class="sv-ok">✓</span></div>
-          <div class="sv-item tilt"><span class="sv-em">🎵</span><div><h5>Spotify</h5><p>Оригинальные плейлисты</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🎵</span><div><h5>Spotify</h5><p>Плейлисты</p></div><span class="sv-ok">✓</span></div>
           <div class="sv-item tilt"><span class="sv-em">🎬</span><div><h5>Netflix</h5><p>Регион US/EU</p></div><span class="sv-ok">✓</span></div>
-          <div class="sv-item tilt"><span class="sv-em">🐦</span><div><h5>X (Twitter)</h5><p>Твиты и стримы</p></div><span class="sv-ok">✓</span></div>
-          <div class="sv-item tilt"><span class="sv-em">📷</span><div><h5>Instagram</h5><p>Reels, Stories, Live</p></div><span class="sv-ok">✓</span></div>
-          <div class="sv-item tilt"><span class="sv-em">💼</span><div><h5>LinkedIn</h5><p>Сообщения и посты</p></div><span class="sv-ok">✓</span></div>
-          <div class="sv-item tilt"><span class="sv-em">📖</span><div><h5>RuTracker</h5><p>Открытые разделы</p></div><span class="sv-ok">✓</span></div>
-          <div class="sv-item tilt"><span class="sv-em">🤖</span><div><h5>ChatGPT</h5><p>GPT-4 и Plus</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🐦</span><div><h5>X (Twitter)</h5><p>Твиты</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">📷</span><div><h5>Instagram</h5><p>Reels, Stories</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">🤖</span><div><h5>ChatGPT</h5><p>GPT-4 Plus</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">📖</span><div><h5>RuTracker</h5><p>Все разделы</p></div><span class="sv-ok">✓</span></div>
           <div class="sv-item tilt"><span class="sv-em">🎨</span><div><h5>Midjourney</h5><p>Без лимитов</p></div><span class="sv-ok">✓</span></div>
+          <div class="sv-item tilt"><span class="sv-em">💼</span><div><h5>LinkedIn</h5><p>Сообщения</p></div><span class="sv-ok">✓</span></div>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div style="margin-top:56px">
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px">Безопасность</h3>
+        <p style="color:var(--tx3);font-size:13px;margin-bottom:20px">Как мы защищаем приложение и ваши данные.</p>
+        <div class="sc-grid">
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="shield"></i><h4>Zero Logs</h4></div><p>Физически не храним трафик. Подтверждено open-source аудитом.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="key"></i><h4>PBKDF2 · 100k</h4></div><p>Пароли + индивидуальная соль. Брутфорс экономически невыгоден.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="lock-keyhole"></i><h4>TLS 1.3 + PFS</h4></div><p>Perfect Forward Secrecy — компрометация одной сессии безопасна.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="radio-tower"></i><h4>Kill Switch</h4></div><p>VPN оборвался — весь трафик блокируется. Никаких утечек.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="fingerprint"></i><h4>Anti-Cheat</h4></div><p>12 слоёв: integrity, debugger, VM, file tamper и др.</p></div>
+          <div class="sc-card tilt glow-hover"><div class="sc-h"><i data-lucide="code"></i><h4>Open Source</h4></div><p>Код открыт. Любой может провести независимый аудит.</p></div>
         </div>
       </div>
     </div>
+
+    <!-- (removed separate tabs — merged into Features) -->
+    <div class="tc" id="t-cm_hidden" style="display:none"></div>
 
     <!-- Comparison tab -->
     <div class="tc" id="t-cm">
@@ -1057,7 +1075,7 @@ body.has-banner .hero{padding-top:112px}
             <li><i data-lucide="check" style="width:14px;height:14px;color:var(--gn)"></i> <span data-i="pf4">Скорость до 1 МБ/с</span></li>
             <li><i data-lucide="check" style="width:14px;height:14px;color:var(--gn)"></i> <span data-i="pf5">20+ DNS серверов</span></li>
           </ul>
-          <a class="btn btn-s" style="width:100%" onclick="mT('dl')" data-i="pl_fb">Скачать бесплатно</a>
+          <a class="btn btn-s" style="width:100%;margin-top:auto" onclick="mT('dl')" data-i="pl_fb">Скачать бесплатно</a>
         </div>
         <div class="prc hi">
           <div class="pn" style="color:var(--ac2)" data-i="pl_p">Premium</div>
@@ -1072,7 +1090,7 @@ body.has-banner .hero{padding-top:112px}
             <li><i data-lucide="check" style="width:14px;height:14px;color:var(--gn)"></i> <span data-i="pp6">Авто-TUN режим</span></li>
             <li><i data-lucide="check" style="width:14px;height:14px;color:var(--gn)"></i> <span data-i="pp7">Приоритетная поддержка</span></li>
           </ul>
-          <a class="btn btn-p" style="width:100%" onclick="openAuth()" data-i="pl_pb">Купить Premium</a>
+          <a class="btn btn-p" style="width:100%" onclick="goBuy('premium_30')" data-i="pl_pb">Купить Premium</a>
         </div>
       </div>
       <!-- Comparison table -->
@@ -1458,6 +1476,15 @@ const SHOP_ITEMS = [
   {key:'traffic_20',     name:'📦 +20 ГБ трафика',         price:99,  desc:'Одноразово',                   color:'#60a5fa'},
   {key:'traffic_100',    name:'💎 +100 ГБ трафика',        price:199, desc:'Одноразово',                   color:'#8b5cf6'},
 ];
+
+// Quick buy (from "Купить Premium" button etc.)
+function goBuy(item){
+  const tok = localStorage.getItem('mrd_tok');
+  if(!tok){ openAuth(); setTimeout(()=>{ alert('Войди в аккаунт и попробуй снова'); }, 300); return; }
+  openShop();
+  // After shop renders, trigger buy for specific item
+  setTimeout(() => { if(typeof buyItem === 'function') buyItem(item); }, 800);
+}
 
 async function openShop(){
   const tok = localStorage.getItem('mrd_tok');
