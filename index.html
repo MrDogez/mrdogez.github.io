@@ -951,32 +951,32 @@ body.has-banner .hero{padding-top:112px}
 </div>
 
 <!-- ═══ SHOP MODAL ═══ -->
-<div class="am" id="shopM" style="z-index:10001">
-  <div class="ac" style="max-width:520px;max-height:92vh;overflow-y:auto">
-    <button class="close" onclick="document.getElementById('shopM').classList.remove('open')"><i data-lucide="x"></i></button>
-    <h3 style="margin-bottom:4px;display:flex;align-items:center;gap:8px"><i data-lucide="shopping-bag"></i> Магазин</h3>
-    <p style="color:var(--tx3);font-size:13px;margin-bottom:20px">Оплата проходит через Monee.pro. Награды применяются автоматически.</p>
-    <div id="shopGrid" style="display:flex;flex-direction:column;gap:10px"></div>
-    <div id="shopMsg" style="margin-top:14px;text-align:center;font-size:13px"></div>
+<div class="mo" id="shopM" onclick="if(event.target===this)document.getElementById('shopM').classList.remove('open')">
+  <div class="md" style="max-width:520px">
+    <button class="md-x" onclick="document.getElementById('shopM').classList.remove('open')"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+    <h2 style="display:flex;align-items:center;gap:10px"><i data-lucide="shopping-bag"></i> Магазин</h2>
+    <div class="msub">Оплата через Monee.pro — награды применяются автоматически</div>
+    <div id="shopGrid" style="display:flex;flex-direction:column;gap:10px;margin-top:16px;max-height:60vh;overflow-y:auto"></div>
+    <div id="shopMsg" class="fmsg" style="margin-top:14px"></div>
   </div>
 </div>
 
 <!-- ═══ PAYMENT WAITING MODAL ═══ -->
-<div class="am" id="payM" style="z-index:10002">
-  <div class="ac" style="max-width:400px;text-align:center">
+<div class="mo" id="payM">
+  <div class="md" style="max-width:400px;text-align:center">
     <div style="width:72px;height:72px;margin:0 auto 20px;position:relative">
-      <svg width="72" height="72" viewBox="0 0 72 72" style="animation:spin 1.5s linear infinite">
+      <svg width="72" height="72" viewBox="0 0 72 72" style="animation:shop-spin 1.5s linear infinite">
         <circle cx="36" cy="36" r="30" stroke="rgba(124,106,239,.2)" stroke-width="4" fill="none"/>
         <circle cx="36" cy="36" r="30" stroke="var(--ac)" stroke-width="4" fill="none" stroke-dasharray="60 160" stroke-linecap="round"/>
       </svg>
     </div>
-    <h3 style="margin-bottom:8px">Ожидание оплаты</h3>
+    <h2 style="margin-bottom:8px">Ожидание оплаты</h2>
     <p id="payMsg" style="color:var(--tx3);font-size:13px;margin-bottom:16px">Оплатите заказ в открывшейся вкладке</p>
     <div id="payTimer" style="font-family:monospace;color:var(--tx3);font-size:12px;margin-bottom:16px">Проверка: 00:00</div>
     <button class="btn btn-s" onclick="cancelPay()">Отмена</button>
   </div>
 </div>
-<style>@keyframes spin{100%{transform:rotate(360deg)}}</style>
+<style>@keyframes shop-spin{100%{transform:rotate(360deg)}}</style>
 
 <!-- ═══ COOKIE ═══ -->
 <div class="ck" id="ckB"><p data-i="ck_t">Мы используем cookies для улучшения работы сайта. Продолжая использование, вы соглашаетесь с политикой конфиденциальности.</p><button class="btn btn-p" style="padding:7px 16px;font-size:11px" onclick="aCk()" data-i="ck_b">Принять</button></div>
