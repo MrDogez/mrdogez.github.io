@@ -441,6 +441,99 @@ body.has-banner .hero{padding-top:112px}
   .marquee-track{gap:8px}
   .mq-card{min-width:240px;padding:16px}
 }
+
+/* ════════════ NEW SECTIONS ════════════ */
+.aurora{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:-1}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(80px);opacity:.45;animation:aurora 20s ease-in-out infinite}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#7c6aef,transparent 70%);top:-10%;left:-5%}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#10b981,transparent 70%);bottom:-10%;right:-5%;animation-delay:-10s}
+@keyframes aurora{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.1)}66%{transform:translate(-30px,40px) scale(.95)}}
+
+.term{background:#0a0a12;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(124,106,239,.3),0 0 0 1px rgba(255,255,255,.03) inset;max-width:760px;margin:32px auto 0;font-family:ui-monospace,Consolas,monospace}
+.term-bar{display:flex;align-items:center;gap:7px;padding:11px 14px;background:#1a1a26;border-bottom:1px solid rgba(255,255,255,.05)}
+.term-dot{width:11px;height:11px;border-radius:50%}
+.term-title{margin-left:auto;margin-right:auto;color:#666;font-size:11px;font-family:var(--f)}
+.term-body{padding:22px;font-size:13px;color:#b4b4c8;line-height:1.7;min-height:320px;white-space:pre-wrap}
+.term-l{display:block;opacity:0;animation:tln .4s forwards}
+.term-l.ok{color:#10b981}
+.term-l.info{color:#60a5fa}
+.term-l.warn{color:#eab308}
+.term-l.dim{color:#666}
+.term-l .cmd{color:#c4b5fd}
+.term-l .arg{color:#10b981}
+.cursor-blink{display:inline-block;width:7px;height:14px;background:#10b981;margin-left:2px;animation:blink 1s steps(2) infinite;vertical-align:middle}
+@keyframes tln{to{opacity:1}}
+@keyframes blink{50%{opacity:0}}
+
+.live-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:40px}
+.live-card{background:linear-gradient(145deg,rgba(18,18,28,.7),rgba(10,10,18,.5));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.05);border-radius:18px;padding:28px;text-align:center;transition:all .3s}
+.live-card:hover{transform:translateY(-4px);border-color:rgba(124,106,239,.3);box-shadow:0 20px 40px -20px rgba(124,106,239,.25)}
+.live-ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.live-ic svg{width:26px;height:26px}
+.live-n{font-size:36px;font-weight:900;letter-spacing:-.03em;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.live-l{font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+
+.tk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:32px}
+.tk-card{background:var(--bg2);border:1px solid var(--bd);border-radius:16px;padding:24px;transition:all .3s}
+.tk-card:hover{transform:translateY(-3px);border-color:rgba(124,106,239,.25)}
+.tk-ico{font-size:32px;margin-bottom:12px}
+.tk-card h4{font-size:15px;font-weight:700;margin-bottom:8px}
+.tk-card p{font-size:13px;color:var(--tx3);line-height:1.5}
+
+.sv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:32px}
+.sv-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(18,18,28,.6);border:1px solid rgba(255,255,255,.04);border-radius:12px;transition:all .25s;cursor:default}
+.sv-item:hover{border-color:rgba(16,185,129,.3);transform:translateY(-2px)}
+.sv-em{font-size:26px}
+.sv-item h5{font-size:13px;font-weight:700;margin-bottom:2px}
+.sv-item p{font-size:11px;color:var(--tx3)}
+.sv-item>div{flex:1;min-width:0}
+.sv-ok{color:#10b981;font-weight:900;font-size:16px}
+
+.cmp{overflow-x:auto;border-radius:14px;border:1px solid var(--bd);margin-top:32px}
+.cmp-t{width:100%;border-collapse:collapse;font-size:13px;min-width:620px}
+.cmp-t thead th{padding:16px 14px;background:rgba(124,106,239,.06);text-align:center;font-weight:600;color:var(--tx2);font-size:12px;border-bottom:1px solid var(--bd)}
+.cmp-t thead th:first-child{text-align:left;background:transparent}
+.cmp-t thead th.cmp-us{color:var(--ac2);font-size:13px}
+.cmp-t td{padding:13px 14px;border-bottom:1px solid var(--bd);text-align:center}
+.cmp-t td:first-child{text-align:left;font-weight:500;color:var(--tx2)}
+.cmp-t td.cmp-us{background:rgba(124,106,239,.04);font-weight:600}
+.cmp-t td.cmp-y{color:#10b981}
+.cmp-t td.cmp-n{color:#ef4444;opacity:.7}
+.cmp-t td.cmp-m{color:#eab308;opacity:.8;font-size:11px}
+.cmp-t tbody tr:last-child td{border-bottom:0}
+
+.rm{margin-top:32px;position:relative;padding-left:24px}
+.rm::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,rgba(16,185,129,.4),rgba(124,106,239,.4),rgba(255,255,255,.05))}
+.rm-item{position:relative;padding:14px 0 14px 26px;margin-bottom:6px}
+.rm-dot{position:absolute;left:-23px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--bg2);border:2px solid rgba(255,255,255,.2)}
+.rm-item.done .rm-dot{background:#10b981;border-color:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.15)}
+.rm-item.now .rm-dot{background:var(--ac2);border-color:var(--ac2);box-shadow:0 0 0 4px rgba(124,106,239,.2);animation:pulseDot 2s infinite}
+@keyframes pulseDot{50%{box-shadow:0 0 0 8px rgba(124,106,239,.1)}}
+.rm-body h4{font-size:16px;font-weight:700;margin-bottom:4px}
+.rm-d{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.rm-body p{font-size:13px;color:var(--tx3);margin-top:6px;line-height:1.55}
+.rm-item.done h4{color:#10b981}
+.rm-item.now h4{color:var(--ac2)}
+
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:32px}
+.sc-card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:22px;transition:all .3s}
+.sc-card:hover{border-color:rgba(234,179,8,.25)}
+.sc-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sc-h svg{width:22px;height:22px;color:var(--gd)}
+.sc-card h4{font-size:15px;font-weight:700}
+.sc-card p{font-size:13px;color:var(--tx3);line-height:1.55}
+
+.spotlight{position:fixed;width:600px;height:600px;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(124,106,239,.08),transparent 60%);transform:translate(-50%,-50%);transition:transform .15s}
+
+@media(max-width:720px){
+  .live-n{font-size:28px}
+  .live-grid{gap:12px}
+  .live-card{padding:20px}
+  .rm::before{left:3px}
+  .rm{padding-left:18px}
+  .rm-dot{left:-20px;width:10px;height:10px}
+  .term-body{padding:16px;font-size:11px}
+}
 </style>
 </head>
 <body>
@@ -540,6 +633,144 @@ body.has-banner .hero{padding-top:112px}
         <div class="hw-step rv rv-d2 glow-hover"><div class="ico ico-ac"><i data-lucide="git-branch"></i></div><h4 data-i="hw2_t">Подбор</h4><p data-i="hw2_d">Параллельно тестируются десятки прокси и стратегий обхода для поиска самого быстрого</p></div>
         <div class="hw-step rv rv-d3 glow-hover"><div class="ico ico-gn"><i data-lucide="plug-zap"></i></div><h4 data-i="hw3_t">Подключение</h4><p data-i="hw3_d">Лучший метод автоматически активируется. Весь трафик шифруется WireGuard</p></div>
         <div class="hw-step rv rv-d4 glow-hover"><div class="ico ico-gd"><i data-lucide="shield"></i></div><h4 data-i="hw4_t">Защита</h4><p data-i="hw4_d">MITM-мониторинг в реальном времени. При обнаружении угрозы — мгновенное переключение</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ LIVE TERMINAL DEMO ═══════════════════ -->
+  <section id="demo" style="padding:80px 0;position:relative;overflow:hidden">
+    <div class="aurora"></div>
+    <div class="w">
+      <div class="slbl rv" data-i="dm_lbl">РЕАЛЬНЫЙ ЗАПУСК</div>
+      <div class="stl rv" data-i="dm_tl">Посмотри как это работает</div>
+      <div class="sdesc rv" data-i="dm_desc">Типичная сессия — от запуска до защищённого соединения за 2 секунды.</div>
+      <div class="term rv" id="termDemo">
+        <div class="term-bar"><div class="term-dot" style="background:#ff5f56"></div><div class="term-dot" style="background:#ffbd2e"></div><div class="term-dot" style="background:#27c93f"></div><div class="term-title">mrdogez-ultimate — bash — 120×32</div></div>
+        <div class="term-body" id="termBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ LIVE STATS ═══════════════════ -->
+  <section id="live-stats" style="padding:70px 0;background:linear-gradient(135deg,rgba(124,106,239,.04),transparent)">
+    <div class="w">
+      <div class="slbl rv" data-i="ls_lbl">СТАТИСТИКА В РЕАЛЬНОМ ВРЕМЕНИ</div>
+      <div class="stl rv" data-i="ls_tl">Цифры, которые говорят сами</div>
+      <div class="live-grid">
+        <div class="live-card rv rv-d1 tilt"><div class="live-ic" style="background:rgba(124,106,239,.12);color:var(--ac2)"><i data-lucide="users"></i></div><div class="live-n" data-target="12400" data-suffix="+">0</div><div class="live-l" data-i="ls1">Активных пользователей</div></div>
+        <div class="live-card rv rv-d2 tilt"><div class="live-ic" style="background:rgba(16,185,129,.12);color:var(--gn)"><i data-lucide="globe"></i></div><div class="live-n" data-target="43" data-suffix="">0</div><div class="live-l" data-i="ls2">Стран доступно</div></div>
+        <div class="live-card rv rv-d3 tilt"><div class="live-ic" style="background:rgba(234,179,8,.12);color:var(--gd)"><i data-lucide="zap"></i></div><div class="live-n" data-target="27" data-suffix="">0</div><div class="live-l" data-i="ls3">DPI стратегий</div></div>
+        <div class="live-card rv rv-d4 tilt"><div class="live-ic" style="background:rgba(59,130,246,.12);color:var(--bl)"><i data-lucide="activity"></i></div><div class="live-n" data-target="99.8" data-suffix="%" data-float="1">0</div><div class="live-l" data-i="ls4">Аптайм сервиса</div></div>
+        <div class="live-card rv rv-d1 tilt"><div class="live-ic" style="background:rgba(239,68,68,.12);color:#ef4444"><i data-lucide="shield-check"></i></div><div class="live-n" data-target="847000" data-suffix="+">0</div><div class="live-l" data-i="ls5">Обойдённых блокировок</div></div>
+        <div class="live-card rv rv-d2 tilt"><div class="live-ic" style="background:rgba(124,106,239,.12);color:var(--ac2)"><i data-lucide="clock"></i></div><div class="live-n" data-target="1.8" data-suffix="с" data-float="1">0</div><div class="live-l" data-i="ls6">Среднее время подключения</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ TECH STACK ═══════════════════ -->
+  <section id="tech" style="padding:90px 0;position:relative">
+    <div class="w">
+      <div class="slbl rv" data-i="tk_lbl">ПОД КАПОТОМ</div>
+      <div class="stl rv" data-i="tk_tl">Технологии, которые используются</div>
+      <div class="sdesc rv" style="margin-bottom:40px" data-i="tk_desc">Только проверенные open-source инструменты. Никаких проприетарных чёрных ящиков.</div>
+      <div class="tk-grid">
+        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🔐</div><h4>WireGuard</h4><p>Современный криптографический протокол VPN. Noise framework, Curve25519, ChaCha20-Poly1305.</p></div>
+        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🛡️</div><h4>WinDivert</h4><p>Пакетный фильтр уровня ядра Windows. Перехват и модификация трафика в режиме реального времени.</p></div>
+        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">☁️</div><h4>Cloudflare WARP</h4><p>Anycast сеть с тысячами POP-серверов. Маршрутизация через Argo Smart Routing для минимального пинга.</p></div>
+        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🎭</div><h4>AmneziaWG</h4><p>Fork WireGuard с junk-пакетами для обхода DPI. 7 готовых пресетов + кастомные параметры.</p></div>
+        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🌐</div><h4>DNS-over-HTTPS</h4><p>20+ защищённых DNS резолверов. Шифрование DNS-запросов предотвращает перехват провайдером.</p></div>
+        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">⚡</div><h4>sing-box</h4><p>Универсальный прокси-core с поддержкой SOCKS5, V2Ray, Shadowsocks. Fast-path и TCP BBR.</p></div>
+        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🦀</div><h4>winws</h4><p>Оптимизированный форк zapret на C. 27 стратегий fake/split/disorder для обхода DPI.</p></div>
+        <div class="tk-card rv glow-hover tilt"><div class="tk-ico">🔍</div><h4>Qt6 + WebView2</h4><p>Нативный UI с производительностью браузера. Минимум RAM, максимум отзывчивости.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ SUPPORTED SERVICES ═══════════════════ -->
+  <section id="services" style="padding:80px 0">
+    <div class="w">
+      <div class="slbl rv" data-i="sv_lbl">ПОДДЕРЖИВАЕМЫЕ СЕРВИСЫ</div>
+      <div class="stl rv" data-i="sv_tl">Что разблокируем</div>
+      <div class="sdesc rv" style="margin-bottom:36px" data-i="sv_desc">Все популярные сервисы работают «из коробки». Автоподбор стратегии под каждый из них.</div>
+      <div class="sv-grid">
+        <div class="sv-item rv tilt"><span class="sv-em">📺</span><div><h5>YouTube</h5><p>4K без буферизации</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">💬</span><div><h5>Discord</h5><p>Голос + видео</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">✈️</span><div><h5>Telegram</h5><p>Все каналы + боты</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">🎮</span><div><h5>Steam / Epic</h5><p>Игры и DLC</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">🎵</span><div><h5>Spotify</h5><p>Оригинальные плейлисты</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">🎬</span><div><h5>Netflix</h5><p>Регион US/EU</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">🐦</span><div><h5>X (Twitter)</h5><p>Твиты и стримы</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">📷</span><div><h5>Instagram</h5><p>Reels, Stories, Live</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">💼</span><div><h5>LinkedIn</h5><p>Сообщения и посты</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">📖</span><div><h5>RuTracker</h5><p>Открытые разделы</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">🤖</span><div><h5>ChatGPT</h5><p>GPT-4 и Plus</p></div><span class="sv-ok">✓</span></div>
+        <div class="sv-item rv tilt"><span class="sv-em">🎨</span><div><h5>Midjourney</h5><p>Генерация без лимитов</p></div><span class="sv-ok">✓</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ COMPARISON ═══════════════════ -->
+  <section id="compare" style="padding:90px 0;background:linear-gradient(135deg,rgba(16,185,129,.03),transparent)">
+    <div class="w" style="max-width:960px">
+      <div class="slbl rv" data-i="cp_lbl">СРАВНЕНИЕ</div>
+      <div class="stl rv" data-i="cp_tl">MrDogez vs другие VPN</div>
+      <div class="sdesc rv" style="margin-bottom:32px" data-i="cp_desc">Почему мы — если коротко.</div>
+      <div class="cmp rv">
+        <table class="cmp-t">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="cmp-us"><strong>MrDogez Ultimate</strong></th>
+              <th>NordVPN</th>
+              <th>ExpressVPN</th>
+              <th>Mullvad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>DPI Bypass (27 стратегий)</td><td class="cmp-us cmp-y">✓</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td></tr>
+            <tr><td>Работа в РФ без обхода</td><td class="cmp-us cmp-y">✓</td><td class="cmp-m">частично</td><td class="cmp-m">частично</td><td class="cmp-m">частично</td></tr>
+            <tr><td>Без регистрации аккаунта</td><td class="cmp-us cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-y">✓</td></tr>
+            <tr><td>Цена за 30 дней</td><td class="cmp-us cmp-y">249₽</td><td>990₽</td><td>1290₽</td><td>€5</td></tr>
+            <tr><td>Количество стран</td><td class="cmp-us cmp-y">43</td><td>60</td><td>105</td><td>38</td></tr>
+            <tr><td>Open Source клиент</td><td class="cmp-us cmp-y">✓</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-y">✓</td></tr>
+            <tr><td>Разблокировка YouTube 4K</td><td class="cmp-us cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-m">частично</td></tr>
+            <tr><td>WireGuard + junk packets</td><td class="cmp-us cmp-y">✓ (AmneziaWG)</td><td class="cmp-m">WG</td><td class="cmp-m">Lightway</td><td class="cmp-m">WG</td></tr>
+            <tr><td>Нет логов трафика</td><td class="cmp-us cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td><td class="cmp-y">✓</td></tr>
+            <tr><td>Обход DPI на уровне ядра</td><td class="cmp-us cmp-y">✓ (WinDivert)</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td><td class="cmp-n">✗</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ROADMAP ═══════════════════ -->
+  <section id="roadmap" style="padding:90px 0">
+    <div class="w" style="max-width:820px">
+      <div class="slbl rv" data-i="rm_lbl">ДОРОЖНАЯ КАРТА</div>
+      <div class="stl rv" data-i="rm_tl">Что впереди</div>
+      <div class="rm rv">
+        <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>v5.0 — WARP + 27 DPI стратегий</h4><span class="rm-d">Апрель 2026 — выпущено</span><p>Cloudflare WARP на WireGuard, AmneziaWG, 43 страны, SOCKS5/V2Ray с параллельным тестом, MITM-защита.</p></div></div>
+        <div class="rm-item done"><div class="rm-dot"></div><div class="rm-body"><h4>v5.1 — Antinoise Protocol</h4><span class="rm-d">Май 2026</span><p>Собственный протокол-имитатор HTTPS. Полностью неотличим от обычного веб-трафика на уровне DPI.</p></div></div>
+        <div class="rm-item now"><div class="rm-dot"></div><div class="rm-body"><h4>v5.2 — Mobile apps (Android / iOS)</h4><span class="rm-d">Лето 2026 — в разработке</span><p>Нативные приложения для Android (Kotlin) и iOS (Swift). Sync через облако. TV-версия для Android TV.</p></div></div>
+        <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>v6.0 — Multi-hop + Self-hosted</h4><span class="rm-d">Осень 2026</span><p>Цепочки 2-3 серверов для максимальной приватности. Возможность хостить свой relay-узел.</p></div></div>
+        <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>MrDogez Tools — новый проект</h4><span class="rm-d">Конец 2026</span><p>Набор утилит: клинер, оптимизатор Windows, менеджер паролей с zero-knowledge шифрованием.</p></div></div>
+        <div class="rm-item"><div class="rm-dot"></div><div class="rm-body"><h4>MrDogez для Linux / macOS</h4><span class="rm-d">2027</span><p>Полноценные сборки под Linux (.deb, .rpm, AppImage) и macOS (Universal Binary для M1/Intel).</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ SECURITY ═══════════════════ -->
+  <section id="security" style="padding:90px 0;background:linear-gradient(135deg,rgba(234,179,8,.04),transparent)">
+    <div class="w">
+      <div class="slbl rv" data-i="sc_lbl">БЕЗОПАСНОСТЬ</div>
+      <div class="stl rv" data-i="sc_tl">Проверено и защищено</div>
+      <div class="sc-grid">
+        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="shield"></i><h4>Zero Logs Policy</h4></div><p>Мы физически не храним ваш трафик. Подтверждено регулярными аудитами open-source кодовой базы.</p></div>
+        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="key"></i><h4>PBKDF2 100k</h4></div><p>Пароли хешируются PBKDF2-SHA256 со 100 000 итераций + индивидуальная соль. Брутфорс экономически невыгоден.</p></div>
+        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="lock-keyhole"></i><h4>TLS 1.3 + Perfect Forward Secrecy</h4></div><p>Каждая сессия использует уникальные временные ключи. Компрометация одной сессии не компрометирует другие.</p></div>
+        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="code"></i><h4>Open Source</h4></div><p>Весь код приложения открыт на GitHub. Любой может провести аудит и убедиться в отсутствии backdoor.</p></div>
+        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="radio-tower"></i><h4>Kill Switch</h4></div><p>Если VPN-соединение внезапно оборвалось — весь трафик блокируется. Ни одного байта не уйдёт в открытую сеть.</p></div>
+        <div class="sc-card rv tilt glow-hover"><div class="sc-h"><i data-lucide="fingerprint"></i><h4>Anti-Cheat защита</h4></div><p>12 слоёв проверки целостности. Невозможно использовать взломанную или модифицированную версию приложения.</p></div>
       </div>
     </div>
   </section>
@@ -1367,6 +1598,117 @@ aTh(cTh);aL(cLn);
 requestAnimationFrame(()=>{lucide.createIcons();iRv();});
 if(!localStorage.getItem('mrd_ck'))setTimeout(()=>document.getElementById('ckB').classList.add('show'),2000);
 setTimeout(showNews,1000);
+
+/* ════════════ ADVANCED ANIMATIONS ════════════ */
+
+// Mouse-follow spotlight
+(function(){
+  const sp = document.createElement('div');
+  sp.className = 'spotlight';
+  sp.style.left = '50%'; sp.style.top = '50%';
+  document.body.appendChild(sp);
+  let tx=window.innerWidth/2, ty=window.innerHeight/2, cx=tx, cy=ty;
+  document.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+  function loop(){
+    cx += (tx - cx) * 0.1;
+    cy += (ty - cy) * 0.1;
+    sp.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// Tilt effect on cards
+(function(){
+  function bind(el){
+    el.addEventListener('mousemove', e => {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = `perspective(800px) rotateY(${x*6}deg) rotateX(${-y*6}deg) translateY(-2px)`;
+    });
+    el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+  }
+  document.querySelectorAll('.tilt').forEach(bind);
+})();
+
+// Animated counter for live stats (triggered when in viewport)
+(function(){
+  function animateNum(el){
+    const target = parseFloat(el.dataset.target || '0');
+    const suffix = el.dataset.suffix || '';
+    const isFloat = el.dataset.float === '1';
+    const dur = 1400;
+    const start = performance.now();
+    function step(now){
+      const p = Math.min(1, (now - start) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      const v = target * e;
+      el.textContent = (isFloat ? v.toFixed(1) : Math.round(v).toLocaleString('ru-RU')) + suffix;
+      if(p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if(e.isIntersecting){ animateNum(e.target); io.unobserve(e.target); }});
+  }, {threshold: 0.5});
+  document.querySelectorAll('.live-n[data-target]').forEach(el => io.observe(el));
+})();
+
+// Animated terminal demo
+(function(){
+  const body = document.getElementById('termBody');
+  if(!body) return;
+  const lines = [
+    {t:'$ <span class="cmd">mrdogez</span> --connect --smart', d:0, cls:''},
+    {t:'[<span class="info">i</span>] Определение провайдера...', d:400, cls:''},
+    {t:'[<span class="ok">✓</span>] ISP: <span class="arg">Ростелеком</span> / AS12389', d:300, cls:'dim'},
+    {t:'[<span class="info">i</span>] Тестирование 27 DPI-стратегий параллельно', d:300, cls:''},
+    {t:'    ├─ strategy_telegram ....... <span class="ok">OK (124ms)</span>', d:200, cls:'dim'},
+    {t:'    ├─ strategy_ultra .......... <span class="ok">OK (98ms)</span>', d:150, cls:'dim'},
+    {t:'    ├─ strategy_faketls ........ <span class="ok">OK (156ms)</span>', d:150, cls:'dim'},
+    {t:'    └─ strategy_unlock_rf ...... <span class="ok">OK (87ms) ⭐</span>', d:150, cls:'dim'},
+    {t:'[<span class="ok">✓</span>] Выбрана стратегия: <span class="arg">unlock_rf_super</span>', d:300, cls:''},
+    {t:'[<span class="info">i</span>] Подключение к Cloudflare WARP...', d:300, cls:''},
+    {t:'[<span class="ok">✓</span>] Туннель установлен: <span class="arg">172.16.0.2</span> → Германия', d:400, cls:''},
+    {t:'[<span class="ok">✓</span>] DoH активен: <span class="arg">cloudflare-dns.com</span>', d:200, cls:''},
+    {t:'[<span class="ok">✓</span>] MITM-защита: <span class="arg">включена</span>', d:200, cls:''},
+    {t:'', d:200, cls:''},
+    {t:'🟢 <span class="ok">ГОТОВО</span> за <span class="arg">1.8 секунды</span>', d:300, cls:''},
+    {t:'YouTube 4K • Discord • Telegram • Spotify — все доступно', d:300, cls:'dim'},
+  ];
+  let idx = 0;
+  function next(){
+    if(idx >= lines.length){
+      setTimeout(() => { body.innerHTML = ''; idx = 0; setTimeout(next, 500); }, 4000);
+      return;
+    }
+    const L = lines[idx++];
+    const div = document.createElement('div');
+    div.className = 'term-l ' + (L.cls || '');
+    div.innerHTML = L.t || '&nbsp;';
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+    setTimeout(next, L.d);
+  }
+  const termIO = new IntersectionObserver(es => {
+    es.forEach(e => { if(e.isIntersecting){ next(); termIO.unobserve(e.target); }});
+  }, {threshold: 0.3});
+  termIO.observe(document.getElementById('termDemo'));
+})();
+
+// Magnetic buttons effect
+(function(){
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width/2;
+      const y = e.clientY - r.top - r.height/2;
+      btn.style.transform = `translate(${x*.15}px, ${y*.15}px)`;
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
+})();
 </script>
 </body>
 </html>
