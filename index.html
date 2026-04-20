@@ -943,12 +943,40 @@ body.has-banner .hero{padding-top:112px}
       <div id="profEmail" style="font-size:14px;font-weight:600;margin-bottom:4px;word-break:break-all"></div>
       <div style="font-size:11px;color:var(--tx3);margin-bottom:20px">Аккаунт активен</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <a class="btn btn-s" style="width:100%" onclick="showPg('mdu');setTimeout(()=>mT('pr'),100);cA()"><i data-lucide="crown" style="width:14px;height:14px"></i> Магазин</a>
+        <a class="btn btn-s" style="width:100%" onclick="openShop()"><i data-lucide="crown" style="width:14px;height:14px"></i> Магазин</a>
         <button class="btn btn-s" style="width:100%;color:var(--rd)" onclick="logout()"><i data-lucide="log-out" style="width:14px;height:14px"></i> Выйти</button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- ═══ SHOP MODAL ═══ -->
+<div class="am" id="shopM" style="z-index:10001">
+  <div class="ac" style="max-width:520px;max-height:92vh;overflow-y:auto">
+    <button class="close" onclick="document.getElementById('shopM').classList.remove('open')"><i data-lucide="x"></i></button>
+    <h3 style="margin-bottom:4px;display:flex;align-items:center;gap:8px"><i data-lucide="shopping-bag"></i> Магазин</h3>
+    <p style="color:var(--tx3);font-size:13px;margin-bottom:20px">Оплата проходит через Monee.pro. Награды применяются автоматически.</p>
+    <div id="shopGrid" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="shopMsg" style="margin-top:14px;text-align:center;font-size:13px"></div>
+  </div>
+</div>
+
+<!-- ═══ PAYMENT WAITING MODAL ═══ -->
+<div class="am" id="payM" style="z-index:10002">
+  <div class="ac" style="max-width:400px;text-align:center">
+    <div style="width:72px;height:72px;margin:0 auto 20px;position:relative">
+      <svg width="72" height="72" viewBox="0 0 72 72" style="animation:spin 1.5s linear infinite">
+        <circle cx="36" cy="36" r="30" stroke="rgba(124,106,239,.2)" stroke-width="4" fill="none"/>
+        <circle cx="36" cy="36" r="30" stroke="var(--ac)" stroke-width="4" fill="none" stroke-dasharray="60 160" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h3 style="margin-bottom:8px">Ожидание оплаты</h3>
+    <p id="payMsg" style="color:var(--tx3);font-size:13px;margin-bottom:16px">Оплатите заказ в открывшейся вкладке</p>
+    <div id="payTimer" style="font-family:monospace;color:var(--tx3);font-size:12px;margin-bottom:16px">Проверка: 00:00</div>
+    <button class="btn btn-s" onclick="cancelPay()">Отмена</button>
+  </div>
+</div>
+<style>@keyframes spin{100%{transform:rotate(360deg)}}</style>
 
 <!-- ═══ COOKIE ═══ -->
 <div class="ck" id="ckB"><p data-i="ck_t">Мы используем cookies для улучшения работы сайта. Продолжая использование, вы соглашаетесь с политикой конфиденциальности.</p><button class="btn btn-p" style="padding:7px 16px;font-size:11px" onclick="aCk()" data-i="ck_b">Принять</button></div>
@@ -1066,18 +1094,147 @@ function showProfile(email){
 }
 function logout(){
   localStorage.removeItem('mrd_u');
+  localStorage.removeItem('mrd_tok');
   cA();
 }
 function uAuth(){const d=D[cLn]||D.ru;if(aMode==='login'){document.getElementById('aT').textContent=d.a_in;document.getElementById('aS').textContent=d.a_in_s;document.getElementById('aBtn').textContent=d.a_in;document.getElementById('aTT').textContent=d.a_no;document.getElementById('aTB').textContent=d.a_reg;}else{document.getElementById('aT').textContent=d.a_up;document.getElementById('aS').textContent=d.a_up_s;document.getElementById('aBtn').textContent=d.a_up;document.getElementById('aTT').textContent=d.a_has;document.getElementById('aTB').textContent=d.a_in;}document.getElementById('aMsg').textContent='';}
-function aSubmit(){
-  const e=document.getElementById('aE').value.trim(),p=document.getElementById('aP').value,m=document.getElementById('aMsg');
+
+const WORKER_URL = 'https://mrdogez-payments.mrdogez2.workers.dev';
+
+async function aSubmit(){
+  const e=document.getElementById('aE').value.trim().toLowerCase();
+  const p=document.getElementById('aP').value;
+  const m=document.getElementById('aMsg');
   if(!e||!p){m.className='fmsg err';m.textContent='Заполните все поля';return;}
-  if(!_captchaSolved){
-    if(!checkCaptcha()){m.className='fmsg err';m.textContent='Пройдите проверку';return;}
+  if(!_captchaSolved && !checkCaptcha()){m.className='fmsg err';m.textContent='Пройдите проверку';return;}
+  m.className='fmsg';m.textContent='Проверяю...';
+  if(aMode==='reg'){
+    m.className='fmsg err';
+    m.innerHTML='Регистрация доступна только в приложении.<br><a href="#" onclick="showPg(\'mdu\');setTimeout(()=>mT(\'dl\'),100);cA()">Скачать прогу →</a>';
+    return;
   }
-  m.className='fmsg ok';m.textContent='✓';
-  localStorage.setItem('mrd_u',e);
-  setTimeout(function(){cA();},1000);
+  try{
+    const r = await fetch(WORKER_URL+'/site_login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email:e, password:p})
+    });
+    const d = await r.json();
+    if(!d.ok){
+      m.className='fmsg err';m.textContent=d.error||'Ошибка входа';
+      return;
+    }
+    m.className='fmsg ok';m.textContent='✓ Вошли';
+    localStorage.setItem('mrd_u', e);
+    localStorage.setItem('mrd_tok', d.token);
+    localStorage.setItem('mrd_prof', JSON.stringify(d));
+    setTimeout(function(){cA();},800);
+  }catch(err){
+    m.className='fmsg err';m.textContent='Сбой сети: '+err.message;
+  }
+}
+
+// ══════════════════════ SHOP ══════════════════════
+const SHOP_ITEMS = [
+  {key:'premium_30',     name:'⭐ Premium 30 дней',        price:249, desc:'Безлимит трафик + VIP серверы', color:'var(--ac)'},
+  {key:'unlock_rf',      name:'🇷🇺 Разблокировка РФ',      price:399, desc:'Навсегда, без лимитов',        color:'#ef4444'},
+  {key:'speed_boost',    name:'⚡ Буст скорости',          price:149, desc:'30 дней быстрых серверов',     color:'#f59e0b'},
+  {key:'unlim_profiles', name:'📁 Безлимит профилей',      price:79,  desc:'Навсегда',                     color:'#10b981'},
+  {key:'traffic_5',      name:'📦 +5 ГБ трафика',          price:49,  desc:'Одноразово',                   color:'#60a5fa'},
+  {key:'traffic_20',     name:'📦 +20 ГБ трафика',         price:99,  desc:'Одноразово',                   color:'#60a5fa'},
+  {key:'traffic_100',    name:'💎 +100 ГБ трафика',        price:199, desc:'Одноразово',                   color:'#8b5cf6'},
+];
+
+function openShop(){
+  const tok = localStorage.getItem('mrd_tok');
+  if(!tok){ cA(); alert('Сначала войдите в аккаунт'); document.getElementById('authM').classList.add('open'); return; }
+  cA();
+  const grid = document.getElementById('shopGrid');
+  grid.innerHTML = SHOP_ITEMS.map(it => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--gnd);border:1px solid var(--bd);border-radius:12px;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px;margin-bottom:2px">${it.name}</div>
+        <div style="font-size:12px;color:var(--tx3)">${it.desc}</div>
+      </div>
+      <button class="btn btn-p" style="padding:8px 14px;font-size:13px;background:${it.color};border-color:${it.color};white-space:nowrap" onclick="buyItem('${it.key}')">${it.price}₽</button>
+    </div>
+  `).join('');
+  document.getElementById('shopMsg').textContent = '';
+  document.getElementById('shopM').classList.add('open');
+  lucide.createIcons();
+}
+
+let _payState = null;
+async function buyItem(key){
+  const tok = localStorage.getItem('mrd_tok');
+  if(!tok){ alert('Войдите'); return; }
+  const msg = document.getElementById('shopMsg');
+  msg.innerHTML = '<span style="color:var(--tx3)">Создаю заказ...</span>';
+  try{
+    const r = await fetch(WORKER_URL+'/site_pay_create', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({token:tok, item:key})
+    });
+    const d = await r.json();
+    if(!d.ok){
+      msg.innerHTML = `<span style="color:var(--rd)">❌ ${d.error}</span>`;
+      return;
+    }
+    msg.textContent = '';
+    document.getElementById('shopM').classList.remove('open');
+    // Open Monee payment in new tab
+    window.open(d.pay_url, '_blank');
+    // Show waiting modal + poll
+    document.getElementById('payMsg').textContent = `Оплати ${d.amount}₽ за «${d.name}» и вернись сюда`;
+    document.getElementById('payM').classList.add('open');
+    _payState = { order_id: d.order_id, start: Date.now(), timer: null };
+    _payState.timer = setInterval(() => pollPay(), 5000);
+    updatePayTimer();
+    setTimeout(pollPay, 3000);
+  }catch(err){
+    msg.innerHTML = `<span style="color:var(--rd)">Сбой сети: ${err.message}</span>`;
+  }
+}
+
+function updatePayTimer(){
+  if(!_payState) return;
+  const sec = Math.floor((Date.now() - _payState.start) / 1000);
+  const mm = String(Math.floor(sec/60)).padStart(2,'0');
+  const ss = String(sec%60).padStart(2,'0');
+  const el = document.getElementById('payTimer');
+  if(el) el.textContent = `Проверка: ${mm}:${ss}`;
+  if(_payState) setTimeout(updatePayTimer, 1000);
+}
+
+async function pollPay(){
+  if(!_payState) return;
+  const tok = localStorage.getItem('mrd_tok');
+  try{
+    const r = await fetch(`${WORKER_URL}/site_pay_status?token=${tok}&order_id=${encodeURIComponent(_payState.order_id)}`);
+    const d = await r.json();
+    if(d.status === 'PAID'){
+      clearInterval(_payState.timer);
+      _payState = null;
+      document.getElementById('payM').classList.remove('open');
+      alert('✅ Оплата получена! Премиум/разблокировка активированы.\n\nЗапусти приложение — награда автоматически синхронизируется из облака.');
+      // Refresh profile
+      const prof = JSON.parse(localStorage.getItem('mrd_prof') || '{}');
+      prof.premium = 1;
+      localStorage.setItem('mrd_prof', JSON.stringify(prof));
+    }
+  }catch(e){ /* network hiccup */ }
+  // Timeout after 15 min
+  if(_payState && (Date.now() - _payState.start) > 15*60*1000){
+    clearInterval(_payState.timer);
+    _payState = null;
+    document.getElementById('payM').classList.remove('open');
+    alert('Таймаут. Если оплата прошла — перезагрузи страницу, награды применятся автоматически.');
+  }
+}
+
+function cancelPay(){
+  if(_payState && _payState.timer) clearInterval(_payState.timer);
+  _payState = null;
+  document.getElementById('payM').classList.remove('open');
 }
 function aCk(){localStorage.setItem('mrd_ck','1');document.getElementById('ckB').classList.remove('show');}
 function iRv(){const o=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');o.unobserve(e.target);}});},{threshold:.06,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.rv:not(.vis)').forEach(e=>o.observe(e));}
