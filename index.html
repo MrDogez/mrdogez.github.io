@@ -1070,8 +1070,13 @@ function checkCaptcha(){
 let aMode='login';
 function openAuth(){
   var user=localStorage.getItem('mrd_u');
+  var tok=localStorage.getItem('mrd_tok');
+  // If profile shown but no real token (legacy/fake login) — force re-login
+  if(user && !tok){
+    localStorage.removeItem('mrd_u');
+    user=null;
+  }
   if(user){
-    // Already logged in — show profile
     showProfile(user);
     return;
   }
