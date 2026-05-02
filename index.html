@@ -2428,7 +2428,7 @@ footer {
     </div>
 
     <div class="hero-scroll-cue"><span>Scroll</span></div>
-    <div class="drag-hint"><span class="arrow"></span><span>Drag the orb</span></div>
+    <div class="drag-hint"><span class="arrow"></span><span>Drag the dog · click to pet</span></div>
   </section>
 
   <!-- ════════════════════════════════════════════════════════════════════
@@ -3047,11 +3047,30 @@ footer {
 
 
   /* ─────────────────────────────────────────────────────────────────────
-     7. HERO ORB — interactive 3D dog mascot
+     7. HERO 3D DOG — procedural low-poly mesh
      ─────────────────────────────────────────────────────────────────────
-     Big icosahedron with vertex displacement (3D simplex noise).
-     User drags to rotate. Clicking briefly pumps the noise amplitude.
-     Texture: gradient color map driven by normal + fresnel.
+     Real 3D dog assembled from THREE.js primitives:
+       Body     — slightly stretched sphere (capsule shape)
+       Head     — sphere
+       Snout    — cone (forward-pointing)
+       Ears     — 2 cones (rotated to droop)
+       Eyes     — 2 small white spheres + 2 black pupil spheres
+       Nose     — small black sphere on snout tip
+       Legs     — 4 cylinders
+       Tail     — torus segment (curved)
+       Collar   — thin torus around the neck (purple gradient)
+
+     All materials use a simple ToonMaterial-style stepped lighting via
+     a custom shader so it reads as cartoon 3D, not realistic.
+
+     Animations
+     ──────────
+       Tail   — wags continuously (sin)
+       Ears   — twitch on click
+       Body   — gentle bob (breathing)
+       Head   — turns toward cursor
+       Drag   — rotates whole dog around Y axis
+       Click  — head bobs, ears flap, tail wag amplitude spikes
      ───────────────────────────────────────────────────────────────────── */
   function initHeroOrb() {
     if (typeof THREE === 'undefined') return;
@@ -3062,125 +3081,184 @@ footer {
 
     const scene  = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
-    camera.position.z = 5.5;
+    camera.position.set(0, 0.4, 5.4);
+    camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setSize(w, h);
 
-    const geo = new THREE.IcosahedronGeometry(1.6, 80);
+    /* ─── Lighting ─── */
+    const ambient = new THREE.AmbientLight(0x6e3aff, 0.5);
+    scene.add(ambient);
 
-    /* ─── Custom shader: displacement + gradient color + fresnel ─── */
-    const orbMat = new THREE.ShaderMaterial({
-      uniforms: {
-        uTime:    { value: 0 },
-        uMouse:   { value: new THREE.Vector2(0, 0) },
-        uPress:   { value: 0 },
-        uAmp:     { value: 1.0 },
-        uColorA:  { value: new THREE.Color(0xa08afa) },
-        uColorB:  { value: new THREE.Color(0x4a90ff) },
-        uColorC:  { value: new THREE.Color(0x6e3aff) },
-      },
-      vertexShader: `
-        uniform float uTime;
-        uniform vec2  uMouse;
-        uniform float uPress;
-        uniform float uAmp;
-        varying vec3  vNormal;
-        varying vec3  vPos;
-        varying float vDispl;
+    const keyLight = new THREE.DirectionalLight(0xa08afa, 1.4);
+    keyLight.position.set(3, 4, 5);
+    scene.add(keyLight);
 
-        // 3D simplex noise (Ashima)
-        vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
-        vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
-        vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
-        vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-        float snoise(vec3 v){
-          const vec2 C = vec2(1./6., 1./3.);
-          const vec4 D = vec4(0., .5, 1., 2.);
-          vec3 i  = floor(v + dot(v, C.yyy));
-          vec3 x0 = v - i + dot(i, C.xxx);
-          vec3 g = step(x0.yzx, x0.xyz);
-          vec3 l = 1. - g;
-          vec3 i1 = min(g.xyz, l.zxy);
-          vec3 i2 = max(g.xyz, l.zxy);
-          vec3 x1 = x0 - i1 + C.xxx;
-          vec3 x2 = x0 - i2 + C.yyy;
-          vec3 x3 = x0 - D.yyy;
-          i = mod289(i);
-          vec4 p = permute(permute(permute(
-              i.z + vec4(0., i1.z, i2.z, 1.))
-            + i.y + vec4(0., i1.y, i2.y, 1.))
-            + i.x + vec4(0., i1.x, i2.x, 1.));
-          float n_ = 1./7.;
-          vec3 ns = n_ * D.wyz - D.xzx;
-          vec4 j = p - 49. * floor(p * ns.z * ns.z);
-          vec4 x_ = floor(j * ns.z);
-          vec4 y_ = floor(j - 7. * x_);
-          vec4 x = x_ * ns.x + ns.yyyy;
-          vec4 y = y_ * ns.x + ns.yyyy;
-          vec4 h = 1. - abs(x) - abs(y);
-          vec4 b0 = vec4(x.xy, y.xy);
-          vec4 b1 = vec4(x.zw, y.zw);
-          vec4 s0 = floor(b0) * 2. + 1.;
-          vec4 s1 = floor(b1) * 2. + 1.;
-          vec4 sh = -step(h, vec4(0.));
-          vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-          vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-          vec3 p0 = vec3(a0.xy, h.x);
-          vec3 p1 = vec3(a0.zw, h.y);
-          vec3 p2 = vec3(a1.xy, h.z);
-          vec3 p3 = vec3(a1.zw, h.w);
-          vec4 nrm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
-          p0 *= nrm.x; p1 *= nrm.y; p2 *= nrm.z; p3 *= nrm.w;
-          vec4 m = max(.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.);
-          m = m * m;
-          return 42. * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
-        }
+    const rimLight = new THREE.DirectionalLight(0x4a90ff, 0.9);
+    rimLight.position.set(-4, 1, -3);
+    scene.add(rimLight);
 
-        void main() {
-          vec3 pos = position;
-          float n  = snoise(pos * 1.4 + uTime * 0.18);
-          float n2 = snoise(pos * 2.6 - uTime * 0.30) * 0.5;
-          float displ = (n * 0.18 + n2 * 0.08) * uAmp;
-          // press pulse
-          displ += uPress * snoise(pos * 5.0) * 0.1;
-          // mouse pull
-          displ += uMouse.x * normal.x * 0.06 + uMouse.y * normal.y * 0.06;
-          vDispl = displ;
-          pos += normal * displ;
-          vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
-          vNormal = normalize(normalMatrix * normal);
-          vPos = mvPos.xyz;
-          gl_Position = projectionMatrix * mvPos;
-        }
-      `,
-      fragmentShader: `
-        uniform float uTime;
-        uniform vec3  uColorA;
-        uniform vec3  uColorB;
-        uniform vec3  uColorC;
-        varying vec3  vNormal;
-        varying vec3  vPos;
-        varying float vDispl;
-        void main() {
-          float fresnel = pow(1.0 - abs(dot(vNormal, normalize(-vPos))), 1.6);
-          float t = (sin(uTime * 0.4) + 1.0) * 0.5;
-          vec3 base = mix(uColorA, uColorB, t);
-          base = mix(base, uColorC, fresnel);
-          base += vec3(vDispl) * 0.35;
-          float glow = smoothstep(0.0, 1.5, fresnel + 0.3);
-          gl_FragColor = vec4(base * (0.7 + glow * 0.7), 0.96);
-        }
-      `,
-      transparent: true,
+    const fillLight = new THREE.PointLight(0xff5cb0, 0.6, 10);
+    fillLight.position.set(0, -2, 4);
+    scene.add(fillLight);
+
+    /* ─── Custom toon shader material (stepped lighting + fresnel rim) ─── */
+    function toonMat(colorHex, emissive = 0.0) {
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          uTime:     { value: 0 },
+          uColor:    { value: new THREE.Color(colorHex) },
+          uEmissive: { value: emissive },
+          uLightDir: { value: new THREE.Vector3(3, 4, 5).normalize() },
+          uRimCol:   { value: new THREE.Color(0xc4b8ff) },
+        },
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vViewPos;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+            vViewPos = mvPos.xyz;
+            gl_Position = projectionMatrix * mvPos;
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform vec3  uColor;
+          uniform float uEmissive;
+          uniform vec3  uLightDir;
+          uniform vec3  uRimCol;
+          varying vec3  vNormal;
+          varying vec3  vViewPos;
+          void main() {
+            // Lambert
+            float NdL = dot(normalize(vNormal), uLightDir);
+            // Toon steps: 3 levels of brightness
+            float light = NdL > 0.6 ? 1.0
+                        : NdL > 0.0 ? 0.7
+                        : 0.4;
+            // Fresnel rim glow
+            float fresnel = pow(1.0 - abs(dot(normalize(vNormal), normalize(-vViewPos))), 2.0);
+            vec3 base = uColor * light;
+            base += uRimCol * fresnel * 0.55;
+            base += uColor * uEmissive;
+            gl_FragColor = vec4(base, 1.0);
+          }
+        `,
+      });
+    }
+
+    /* Materials per body part */
+    const matBody  = toonMat(0x6e3aff, 0.05);  // primary purple
+    const matHead  = toonMat(0x7a4cff, 0.06);  // slightly lighter
+    const matEar   = toonMat(0x4a90ff, 0.04);  // blue ears for contrast
+    const matSnout = toonMat(0xa08afa, 0.05);  // light purple snout
+    const matEye   = toonMat(0xffffff, 0.10);
+    const matPupil = toonMat(0x0a0820, 0.0);
+    const matNose  = toonMat(0x0a0820, 0.0);
+    const matCollar = toonMat(0x4dd6ff, 0.20); // glowing cyan collar
+    const matLeg   = toonMat(0x6e3aff, 0.04);
+    const matTail  = toonMat(0x6e3aff, 0.05);
+
+    /* ─── Build the dog as a Group ─── */
+    const dog = new THREE.Group();
+
+    // Body — stretched sphere (rugby-ball shape)
+    const bodyGeo = new THREE.SphereGeometry(0.85, 32, 24);
+    bodyGeo.scale(1.25, 0.95, 0.95);
+    const body = new THREE.Mesh(bodyGeo, matBody);
+    body.position.set(0, -0.15, 0);
+    dog.add(body);
+
+    // Head — sphere, in front of body
+    const headGroup = new THREE.Group();
+    headGroup.position.set(0.95, 0.45, 0);
+    dog.add(headGroup);
+
+    const headGeo = new THREE.SphereGeometry(0.55, 32, 24);
+    const head = new THREE.Mesh(headGeo, matHead);
+    headGroup.add(head);
+
+    // Snout — cone forward
+    const snoutGeo = new THREE.ConeGeometry(0.28, 0.55, 24);
+    snoutGeo.rotateZ(-Math.PI / 2);
+    const snout = new THREE.Mesh(snoutGeo, matSnout);
+    snout.position.set(0.55, -0.05, 0);
+    headGroup.add(snout);
+
+    // Nose — small black sphere on snout tip
+    const noseGeo = new THREE.SphereGeometry(0.10, 16, 16);
+    const nose = new THREE.Mesh(noseGeo, matNose);
+    nose.position.set(0.85, -0.02, 0);
+    headGroup.add(nose);
+
+    // Ears — 2 cones rotated outward + back
+    const earGeo = new THREE.ConeGeometry(0.22, 0.55, 16);
+    const earL = new THREE.Mesh(earGeo, matEar);
+    earL.position.set(-0.15, 0.45, 0.35);
+    earL.rotation.set(0.3, 0, -0.4);
+    headGroup.add(earL);
+
+    const earR = new THREE.Mesh(earGeo, matEar);
+    earR.position.set(-0.15, 0.45, -0.35);
+    earR.rotation.set(-0.3, 0, -0.4);
+    headGroup.add(earR);
+
+    // Eyes — white spheres + black pupils, positioned on face
+    const eyeGeo = new THREE.SphereGeometry(0.10, 16, 16);
+    const eyeL = new THREE.Mesh(eyeGeo, matEye);
+    eyeL.position.set(0.35, 0.18, 0.28);
+    headGroup.add(eyeL);
+    const eyeR = new THREE.Mesh(eyeGeo, matEye);
+    eyeR.position.set(0.35, 0.18, -0.28);
+    headGroup.add(eyeR);
+
+    const pupilGeo = new THREE.SphereGeometry(0.05, 12, 12);
+    const pupilL = new THREE.Mesh(pupilGeo, matPupil);
+    pupilL.position.set(0.42, 0.18, 0.30);
+    headGroup.add(pupilL);
+    const pupilR = new THREE.Mesh(pupilGeo, matPupil);
+    pupilR.position.set(0.42, 0.18, -0.30);
+    headGroup.add(pupilR);
+
+    // Collar — thin torus around the neck
+    const collarGeo = new THREE.TorusGeometry(0.4, 0.06, 12, 32);
+    collarGeo.rotateY(Math.PI / 2);
+    const collar = new THREE.Mesh(collarGeo, matCollar);
+    collar.position.set(0.5, 0.05, 0);
+    dog.add(collar);
+
+    // Legs — 4 cylinders, two per side
+    const legGeo = new THREE.CylinderGeometry(0.13, 0.16, 0.55, 16);
+    const legPositions = [
+      [ 0.55, -0.85,  0.35],
+      [ 0.55, -0.85, -0.35],
+      [-0.55, -0.85,  0.35],
+      [-0.55, -0.85, -0.35],
+    ];
+    legPositions.forEach((p) => {
+      const leg = new THREE.Mesh(legGeo, matLeg);
+      leg.position.set(p[0], p[1], p[2]);
+      dog.add(leg);
     });
 
-    const orb = new THREE.Mesh(geo, orbMat);
-    scene.add(orb);
+    // Tail — curved using a small torus segment positioned at the back
+    const tailGeo = new THREE.TorusGeometry(0.25, 0.07, 12, 24, Math.PI * 1.4);
+    const tailPivot = new THREE.Group();
+    tailPivot.position.set(-1.05, 0.15, 0);
+    dog.add(tailPivot);
+    const tail = new THREE.Mesh(tailGeo, matTail);
+    tail.rotation.set(0, 0, Math.PI / 2 - 0.4);
+    tailPivot.add(tail);
 
-    /* ─── Halo (back-side sphere with fresnel) ─── */
-    const haloGeo = new THREE.SphereGeometry(2.5, 48, 48);
+    // Center the whole dog up a bit (legs reach below ground)
+    dog.position.y = 0.4;
+    scene.add(dog);
+
+    /* ─── Halo (back-side sphere with fresnel) — atmospheric glow ─── */
+    const haloGeo = new THREE.SphereGeometry(2.8, 48, 48);
     const haloMat = new THREE.ShaderMaterial({
       uniforms: { uTime: { value: 0 } },
       vertexShader: `
@@ -3200,7 +3278,7 @@ footer {
         void main() {
           float fr = pow(1.0 - abs(dot(vNormal, normalize(-vPos))), 3.0);
           vec3 col = mix(vec3(0.43, 0.23, 1.0), vec3(0.29, 0.56, 1.0), 0.5);
-          gl_FragColor = vec4(col * fr, fr * 0.4);
+          gl_FragColor = vec4(col * fr, fr * 0.45);
         }
       `,
       transparent: true,
@@ -3210,14 +3288,13 @@ footer {
     const halo = new THREE.Mesh(haloGeo, haloMat);
     scene.add(halo);
 
-    /* ─── Mouse drives uMouse, drag rotates orb ─── */
+    /* ─── Mouse + drag controls ─── */
     let mtx = 0, mty = 0, mtxL = 0, mtyL = 0;
     document.addEventListener('mousemove', (e) => {
       mtx = (e.clientX / innerWidth)  * 2 - 1;
       mty = -(e.clientY / innerHeight) * 2 + 1;
     });
 
-    /* Drag-rotate state */
     let dragging = false, lastX = 0, lastY = 0;
     let rotVelX = 0, rotVelY = 0;
 
@@ -3231,7 +3308,7 @@ footer {
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
       rotVelY += dx * 0.005;
-      rotVelX += dy * 0.005;
+      rotVelX += dy * 0.003;
       lastX = e.clientX; lastY = e.clientY;
     };
     const onUp = () => {
@@ -3243,7 +3320,6 @@ footer {
     addEventListener('mousemove', onMove);
     addEventListener('mouseup', onUp);
 
-    /* Touch support */
     canvas.addEventListener('touchstart', (e) => {
       const t = e.touches[0];
       onDown({ clientX: t.clientX, clientY: t.clientY });
@@ -3255,10 +3331,10 @@ footer {
     });
     addEventListener('touchend', onUp);
 
-    /* Click to pulse */
-    let pressTarget = 0;
+    /* Click → "happy" anim: tail wag faster, ears flap, head shake */
+    let happiness = 0;
     canvas.addEventListener('click', () => {
-      pressTarget = 1;
+      happiness = 1;
       try { window.audioEngine && window.audioEngine.playClick(); } catch (e) {}
     });
 
@@ -3269,33 +3345,69 @@ footer {
       renderer.setSize(innerWidth, innerHeight);
     });
 
-    /* Render loop */
+    /* ─── Animation loop ─── */
     const clk = new THREE.Clock();
+
+    // Save initial transforms for delta-based animation
+    const headBaseRot = { x: head.rotation.x, y: head.rotation.y, z: head.rotation.z };
+    const earLBaseRot = { ...earL.rotation };
+    const earRBaseRot = { ...earR.rotation };
+    const tailBaseRot = { ...tailPivot.rotation };
+    const dogBaseY    = dog.position.y;
+
     function render() {
       const t = clk.getElapsedTime();
-      orbMat.uniforms.uTime.value = t;
+
+      // Update toon material times
+      [matBody, matHead, matEar, matSnout, matEye, matPupil, matNose, matCollar, matLeg, matTail].forEach(m => {
+        m.uniforms.uTime.value = t;
+      });
       haloMat.uniforms.uTime.value = t;
 
       mtxL = lerp(mtxL, mtx, 0.05);
       mtyL = lerp(mtyL, mty, 0.05);
-      orbMat.uniforms.uMouse.value.x = mtxL;
-      orbMat.uniforms.uMouse.value.y = mtyL;
 
-      // Press pulse decays
-      pressTarget *= 0.92;
-      orbMat.uniforms.uPress.value = pressTarget;
+      // Idle body bob (breathing)
+      dog.position.y = dogBaseY + Math.sin(t * 1.6) * 0.05;
 
-      // Apply drag rotation with friction
-      orb.rotation.y += rotVelY;
-      orb.rotation.x += rotVelX;
-      rotVelX *= 0.94;
-      rotVelY *= 0.94;
-      // Idle rotation when not dragging
-      if (!dragging && Math.abs(rotVelX) < 0.001 && Math.abs(rotVelY) < 0.001) {
-        orb.rotation.y += 0.005;
+      // Head looks at cursor (when not dragging)
+      if (!dragging) {
+        headGroup.rotation.y = mtxL * 0.4;
+        headGroup.rotation.x = mtyL * -0.2;
       }
 
-      // Halo just rotates slowly
+      // Tail wag — happiness boosts amplitude + frequency
+      const wagSpeed = 5 + happiness * 8;
+      const wagAmp   = 0.6 + happiness * 0.6;
+      tailPivot.rotation.x = tailBaseRot.x + Math.sin(t * wagSpeed) * wagAmp;
+
+      // Ears twitch when happy
+      const earFlap = happiness * Math.sin(t * 14) * 0.35;
+      earL.rotation.z = earLBaseRot.z + earFlap;
+      earR.rotation.z = earRBaseRot.z - earFlap;
+
+      // Pupils follow cursor (look around)
+      pupilL.position.x = 0.42 + mtxL * 0.025;
+      pupilL.position.y = 0.18 + mtyL * 0.020;
+      pupilR.position.x = 0.42 + mtxL * 0.025;
+      pupilR.position.y = 0.18 + mtyL * 0.020;
+
+      // Decay happiness
+      happiness *= 0.96;
+
+      // Drag rotation with friction
+      dog.rotation.y += rotVelY;
+      // Limit X rotation so we don't flip the dog
+      dog.rotation.x = clamp(dog.rotation.x + rotVelX, -0.5, 0.5);
+      rotVelX *= 0.94;
+      rotVelY *= 0.94;
+
+      // Idle slow rotation when not dragging
+      if (!dragging && Math.abs(rotVelX) < 0.001 && Math.abs(rotVelY) < 0.001) {
+        dog.rotation.y += 0.003;
+      }
+
+      // Halo slow counter-rotation
       halo.rotation.y -= 0.001;
 
       renderer.render(scene, camera);
