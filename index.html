@@ -7,13 +7,14 @@
 <meta name="verification" content="56db57b4db0a6fcb7f9e0c0b504f6472">
 
 <title>MrDogez — Программы для людей</title>
-<meta name="description" content="MrDogez — solo dev. Делаю программы которые работают: VPN, утилиты, и что ещё нужно. Для друзей. Бесплатно или почти.">
-<meta property="og:title" content="MrDogez — Software">
+<meta name="description" content="MrDogez — solo dev. Делаю программы которые работают. VPN, утилиты, инструменты. Бесплатно или почти. Без подписок-ловушек.">
+<meta property="og:title" content="MrDogez — Программы для людей">
 <meta property="og:description" content="Solo dev. Программы которые работают.">
 <meta property="og:image" content="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mrdogez.github.io/">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
 
 <link rel="icon" href="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/MrDogez/mrdogez.github.io/main/icon.png">
@@ -22,24 +23,45 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-<!-- Three.js — WebGL hero scene -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     External libraries (CDN)
+     - three.js: WebGL hero scene + 3D mascot
+     - GSAP + ScrollTrigger + SplitText: scroll-driven animations
+     - Lenis: momentum-based smooth scroll
+     ═══════════════════════════════════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r158/three.min.js"></script>
-<!-- GSAP + ScrollTrigger — scroll-driven animations -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/SplitText.min.js"></script>
-<!-- Lenis — momentum smooth scroll -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.0.42/lenis.min.js"></script>
 
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
-   MrDogez — Premium agency-style portfolio
-   Inspired by activetheory.net — WebGL bg, smooth scroll, dramatic transitions.
-   Palette: deep blue-purple darkness with electric accents.
+   MrDogez — Premium agency portfolio v2
+   ─────────────────────────────────────────────────────────────────────────
+   Inspiration:    activetheory.net (cinematic WebGL agency portfolio)
+   Aesthetic:      deep midnight blue-purple, electric accents, big serif
+                   display headlines, custom cursor follower, GLSL background
+   Goals:          (a) make the user say "wow" within 1 second of loading
+                   (b) keep scroll buttery smooth at 60fps
+                   (c) work on desktop AND mobile (touch fallbacks)
+   ─────────────────────────────────────────────────────────────────────────
+   Architecture
+   ─────────────────────────────────────────────────────────────────────────
+   Layer 0:        WebGL canvas (background) — three.js + custom GLSL
+   Layer 1:        Grain + vignette overlays
+   Layer 2:        DOM content
+   Layer 3:        Custom cursor + ring
+   Layer 4:        Loading screen + page-transition overlay
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ──────────────────────────────── Reset ──────────────────────────────── */
-*, *::before, *::after {
+
+/* ═════════════════════════════════════════════════════════════════
+   1. CSS RESET (modernized normalize)
+   ═════════════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -47,20 +69,26 @@
 }
 
 html {
-  scroll-behavior: auto; /* Lenis takes over */
+  /* Lenis takes over native smooth scroll. We keep this fallback for
+     anchor jumps that bypass Lenis (e.g. user disables JS or prefers
+     reduced motion). */
+  scroll-behavior: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* Subtle text contrast across the dark gradient — the global font feature
+     settings unlock Inter's stylistic alternates that look better on dark. */
 }
 
-html, body {
+html,
+body {
   background: #050410;
   color: #f0eef8;
   overflow-x: hidden;
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 16px;
   line-height: 1.55;
   letter-spacing: -0.011em;
@@ -69,62 +97,156 @@ body {
   min-height: 100vh;
 }
 
-img, svg, video { display: block; max-width: 100%; }
-a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 0; }
-ul, ol { list-style: none; }
-input, textarea, select { font: inherit; color: inherit; }
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
 
-::selection { background: #6e3aff; color: #fff; }
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-/* ──────────────────────────────── Tokens ──────────────────────────────── */
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: 0;
+  background: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: #6e3aff;
+  color: #fff;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   2. DESIGN TOKENS
+   ─────────────────────────────────────────────────────────────────
+   Single source of truth for every color / spacing / motion value.
+   If a designer rewrites the palette, only this block changes.
+   ═════════════════════════════════════════════════════════════════ */
+
 :root {
-  --bg: #050410;
-  --bg-2: #0a0820;
-  --bg-3: #110e30;
-  --line: rgba(160, 138, 250, 0.1);
-  --line-2: rgba(160, 138, 250, 0.18);
-  --line-3: rgba(160, 138, 250, 0.32);
+  /* ─── color: surfaces ─── */
+  --bg:        #050410;
+  --bg-2:      #0a0820;
+  --bg-3:      #110e30;
+  --bg-4:      #1a1640;
+  --bg-5:      #221c50;
 
-  --fg: #f0eef8;
-  --fg-2: #a09abb;
-  --fg-3: #6c6885;
-  --fg-4: #3d394e;
-  --fg-5: #28253a;
+  /* ─── color: lines / dividers ─── */
+  --line:      rgba(160, 138, 250, 0.10);
+  --line-2:    rgba(160, 138, 250, 0.18);
+  --line-3:    rgba(160, 138, 250, 0.32);
+  --line-4:    rgba(160, 138, 250, 0.55);
 
-  --acc: #6e3aff;
-  --acc-2: #a08afa;
-  --acc-3: #c4b8ff;
-  --acc-glow: rgba(110, 58, 255, 0.4);
+  /* ─── color: foreground (text) ─── */
+  --fg:        #f0eef8;
+  --fg-2:      #a09abb;
+  --fg-3:      #6c6885;
+  --fg-4:      #3d394e;
+  --fg-5:      #28253a;
 
-  --blue: #4a90ff;
-  --blue-glow: rgba(74, 144, 255, 0.4);
-  --cyan: #4dd6ff;
-  --pink: #ff5cb0;
-  --gold: #f5c842;
-  --green: #10d97e;
-  --red: #ff5c5c;
+  /* ─── color: accents (electric) ─── */
+  --acc:        #6e3aff;
+  --acc-2:      #a08afa;
+  --acc-3:      #c4b8ff;
+  --acc-glow:   rgba(110, 58, 255, 0.4);
+  --acc-glow-2: rgba(110, 58, 255, 0.65);
 
-  --serif: 'Instrument Serif', 'Times New Roman', serif;
-  --sans: 'Inter', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
+  --blue:        #4a90ff;
+  --blue-2:      #6ba9ff;
+  --blue-glow:   rgba(74, 144, 255, 0.4);
+  --blue-glow-2: rgba(74, 144, 255, 0.6);
 
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cyan:        #4dd6ff;
+  --cyan-glow:   rgba(77, 214, 255, 0.4);
 
-  --container-max: 1340px;
-  --header-h: 76px;
+  --pink:        #ff5cb0;
+  --pink-glow:   rgba(255, 92, 176, 0.35);
 
+  --gold:        #f5c842;
+  --gold-glow:   rgba(245, 200, 66, 0.35);
+
+  --green:       #10d97e;
+  --green-glow:  rgba(16, 217, 126, 0.45);
+
+  --red:         #ff5c5c;
+  --red-glow:    rgba(255, 92, 92, 0.4);
+
+  /* ─── typography ─── */
+  --serif:  'Instrument Serif', 'Times New Roman', serif;
+  --sans:   'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --mono:   'JetBrains Mono', ui-monospace, monospace;
+
+  /* ─── motion: easing curves ─── */
+  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:      cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out:  cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-bounce:  cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  --ease-snappy:  cubic-bezier(0.45, 0, 0.55, 1);
+
+  /* ─── layout ─── */
+  --container-max:    1340px;
+  --container-pad:    32px;
+  --container-pad-sm: 22px;
+  --header-h:         76px;
+  --section-pad:      160px;
+  --section-pad-sm:   100px;
+
+  /* ─── radii ─── */
+  --r-sm:   8px;
+  --r-md:   14px;
+  --r-lg:   20px;
+  --r-xl:   28px;
+  --r-2xl:  40px;
+  --r-pill: 999px;
+
+  /* ─── shadows ─── */
+  --sh-sm:    0 1px 2px rgba(0,0,0,0.3);
+  --sh-md:    0 8px 24px rgba(0,0,0,0.4);
+  --sh-lg:    0 20px 60px rgba(0,0,0,0.5);
+  --sh-glow:  0 0 60px var(--acc-glow);
+
+  /* ─── colors meta ─── */
   color-scheme: dark;
 }
 
-/* ──────────────────────────────── Background mesh ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   3. LAYERED BACKGROUND
+   ─────────────────────────────────────────────────────────────────
+   Three stacked fixed layers behind everything else.
+   Layer A: WebGL canvas (animated by JS)
+   Layer B: Film grain (CSS, static SVG)
+   Layer C: Vignette darken (CSS gradient)
+   ═════════════════════════════════════════════════════════════════ */
+
 .bg-canvas {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* Three.js will write to this; before it boots we want a solid bg. */
+  background: var(--bg);
 }
 
 .bg-grain {
@@ -132,7 +254,7 @@ input, textarea, select { font: inherit; color: inherit; }
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.04;
+  opacity: 0.05;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
 }
@@ -142,11 +264,21 @@ input, textarea, select { font: inherit; color: inherit; }
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(ellipse 80% 60% at 50% 50%, transparent 0%, rgba(5, 4, 16, 0.6) 100%);
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    transparent 0%,
+    rgba(5, 4, 16, 0.6) 100%
+  );
 }
 
-/* ──────────────────────────────── Main wrap ──────────────────────────────── */
-main, header, footer {
+
+/* ═════════════════════════════════════════════════════════════════
+   4. CONTAINER + LAYOUT HELPERS
+   ═════════════════════════════════════════════════════════════════ */
+
+main,
+header,
+footer {
   position: relative;
   z-index: 2;
 }
@@ -154,25 +286,68 @@ main, header, footer {
 .container {
   max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 var(--container-pad);
+}
+
+.container-narrow {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+.container-wide {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
 }
 
 @media (max-width: 720px) {
-  .container { padding: 0 22px; }
+  .container,
+  .container-narrow,
+  .container-wide {
+    padding: 0 var(--container-pad-sm);
+  }
 }
 
-/* ──────────────────────────────── Loading screen ──────────────────────────────── */
+/* Visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   5. LOADING SCREEN
+   ─────────────────────────────────────────────────────────────────
+   Shown immediately on page load. Fakes a percentage counter that
+   reaches 100% in ~1.5–2.0s, then fades out revealing the hero.
+   The fake-loading buys time for Three.js to compile its shaders
+   off-screen so the user never sees a jank-frame.
+   ═════════════════════════════════════════════════════════════════ */
+
 .loader {
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: var(--bg);
+  background: radial-gradient(
+    ellipse at center,
+    var(--bg-2) 0%,
+    var(--bg) 70%
+  );
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
-  transition: opacity 0.8s var(--ease-out), visibility 0s linear 0.8s;
+  gap: 36px;
+  transition: opacity 0.9s var(--ease-out),
+              visibility 0s linear 0.9s;
 }
 
 .loader.hidden {
@@ -183,31 +358,41 @@ main, header, footer {
 
 .loader-logo {
   position: relative;
-  width: 96px;
-  height: 96px;
-  animation: loader-pulse 1.4s var(--ease-in-out) infinite;
-}
-
-.loader-logo::before,
-.loader-logo::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
+  width: 110px;
+  height: 110px;
+  animation: loader-pulse 2s var(--ease-in-out) infinite;
 }
 
 .loader-logo::before {
-  background: radial-gradient(circle at 30% 30%, #fff 0%, var(--acc-2) 35%, var(--acc) 70%, transparent 95%);
-  filter: blur(2px);
-  box-shadow: 0 0 60px var(--acc-glow), 0 0 120px var(--acc-glow);
+  /* The glow halo behind the dog */
+  content: '';
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--acc-glow-2) 0%,
+    var(--acc-glow) 30%,
+    transparent 70%
+  );
+  filter: blur(20px);
+  animation: halo-pulse 3s var(--ease-in-out) infinite;
 }
 
-.loader-logo::after {
-  inset: 18px;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.loader-logo .ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--acc-2);
+  opacity: 0.4;
+  animation: ring-rotate 8s linear infinite;
+}
+
+.loader-logo .ring-2 {
+  inset: 8px;
+  border: 1px dashed var(--acc-2);
+  animation: ring-rotate 12s linear infinite reverse;
+  opacity: 0.25;
 }
 
 .loader-logo .doge {
@@ -216,20 +401,31 @@ main, header, footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 44px;
+  font-size: 48px;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.5))
+          drop-shadow(0 0 30px rgba(160, 138, 250, 0.6));
   z-index: 2;
 }
 
 @keyframes loader-pulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
+  50%      { transform: scale(1.06); }
+}
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+@keyframes ring-rotate {
+  to { transform: rotate(360deg); }
 }
 
 .loader-meta {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   font-family: var(--mono);
   font-size: 11px;
   color: var(--fg-3);
@@ -238,7 +434,7 @@ main, header, footer {
 }
 
 .loader-bar {
-  width: 200px;
+  width: 240px;
   height: 1px;
   background: var(--line);
   position: relative;
@@ -252,7 +448,7 @@ main, header, footer {
   bottom: 0;
   width: 0%;
   background: linear-gradient(90deg, var(--acc) 0%, var(--blue) 100%);
-  box-shadow: 0 0 12px var(--acc-glow);
+  box-shadow: 0 0 14px var(--acc-glow);
   transition: width 0.3s var(--ease-out);
 }
 
@@ -263,7 +459,60 @@ main, header, footer {
   font-weight: 600;
 }
 
-/* ──────────────────────────────── Custom cursor ──────────────────────────────── */
+.loader-tagline {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fg-4);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fade-in 1.5s var(--ease-out) 0.5s forwards;
+}
+
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   6. PAGE TRANSITION OVERLAY
+   ─────────────────────────────────────────────────────────────────
+   Triggered when user clicks a same-page anchor link — sweeps a
+   diagonal panel across the screen for that "agency feel" before
+   smooth-scrolling to the destination.
+   ═════════════════════════════════════════════════════════════════ */
+
+.page-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  background: linear-gradient(135deg, var(--acc) 0%, var(--blue) 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.7s var(--ease-in-out);
+}
+
+.page-overlay.active {
+  transform: scaleX(1);
+}
+
+.page-overlay.exiting {
+  transform-origin: right center;
+  transform: scaleX(0);
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   7. CUSTOM CURSOR
+   ─────────────────────────────────────────────────────────────────
+   Two layers: a tight 6px dot that follows the mouse 1:1, and a
+   36px ring that lerps with delay creating a "trail" feel.
+   On hover over interactive elements: dot disappears, ring grows.
+   On hover over text: dot becomes a thin caret (text-cursor mode).
+   ═════════════════════════════════════════════════════════════════ */
+
 .cursor {
   position: fixed;
   top: 0;
@@ -275,7 +524,10 @@ main, header, footer {
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  transition: width 0.3s var(--ease-out), height 0.3s var(--ease-out), background 0.3s var(--ease-out);
+  transition: width 0.3s var(--ease-out),
+              height 0.3s var(--ease-out),
+              background 0.3s var(--ease-out),
+              border-radius 0.3s var(--ease-out);
   mix-blend-mode: difference;
   will-change: transform;
 }
@@ -291,31 +543,61 @@ main, header, footer {
   pointer-events: none;
   z-index: 9998;
   transform: translate(-50%, -50%);
-  transition: width 0.4s var(--ease-out), height 0.4s var(--ease-out), border-color 0.4s var(--ease-out), opacity 0.3s;
+  transition: width 0.4s var(--ease-out),
+              height 0.4s var(--ease-out),
+              border-color 0.4s var(--ease-out),
+              opacity 0.3s,
+              background 0.4s var(--ease-out);
   will-change: transform;
 }
 
-body.cursor-link .cursor { width: 0; height: 0; }
+body.cursor-link .cursor {
+  width: 0;
+  height: 0;
+}
+
 body.cursor-link .cursor-ring {
   width: 80px;
   height: 80px;
   border-color: var(--acc-2);
-  background: rgba(110, 58, 255, 0.04);
+  background: rgba(110, 58, 255, 0.06);
 }
 
 body.cursor-text .cursor {
   width: 2px;
-  height: 24px;
+  height: 22px;
   border-radius: 2px;
   background: var(--fg);
 }
-body.cursor-text .cursor-ring { opacity: 0; }
 
-@media (hover: none), (pointer: coarse) {
-  .cursor, .cursor-ring { display: none; }
+body.cursor-text .cursor-ring {
+  opacity: 0;
 }
 
-/* ──────────────────────────────── Header ──────────────────────────────── */
+body.cursor-magnet .cursor-ring {
+  width: 100px;
+  height: 100px;
+  border-color: var(--blue);
+  background: rgba(74, 144, 255, 0.08);
+}
+
+@media (hover: none), (pointer: coarse) {
+  /* Touch devices: hide the custom cursor entirely; native touch
+     interactions are sufficient. */
+  .cursor,
+  .cursor-ring {
+    display: none;
+  }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   8. SITE HEADER
+   ─────────────────────────────────────────────────────────────────
+   Fixed transparent at top, becomes blurred-glass after 40px scroll.
+   Mobile: hides the inline nav links, keeps brand + CTA.
+   ═════════════════════════════════════════════════════════════════ */
+
 .site-header {
   position: fixed;
   top: 0;
@@ -325,7 +607,9 @@ body.cursor-text .cursor-ring { opacity: 0; }
   height: var(--header-h);
   display: flex;
   align-items: center;
-  transition: background 0.4s var(--ease-out), backdrop-filter 0.4s var(--ease-out), border-color 0.4s;
+  transition: background 0.4s var(--ease-out),
+              backdrop-filter 0.4s var(--ease-out),
+              border-color 0.4s;
   border-bottom: 1px solid transparent;
 }
 
@@ -344,6 +628,7 @@ body.cursor-text .cursor-ring { opacity: 0; }
   width: 100%;
 }
 
+/* ─── brand mark ─── */
 .brand {
   display: flex;
   align-items: center;
@@ -353,22 +638,54 @@ body.cursor-text .cursor-ring { opacity: 0; }
   font-weight: 400;
   letter-spacing: -0.01em;
   color: var(--fg);
+  position: relative;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.brand:hover {
+  transform: translateX(2px);
 }
 
 .brand-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
   background: linear-gradient(135deg, var(--acc) 0%, var(--blue) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 17px;
-  box-shadow: 0 0 20px var(--acc-glow), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 24px var(--acc-glow),
+              inset 0 1px 0 rgba(255, 255, 255, 0.18),
+              inset 0 -2px 6px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
-.brand em { font-style: italic; color: var(--acc-2); }
+.brand-mark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.7s var(--ease-out);
+}
 
+.brand:hover .brand-mark::before {
+  transform: translateX(100%);
+}
+
+.brand em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+/* ─── nav links ─── */
 .nav {
   display: flex;
   align-items: center;
@@ -377,19 +694,26 @@ body.cursor-text .cursor-ring { opacity: 0; }
 
 .nav a {
   padding: 9px 16px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   font-size: 13px;
   font-weight: 500;
   color: var(--fg-2);
   transition: color 0.2s, background 0.2s;
+  position: relative;
 }
 
-.nav a:hover { color: var(--fg); background: rgba(255, 255, 255, 0.05); }
+.nav a:hover {
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.05);
+}
 
 .nav a.cta {
   background: var(--fg);
   color: var(--bg);
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .nav a.cta:hover {
@@ -398,11 +722,30 @@ body.cursor-text .cursor-ring { opacity: 0; }
   box-shadow: 0 8px 24px var(--acc-glow);
 }
 
-@media (max-width: 720px) {
-  .nav .nl { display: none; }
+.nav a.cta svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s var(--ease-out);
 }
 
-/* ──────────────────────────────── Hero ──────────────────────────────── */
+.nav a.cta:hover svg {
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 720px) {
+  .nav .nl {
+    display: none;
+  }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   9. HERO
+   ─────────────────────────────────────────────────────────────────
+   First-fold experience. Floating 3D dog avatar (rendered by Three.js)
+   sits on the right; staggered text reveal on the left.
+   ═════════════════════════════════════════════════════════════════ */
+
 .hero {
   min-height: 100svh;
   display: flex;
@@ -418,12 +761,13 @@ body.cursor-text .cursor-ring { opacity: 0; }
   width: 100%;
 }
 
+/* ─── eyebrow pill ─── */
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 12px;
   padding: 8px 18px 8px 14px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--line-2);
   font-family: var(--mono);
@@ -435,6 +779,12 @@ body.cursor-text .cursor-ring { opacity: 0; }
   margin-bottom: 56px;
   opacity: 0;
   animation: fade-in 1s var(--ease-out) 0.2s forwards;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.hero-eyebrow:hover {
+  border-color: var(--line-3);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .hero-eyebrow .live {
@@ -447,15 +797,12 @@ body.cursor-text .cursor-ring { opacity: 0; }
 }
 
 @keyframes live-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(16, 217, 126, 0.5); }
-  70% { box-shadow: 0 0 0 12px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
+  0%   { box-shadow: 0 0 0 0    rgba(16, 217, 126, 0.5); }
+  70%  { box-shadow: 0 0 0 12px rgba(16, 217, 126, 0); }
+  100% { box-shadow: 0 0 0 0    rgba(16, 217, 126, 0); }
 }
 
-@keyframes fade-in {
-  to { opacity: 1; }
-}
-
+/* ─── massive serif title ─── */
 .hero h1 {
   font-family: var(--serif);
   font-size: clamp(64px, 13vw, 220px);
@@ -490,30 +837,50 @@ body.cursor-text .cursor-ring { opacity: 0; }
 
 .hero h1 em {
   font-style: italic;
-  background: linear-gradient(135deg, var(--acc-2) 0%, var(--blue) 50%, var(--cyan) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--acc-2) 0%,
+    var(--blue) 50%,
+    var(--cyan) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   position: relative;
 }
 
+/* Pulsing glow dot at end of title */
 .hero h1 .dot-end {
   display: inline-block;
   width: 0.18em;
   height: 0.18em;
   border-radius: 50%;
   background: var(--acc);
-  box-shadow: 0 0 30px var(--acc-glow), 0 0 60px var(--acc-glow);
+  box-shadow:
+    0 0 30px  var(--acc-glow),
+    0 0 60px  var(--acc-glow),
+    0 0 100px var(--acc-glow);
   vertical-align: 0.05em;
   margin-left: 0.05em;
   animation: dot-pulse 3s var(--ease-in-out) infinite;
 }
 
 @keyframes dot-pulse {
-  0%, 100% { box-shadow: 0 0 30px var(--acc-glow), 0 0 60px var(--acc-glow); }
-  50% { box-shadow: 0 0 50px var(--acc-glow), 0 0 100px var(--acc-glow); }
+  0%, 100% {
+    box-shadow:
+      0 0 30px  var(--acc-glow),
+      0 0 60px  var(--acc-glow),
+      0 0 100px var(--acc-glow);
+  }
+  50% {
+    box-shadow:
+      0 0 40px  var(--acc-glow-2),
+      0 0 80px  var(--acc-glow-2),
+      0 0 140px var(--acc-glow-2);
+  }
 }
 
+/* ─── subtitle ─── */
 .hero-sub {
   font-size: clamp(16px, 1.7vw, 22px);
   font-weight: 400;
@@ -530,6 +897,7 @@ body.cursor-text .cursor-ring { opacity: 0; }
   font-weight: 500;
 }
 
+/* ─── CTA buttons ─── */
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -544,14 +912,18 @@ body.cursor-text .cursor-ring { opacity: 0; }
   align-items: center;
   gap: 12px;
   padding: 18px 32px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
   border: 0;
   font-family: inherit;
-  transition: transform 0.2s var(--ease-out), background 0.3s, color 0.3s, box-shadow 0.4s;
+  transition: transform 0.2s var(--ease-out),
+              background 0.3s,
+              color 0.3s,
+              box-shadow 0.4s,
+              border-color 0.3s;
   position: relative;
   white-space: nowrap;
   will-change: transform;
@@ -560,16 +932,23 @@ body.cursor-text .cursor-ring { opacity: 0; }
 .btn-primary {
   background: var(--fg);
   color: var(--bg);
-  box-shadow: 0 12px 40px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12px 40px rgba(255, 255, 255, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .btn-primary:hover {
   background: var(--acc-2);
-  box-shadow: 0 18px 50px var(--acc-glow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 18px 50px var(--acc-glow),
+              inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-.btn-primary svg { transition: transform 0.3s var(--ease-out); }
-.btn-primary:hover svg { transform: translate(4px, -4px); }
+.btn-primary svg {
+  transition: transform 0.3s var(--ease-out);
+}
+
+.btn-primary:hover svg {
+  transform: translate(4px, -4px);
+}
 
 .btn-ghost {
   background: transparent;
@@ -582,6 +961,20 @@ body.cursor-text .cursor-ring { opacity: 0; }
   border-color: var(--line-3);
 }
 
+.btn-glow {
+  background: linear-gradient(135deg, var(--acc) 0%, var(--blue) 100%);
+  color: #fff;
+  box-shadow: 0 12px 40px var(--acc-glow),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btn-glow:hover {
+  box-shadow: 0 16px 50px var(--acc-glow-2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+/* ─── scroll cue ─── */
 .hero-scroll-cue {
   position: absolute;
   bottom: 32px;
@@ -611,11 +1004,19 @@ body.cursor-text .cursor-ring { opacity: 0; }
 }
 
 @keyframes cue-drop {
-  0%, 100% { opacity: 0.3; height: 56px; transform: translateY(0); }
-  50% { opacity: 1; height: 70px; transform: translateY(8px); }
+  0%, 100% {
+    opacity: 0.3;
+    height: 56px;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    height: 72px;
+    transform: translateY(8px);
+  }
 }
 
-/* Floating orb in hero */
+/* ─── 3D dog avatar (right side) ─── */
 .hero-orb {
   position: absolute;
   right: -8%;
@@ -633,7 +1034,13 @@ body.cursor-text .cursor-ring { opacity: 0; }
   animation: fade-in 1.4s var(--ease-out) 0.8s forwards;
 }
 
-.hero-orb .core {
+.hero-orb canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Fallback orb (CSS-only) shown if WebGL fails */
+.hero-orb .core-fallback {
   position: relative;
   width: 65%;
   aspect-ratio: 1;
@@ -651,7 +1058,7 @@ body.cursor-text .cursor-ring { opacity: 0; }
   justify-content: center;
 }
 
-.hero-orb .core::before {
+.hero-orb .core-fallback::before {
   content: '';
   position: absolute;
   inset: -2%;
@@ -660,7 +1067,7 @@ body.cursor-text .cursor-ring { opacity: 0; }
   animation: orb-rot 24s linear infinite;
 }
 
-.hero-orb .core::after {
+.hero-orb .core-fallback::after {
   content: '';
   position: absolute;
   inset: -8%;
@@ -669,9 +1076,10 @@ body.cursor-text .cursor-ring { opacity: 0; }
   animation: orb-rot 36s linear infinite reverse;
 }
 
-.hero-orb .core .doge {
+.hero-orb .core-fallback .doge {
   font-size: clamp(60px, 8vw, 130px);
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.25));
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5))
+          drop-shadow(0 0 30px rgba(255, 255, 255, 0.25));
   z-index: 2;
   position: relative;
   animation: doge-bob 4s var(--ease-in-out) infinite;
@@ -679,7 +1087,7 @@ body.cursor-text .cursor-ring { opacity: 0; }
 
 @keyframes orb-float {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-12px, 10px) scale(1.04); }
+  50%      { transform: translate(-12px, 10px) scale(1.04); }
 }
 
 @keyframes orb-rot {
@@ -688,10 +1096,11 @@ body.cursor-text .cursor-ring { opacity: 0; }
 
 @keyframes doge-bob {
   0%, 100% { transform: translateY(0) rotate(-3deg); }
-  50% { transform: translateY(-10px) rotate(3deg); }
+  50%      { transform: translateY(-10px) rotate(3deg); }
 }
 
-/* Hero floating particles */
+/* Floating particles in hero corners (CSS-driven small set, not the
+   main WebGL particles in the bg canvas) */
 .hero-particles {
   position: absolute;
   inset: 0;
@@ -711,9 +1120,9 @@ body.cursor-text .cursor-ring { opacity: 0; }
 }
 
 @keyframes particle-drift {
-  0% { opacity: 0; transform: translate(0, 0) scale(0); }
-  10% { opacity: 1; transform: translate(0, -10px) scale(1); }
-  90% { opacity: 1; }
+  0%   { opacity: 0; transform: translate(0, 0) scale(0); }
+  10%  { opacity: 1; transform: translate(0, -10px) scale(1); }
+  90%  { opacity: 1; }
   100% { opacity: 0; transform: translate(var(--dx, 100px), var(--dy, -300px)) scale(0); }
 }
 
@@ -728,14 +1137,22 @@ body.cursor-text .cursor-ring { opacity: 0; }
   }
 }
 
-/* ──────────────────────────────── Section primitives ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   10. SECTION PRIMITIVES
+   ─────────────────────────────────────────────────────────────────
+   Common section structure: eyebrow → title → lead → content.
+   ═════════════════════════════════════════════════════════════════ */
+
 section {
   position: relative;
-  padding: 160px 0;
+  padding: var(--section-pad) 0;
 }
 
 @media (max-width: 720px) {
-  section { padding: 100px 0; }
+  section {
+    padding: var(--section-pad-sm) 0;
+  }
 }
 
 .eyebrow {
@@ -794,7 +1211,7 @@ section {
   margin-bottom: 80px;
 }
 
-/* GSAP-controlled reveal classes — initial state */
+/* GSAP-controlled reveal classes — initial state is hidden */
 .fade-up {
   opacity: 0;
   transform: translateY(40px);
@@ -815,9 +1232,18 @@ section {
   transform: translateY(110%);
 }
 
-/* ──────────────────────────────── Manifesto ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   11. MANIFESTO
+   ─────────────────────────────────────────────────────────────────
+   Big serif text where each word lights up as it scrolls into view.
+   GSAP ScrollTrigger drives the color transition tied to scroll
+   progress (not just intersection) for a cinematic word-by-word
+   reveal.
+   ═════════════════════════════════════════════════════════════════ */
+
 .manifesto {
-  padding: 200px 0;
+  padding: 220px 0;
 }
 
 .manifesto p {
@@ -833,15 +1259,12 @@ section {
 .manifesto p .word {
   display: inline-block;
   margin-right: 0.18em;
-  transition: color 0.6s var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 0.012s);
-}
-
-.manifesto p .word.lit {
-  color: var(--fg);
+  /* GSAP will transition color directly */
+  color: var(--fg-3);
 }
 
 .manifesto p .word.acc {
+  /* Em words get the gradient color baseline */
   color: var(--acc-2);
 }
 
@@ -853,13 +1276,25 @@ section {
   background-clip: text;
 }
 
-/* ──────────────────────────────── Marquee ticker ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   12. MARQUEE TICKER
+   ─────────────────────────────────────────────────────────────────
+   Infinite horizontal scroll of words. Track is duplicated by JS so
+   the loop appears seamless.
+   ═════════════════════════════════════════════════════════════════ */
+
 .marquee {
   position: relative;
   overflow: hidden;
   padding: 64px 0;
   border-block: 1px solid var(--line);
-  background: linear-gradient(180deg, transparent, rgba(110, 58, 255, 0.04), transparent);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(110, 58, 255, 0.04),
+    transparent
+  );
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
@@ -905,7 +1340,14 @@ section {
   to { transform: translateX(-50%); }
 }
 
-/* ──────────────────────────────── Stats ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   13. STATS
+   ─────────────────────────────────────────────────────────────────
+   Big serif numbers with scramble animation: a brief flicker through
+   random characters before settling on the target value.
+   ═════════════════════════════════════════════════════════════════ */
+
 .stats {
   border-block: 1px solid var(--line);
 }
@@ -929,6 +1371,7 @@ section {
 .stat:hover { background: rgba(110, 58, 255, 0.03); }
 
 .stat::before {
+  /* Sweep highlight on hover — single pass left→right */
   content: '';
   position: absolute;
   top: 0;
@@ -940,7 +1383,9 @@ section {
   transition: transform 0.9s var(--ease-out);
 }
 
-.stat:hover::before { transform: translateX(100%); }
+.stat:hover::before {
+  transform: translateX(100%);
+}
 
 .stat .num {
   font-family: var(--serif);
@@ -951,6 +1396,9 @@ section {
   color: var(--fg);
   margin-bottom: 16px;
   font-feature-settings: "tnum";
+  display: flex;
+  align-items: baseline;
+  gap: 0.05em;
 }
 
 .stat .num em {
@@ -967,34 +1415,61 @@ section {
   letter-spacing: 0.18em;
 }
 
+.stat-meta {
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--fg-3);
+  line-height: 1.5;
+  max-width: 220px;
+}
+
 @media (max-width: 880px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .stat:nth-child(2) { border-right: 0; }
   .stat:nth-child(odd) { border-right: 1px solid var(--line); }
   .stat:nth-child(2n) { border-right: 0; }
-  .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--line); }
+  .stat:nth-child(1),
+  .stat:nth-child(2) { border-bottom: 1px solid var(--line); }
 }
 
-/* ──────────────────────────────── Projects (current + soon) ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   14. PROJECTS — featured product showcase
+   ─────────────────────────────────────────────────────────────────
+   Big card with product details on left, stylized device mockup on
+   right. Hover triggers a cursor-following radial glow.
+   ═════════════════════════════════════════════════════════════════ */
+
 .proj-feature {
   position: relative;
   padding: 80px 64px;
-  border-radius: 32px;
-  background: linear-gradient(160deg, rgba(110, 58, 255, 0.08) 0%, rgba(74, 144, 255, 0.04) 100%);
+  border-radius: var(--r-2xl);
+  background: linear-gradient(
+    160deg,
+    rgba(110, 58, 255, 0.08) 0%,
+    rgba(74, 144, 255, 0.04) 100%
+  );
   border: 1px solid var(--line-2);
   overflow: hidden;
   isolation: isolate;
-  transition: border-color 0.4s, transform 0.4s var(--ease-out);
+  transition: border-color 0.4s,
+              transform 0.4s var(--ease-out);
   margin-bottom: 24px;
 }
 
-.proj-feature:hover { border-color: var(--line-3); }
+.proj-feature:hover {
+  border-color: var(--line-3);
+}
 
 .proj-feature::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(110, 58, 255, 0.12), transparent 50%);
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(110, 58, 255, 0.12),
+    transparent 50%
+  );
   opacity: 0;
   transition: opacity 0.4s;
   z-index: -1;
@@ -1010,16 +1485,23 @@ section {
 }
 
 @media (max-width: 880px) {
-  .proj-feature { padding: 48px 28px; border-radius: 24px; }
-  .proj-feature .grid { grid-template-columns: 1fr; gap: 32px; }
+  .proj-feature {
+    padding: 48px 28px;
+    border-radius: var(--r-xl);
+  }
+  .proj-feature .grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }
 
+/* ─── live status pill ─── */
 .proj-tag {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(16, 217, 126, 0.1);
   border: 1px solid rgba(16, 217, 126, 0.3);
   font-family: var(--mono);
@@ -1039,6 +1521,7 @@ section {
   box-shadow: 0 0 8px var(--green);
 }
 
+/* ─── product title ─── */
 .proj-feature h3 {
   font-family: var(--serif);
   font-size: clamp(40px, 5vw, 76px);
@@ -1099,13 +1582,15 @@ section {
   align-items: center;
   gap: 8px;
   padding: 12px 18px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line-2);
   color: var(--fg);
   font-size: 13px;
   font-weight: 600;
-  transition: background 0.25s, border-color 0.25s, transform 0.2s var(--ease-out);
+  transition: background 0.25s,
+              border-color 0.25s,
+              transform 0.2s var(--ease-out);
 }
 
 .btn-line:hover {
@@ -1115,7 +1600,11 @@ section {
 
 .btn-line:active { transform: scale(0.97); }
 
-.btn-line svg { width: 13px; height: 13px; opacity: 0.75; }
+.btn-line svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0.75;
+}
 
 .btn-line.primary {
   background: var(--fg);
@@ -1129,18 +1618,19 @@ section {
   box-shadow: 0 12px 32px var(--acc-glow);
 }
 
-/* device mockup inside project card */
+/* ─── device mockup ─── */
 .proj-mock {
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 5;
   max-width: 380px;
   margin-left: auto;
-  border-radius: 28px;
+  border-radius: var(--r-xl);
   background: linear-gradient(160deg, #1a1530 0%, #0a0820 100%);
   border: 1px solid var(--line-2);
   padding: 12px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(110, 58, 255, 0.1);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5),
+              0 0 60px rgba(110, 58, 255, 0.1);
   overflow: hidden;
 }
 
@@ -1148,7 +1638,7 @@ section {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 18px;
+  border-radius: var(--r-lg);
   background: linear-gradient(180deg, #0a0820 0%, #050410 100%);
   overflow: hidden;
   display: flex;
@@ -1191,7 +1681,11 @@ section {
 }
 
 .proj-mock-row.act {
-  background: linear-gradient(90deg, rgba(110, 58, 255, 0.2), rgba(74, 144, 255, 0.1));
+  background: linear-gradient(
+    90deg,
+    rgba(110, 58, 255, 0.2),
+    rgba(74, 144, 255, 0.1)
+  );
   border-color: rgba(110, 58, 255, 0.4);
   box-shadow: 0 0 24px var(--acc-glow);
 }
@@ -1236,10 +1730,10 @@ section {
 
 @keyframes cta-glow {
   0%, 100% { box-shadow: 0 12px 30px var(--acc-glow); }
-  50% { box-shadow: 0 16px 50px var(--acc-glow), 0 0 80px var(--acc-glow); }
+  50%      { box-shadow: 0 16px 50px var(--acc-glow), 0 0 80px var(--acc-glow); }
 }
 
-/* Soon cards grid */
+/* ─── Soon cards grid ─── */
 .soon-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1254,24 +1748,38 @@ section {
 .soon-card {
   position: relative;
   padding: 36px 32px;
-  border-radius: 24px;
-  background: linear-gradient(160deg, rgba(110, 58, 255, 0.04) 0%, transparent 100%);
+  border-radius: var(--r-xl);
+  background: linear-gradient(
+    160deg,
+    rgba(110, 58, 255, 0.04) 0%,
+    transparent 100%
+  );
   border: 1px solid var(--line);
   overflow: hidden;
-  transition: border-color 0.35s, transform 0.4s var(--ease-out), background 0.4s;
+  transition: border-color 0.35s,
+              transform 0.4s var(--ease-out),
+              background 0.4s;
   isolation: isolate;
 }
 
 .soon-card:hover {
   border-color: var(--line-2);
-  background: linear-gradient(160deg, rgba(110, 58, 255, 0.08) 0%, transparent 100%);
+  background: linear-gradient(
+    160deg,
+    rgba(110, 58, 255, 0.08) 0%,
+    transparent 100%
+  );
 }
 
 .soon-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(110, 58, 255, 0.12), transparent 50%);
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(110, 58, 255, 0.12),
+    transparent 50%
+  );
   opacity: 0;
   transition: opacity 0.4s;
   z-index: -1;
@@ -1298,6 +1806,12 @@ section {
   border-radius: 50%;
   background: var(--gold);
   box-shadow: 0 0 8px var(--gold);
+  animation: pulse-soft 2.5s var(--ease-in-out) infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
 }
 
 .soon-card h4 {
@@ -1319,12 +1833,153 @@ section {
   font-size: 14.5px;
   color: var(--fg-2);
   line-height: 1.55;
+  margin-bottom: 20px;
 }
 
-/* ──────────────────────────────── Process / Why ──────────────────────────────── */
-.process {
-  position: relative;
+.soon-card .tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
+
+.soon-card .tag {
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fg-3);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   15. USE CASES SECTION
+   ─────────────────────────────────────────────────────────────────
+   Grid of "что работает" — categorized features with icons. Each
+   card hovers with a gradient border + cursor-tracking glow.
+   ═════════════════════════════════════════════════════════════════ */
+
+.usecases-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 980px) {
+  .usecases-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .usecases-grid { grid-template-columns: 1fr; }
+}
+
+.usecase {
+  position: relative;
+  padding: 32px 28px 28px;
+  border-radius: var(--r-xl);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: border-color 0.4s,
+              background 0.4s,
+              transform 0.4s var(--ease-out);
+  isolation: isolate;
+}
+
+.usecase:hover {
+  border-color: var(--line-2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.usecase::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(110, 58, 255, 0.15),
+    transparent 50%
+  );
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: -1;
+}
+
+.usecase:hover::before { opacity: 1; }
+
+.usecase .icon-shell {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg,
+    rgba(110, 58, 255, 0.2),
+    rgba(74, 144, 255, 0.1)
+  );
+  border: 1px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--acc-2);
+  margin-bottom: 22px;
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.usecase:hover .icon-shell {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.usecase .icon-shell svg {
+  width: 20px;
+  height: 20px;
+}
+
+.usecase h4 {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin-bottom: 10px;
+}
+
+.usecase h4 em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+.usecase p {
+  font-size: 14px;
+  color: var(--fg-2);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.usecase .badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.usecase .badge {
+  padding: 4px 9px;
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fg-3);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   16. PROCESS / how I work
+   ─────────────────────────────────────────────────────────────────
+   Numbered steps in horizontal row. Big numbers, soft hover state.
+   ═════════════════════════════════════════════════════════════════ */
 
 .process-list {
   display: grid;
@@ -1356,11 +2011,15 @@ section {
   .proc:nth-child(2) { border-right: 0; }
   .proc:nth-child(odd) { border-right: 1px solid var(--line); }
   .proc:nth-child(2n) { border-right: 0; }
-  .proc:nth-child(1), .proc:nth-child(2) { border-bottom: 1px solid var(--line); }
+  .proc:nth-child(1),
+  .proc:nth-child(2) { border-bottom: 1px solid var(--line); }
 }
 
 @media (max-width: 540px) {
-  .proc { border-right: 0; border-bottom: 1px solid var(--line); }
+  .proc {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
   .proc:last-child { border-bottom: 0; }
 }
 
@@ -1373,7 +2032,9 @@ section {
   color: var(--fg-4);
   margin-bottom: 32px;
   font-feature-settings: "tnum";
-  transition: color 0.5s;
+  transition: color 0.5s,
+              background 0.5s,
+              -webkit-text-fill-color 0.5s;
 }
 
 .proc:hover .num {
@@ -1393,7 +2054,10 @@ section {
   color: var(--fg);
 }
 
-.proc h3 em { font-style: italic; color: var(--acc-2); }
+.proc h3 em {
+  font-style: italic;
+  color: var(--acc-2);
+}
 
 .proc p {
   font-size: 14.5px;
@@ -1402,7 +2066,13 @@ section {
   max-width: 320px;
 }
 
-/* ──────────────────────────────── Why / values ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   17. VALUES SECTION
+   ─────────────────────────────────────────────────────────────────
+   Mission-style cards explaining the "why" behind the products.
+   ═════════════════════════════════════════════════════════════════ */
+
 .values {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1414,11 +2084,13 @@ section {
 .value {
   position: relative;
   padding: 36px 32px 32px;
-  border-radius: 20px;
+  border-radius: var(--r-lg);
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--line);
   overflow: hidden;
-  transition: background 0.4s, border-color 0.4s, transform 0.4s var(--ease-out);
+  transition: background 0.4s,
+              border-color 0.4s,
+              transform 0.4s var(--ease-out);
   isolation: isolate;
 }
 
@@ -1431,7 +2103,11 @@ section {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(110, 58, 255, 0.15), transparent 50%);
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    rgba(110, 58, 255, 0.15),
+    transparent 50%
+  );
   opacity: 0;
   transition: opacity 0.4s;
   z-index: -1;
@@ -1443,16 +2119,27 @@ section {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(110, 58, 255, 0.2), rgba(74, 144, 255, 0.1));
+  background: linear-gradient(135deg,
+    rgba(110, 58, 255, 0.2),
+    rgba(74, 144, 255, 0.1)
+  );
   border: 1px solid var(--line-2);
   color: var(--acc-2);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 24px;
+  transition: transform 0.4s var(--ease-spring);
 }
 
-.value .ico-circle svg { width: 20px; height: 20px; }
+.value:hover .ico-circle {
+  transform: rotate(8deg) scale(1.05);
+}
+
+.value .ico-circle svg {
+  width: 20px;
+  height: 20px;
+}
 
 .value h4 {
   font-family: var(--serif);
@@ -1464,7 +2151,10 @@ section {
   margin-bottom: 12px;
 }
 
-.value h4 em { font-style: italic; color: var(--acc-2); }
+.value h4 em {
+  font-style: italic;
+  color: var(--acc-2);
+}
 
 .value p {
   font-size: 14.5px;
@@ -1472,7 +2162,271 @@ section {
   line-height: 1.6;
 }
 
-/* ──────────────────────────────── Final CTA ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   18. TECH STACK
+   ─────────────────────────────────────────────────────────────────
+   List of technologies used across products. Fancy hover with brand
+   color tint.
+   ═════════════════════════════════════════════════════════════════ */
+
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 880px) { .stack-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px) { .stack-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.stack-item {
+  position: relative;
+  padding: 28px 24px;
+  border-radius: var(--r-lg);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  transition: background 0.35s,
+              border-color 0.35s,
+              transform 0.35s var(--ease-out);
+}
+
+.stack-item:hover {
+  background: rgba(110, 58, 255, 0.05);
+  border-color: var(--line-2);
+  transform: translateY(-3px);
+}
+
+.stack-item .logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--acc) 0%, var(--blue) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.stack-item .name {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.stack-item .name em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+.stack-item .desc {
+  font-size: 13px;
+  color: var(--fg-2);
+  line-height: 1.5;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   19. TESTIMONIALS
+   ─────────────────────────────────────────────────────────────────
+   Three columns of user quotes. Italic serif quote, mono attribution.
+   ═════════════════════════════════════════════════════════════════ */
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 980px) { .testimonial-grid { grid-template-columns: 1fr; } }
+
+.testi {
+  position: relative;
+  padding: 40px 32px;
+  border-radius: var(--r-xl);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: border-color 0.35s,
+              background 0.35s;
+}
+
+.testi:hover {
+  background: rgba(110, 58, 255, 0.04);
+  border-color: var(--line-2);
+}
+
+.testi-quote {
+  font-family: var(--serif);
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+  margin-bottom: 28px;
+}
+
+.testi-quote::before {
+  content: '"';
+  font-size: 1.4em;
+  color: var(--acc-2);
+  margin-right: 0.05em;
+  vertical-align: -0.1em;
+}
+
+.testi-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--fg-3);
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+}
+
+.testi-author .ava {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--acc) 0%, var(--blue) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   20. FAQ ACCORDION
+   ─────────────────────────────────────────────────────────────────
+   Native <details> elements with custom styling — height transitions
+   smoothly, plus icon flips with spring easing.
+   ═════════════════════════════════════════════════════════════════ */
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  border-block: 1px solid var(--line);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-item:last-child { border-bottom: 0; }
+
+.faq-q {
+  list-style: none;
+  cursor: pointer;
+  padding: 32px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  font-family: var(--serif);
+  font-size: clamp(22px, 2.6vw, 32px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  transition: color 0.25s;
+}
+
+.faq-q::-webkit-details-marker { display: none; }
+
+.faq-q:hover { color: var(--acc-2); }
+
+.faq-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background 0.3s,
+              border-color 0.3s,
+              transform 0.4s var(--ease-spring);
+}
+
+.faq-item[open] .faq-icon {
+  background: var(--acc);
+  border-color: var(--acc);
+  transform: rotate(135deg);
+}
+
+.faq-icon::before,
+.faq-icon::after {
+  content: '';
+  position: absolute;
+  background: var(--fg);
+  border-radius: 1px;
+  transition: background 0.3s;
+}
+
+.faq-icon::before { width: 14px; height: 1.5px; }
+.faq-icon::after  { width: 1.5px; height: 14px; }
+
+.faq-item[open] .faq-icon::before,
+.faq-item[open] .faq-icon::after {
+  background: #fff;
+}
+
+.faq-a {
+  padding: 0 60px 32px 0;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--fg-2);
+  max-width: 800px;
+}
+
+.faq-a strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.faq-a a {
+  color: var(--acc-2);
+  text-decoration: underline;
+  text-decoration-color: rgba(160, 138, 250, 0.4);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.25s;
+}
+
+.faq-a a:hover {
+  text-decoration-color: var(--acc-2);
+}
+
+.faq-item[open] .faq-a {
+  animation: faq-in 0.4s var(--ease-out);
+}
+
+@keyframes faq-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   21. FINAL CTA
+   ─────────────────────────────────────────────────────────────────
+   Massive serif "Поговорим?" with glow background. The actual
+   centerpiece of the lower fold.
+   ═════════════════════════════════════════════════════════════════ */
+
 .final-cta {
   position: relative;
   padding: 200px 0 160px;
@@ -1482,6 +2436,7 @@ section {
 }
 
 .final-cta::before {
+  /* Top dividing accent line */
   content: '';
   position: absolute;
   top: -1px;
@@ -1494,6 +2449,7 @@ section {
 }
 
 .final-cta::after {
+  /* Big radial glow centered behind text */
   content: '';
   position: absolute;
   bottom: 0;
@@ -1502,7 +2458,11 @@ section {
   width: 800px;
   height: 800px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(110, 58, 255, 0.12) 0%, transparent 60%);
+  background: radial-gradient(
+    circle,
+    rgba(110, 58, 255, 0.12) 0%,
+    transparent 60%
+  );
   pointer-events: none;
   z-index: -1;
 }
@@ -1519,7 +2479,12 @@ section {
 
 .final-cta h2 em {
   font-style: italic;
-  background: linear-gradient(135deg, var(--acc-2) 0%, var(--blue) 50%, var(--cyan) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--acc-2) 0%,
+    var(--blue) 50%,
+    var(--cyan) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1538,7 +2503,13 @@ section {
   padding: 22px 40px;
 }
 
-/* ──────────────────────────────── Footer ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   22. FOOTER
+   ─────────────────────────────────────────────────────────────────
+   Multi-column layout: brand block + 3 nav columns + bottom strip.
+   ═════════════════════════════════════════════════════════════════ */
+
 footer {
   position: relative;
   padding: 100px 0 40px;
@@ -1553,8 +2524,13 @@ footer {
   margin-bottom: 80px;
 }
 
-@media (max-width: 880px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
-@media (max-width: 540px) { .footer-grid { grid-template-columns: 1fr; gap: 32px; } }
+@media (max-width: 880px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+}
+
+@media (max-width: 540px) {
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+}
 
 .footer-brand h3 {
   font-family: var(--serif);
@@ -1588,8 +2564,8 @@ footer {
 }
 
 .footer-socials a {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1597,7 +2573,10 @@ footer {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
   color: var(--fg-2);
-  transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.25s var(--ease-out);
+  transition: background 0.25s,
+              color 0.25s,
+              border-color 0.25s,
+              transform 0.25s var(--ease-out);
 }
 
 .footer-socials a:hover {
@@ -1607,7 +2586,10 @@ footer {
   transform: translateY(-2px);
 }
 
-.footer-socials a svg { width: 16px; height: 16px; }
+.footer-socials a svg {
+  width: 16px;
+  height: 16px;
+}
 
 .footer-col h4 {
   font-family: var(--mono);
@@ -1627,12 +2609,20 @@ footer {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: color 0.2s, transform 0.25s var(--ease-out);
+  transition: color 0.2s,
+              transform 0.25s var(--ease-out);
 }
 
-.footer-col ul li a:hover { color: var(--fg); transform: translateX(3px); }
+.footer-col ul li a:hover {
+  color: var(--fg);
+  transform: translateX(3px);
+}
 
-.footer-col ul li a svg { width: 11px; height: 11px; opacity: 0.55; }
+.footer-col ul li a svg {
+  width: 11px;
+  height: 11px;
+  opacity: 0.55;
+}
 
 .footer-bottom {
   padding-top: 40px;
@@ -1652,9 +2642,9 @@ footer {
 .footer-bottom .logo-mini {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-family: var(--serif);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   text-transform: none;
   letter-spacing: -0.01em;
@@ -1662,10 +2652,11 @@ footer {
 }
 
 .footer-bottom .logo-mini i {
-  width: 18px;
-  height: 18px;
-  border-radius: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
   background: linear-gradient(135deg, var(--acc) 0%, var(--blue) 100%);
+  box-shadow: 0 0 14px var(--acc-glow);
 }
 
 .footer-bottom a {
@@ -1673,23 +2664,1654 @@ footer {
   transition: color 0.2s;
 }
 
-.footer-bottom a:hover { color: var(--acc-2); }
-
-/* ──────────────────────────────── Animations ──────────────────────────────── */
-@keyframes mesh-drift {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  100% { transform: translate(40px, -30px) rotate(15deg); }
+.footer-bottom a:hover {
+  color: var(--acc-2);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-delay: 0 !important;
-    transition-duration: 0.01ms !important;
+.footer-bottom em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.5. CURSOR TRAIL PARTICLES
+   ─────────────────────────────────────────────────────────────────
+   Small particles spawned as the cursor moves. Each fades and
+   shrinks over ~600ms. Density scales with cursor speed.
+   ═════════════════════════════════════════════════════════════════ */
+
+.trail-particle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  background: radial-gradient(circle,
+    var(--acc-2) 0%,
+    var(--acc) 60%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px var(--acc-glow);
+  transform: translate(-50%, -50%);
+  animation: trail-fade 0.7s linear forwards;
+  mix-blend-mode: screen;
+}
+
+@keyframes trail-fade {
+  0%   { opacity: 1;    transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0;    transform: translate(-50%, -50%) scale(0.2); }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.6. SCROLL PROGRESS BAR
+   ─────────────────────────────────────────────────────────────────
+   Thin horizontal bar at the top that fills as the user scrolls.
+   ═════════════════════════════════════════════════════════════════ */
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  z-index: 200;
+  background: linear-gradient(90deg,
+    var(--acc) 0%,
+    var(--blue) 50%,
+    var(--cyan) 100%
+  );
+  box-shadow: 0 0 12px var(--acc-glow);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.7. ROADMAP TIMELINE
+   ─────────────────────────────────────────────────────────────────
+   Vertical timeline with release milestones. Each item slides in
+   on scroll, has a glowing dot connecting to the next.
+   ═════════════════════════════════════════════════════════════════ */
+
+.roadmap {
+  position: relative;
+  padding-left: 60px;
+}
+
+.roadmap::before {
+  /* Vertical line connecting all milestones */
+  content: '';
+  position: absolute;
+  left: 23px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    var(--line-2) 5%,
+    var(--line-2) 95%,
+    transparent 100%
+  );
+}
+
+.roadmap-item {
+  position: relative;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.roadmap-item:last-child {
+  border-bottom: 0;
+}
+
+.roadmap-item::before {
+  /* The dot on the timeline */
+  content: '';
+  position: absolute;
+  left: -45px;
+  top: 38px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-2);
+  border: 2px solid var(--line-3);
+  transition: background 0.3s,
+              border-color 0.3s,
+              box-shadow 0.3s,
+              transform 0.3s var(--ease-spring);
+}
+
+.roadmap-item.done::before {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 16px var(--green-glow);
+}
+
+.roadmap-item.current::before {
+  background: var(--acc);
+  border-color: var(--acc);
+  box-shadow: 0 0 18px var(--acc-glow),
+              0 0 36px var(--acc-glow);
+  animation: roadmap-current-pulse 2s var(--ease-in-out) infinite;
+}
+
+.roadmap-item.future::before {
+  background: var(--bg-2);
+  border-color: var(--line-3);
+}
+
+@keyframes roadmap-current-pulse {
+  0%, 100% {
+    box-shadow: 0 0 18px var(--acc-glow), 0 0 36px var(--acc-glow);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 28px var(--acc-glow-2), 0 0 56px var(--acc-glow-2);
+    transform: scale(1.15);
   }
 }
 
-/* ──────────────────────────────── Section divider ──────────────────────────────── */
+.roadmap-item:hover::before {
+  transform: scale(1.3);
+}
+
+.roadmap-item .row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .roadmap { padding-left: 36px; }
+  .roadmap::before { left: 11px; }
+  .roadmap-item::before { left: -33px; top: 34px; }
+  .roadmap-item .row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.roadmap-date {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding-top: 10px;
+}
+
+.roadmap-item.done .roadmap-date {
+  color: var(--green);
+}
+
+.roadmap-item.current .roadmap-date {
+  color: var(--acc-2);
+}
+
+.roadmap-content h4 {
+  font-family: var(--serif);
+  font-size: clamp(24px, 2.5vw, 36px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin-bottom: 12px;
+}
+
+.roadmap-content h4 em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+.roadmap-content .badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.roadmap-content .badge.done {
+  background: rgba(16, 217, 126, 0.1);
+  border: 1px solid rgba(16, 217, 126, 0.3);
+  color: var(--green);
+}
+
+.roadmap-content .badge.current {
+  background: rgba(110, 58, 255, 0.12);
+  border: 1px solid rgba(110, 58, 255, 0.35);
+  color: var(--acc-2);
+}
+
+.roadmap-content .badge.future {
+  background: rgba(245, 200, 66, 0.08);
+  border: 1px solid rgba(245, 200, 66, 0.25);
+  color: var(--gold);
+}
+
+.roadmap-content p {
+  font-size: 15px;
+  color: var(--fg-2);
+  line-height: 1.6;
+  max-width: 560px;
+  margin-bottom: 16px;
+}
+
+.roadmap-content .feat-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.roadmap-content .feat-mini span {
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--fg-3);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.8. COMPARISON TABLE
+   ─────────────────────────────────────────────────────────────────
+   MrDogez vs paid VPNs vs browser-built-in.
+   ═════════════════════════════════════════════════════════════════ */
+
+.compare-wrap {
+  overflow-x: auto;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
+.compare-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+
+.compare-wrap::-webkit-scrollbar-track {
+  background: var(--bg-2);
+}
+
+.compare-wrap::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 3px;
+}
+
+.compare-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 22px 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  font-size: 14.5px;
+  vertical-align: middle;
+}
+
+.compare-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.compare-table th {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  background: var(--bg-3);
+  border-bottom: 1px solid var(--line-2);
+}
+
+.compare-table th.us {
+  color: var(--acc-2);
+  position: relative;
+}
+
+.compare-table th.us::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--acc) 0%, var(--blue) 100%);
+}
+
+.compare-table td.us {
+  background: rgba(110, 58, 255, 0.04);
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.compare-table td.feat {
+  font-weight: 600;
+  color: var(--fg);
+  font-family: var(--sans);
+}
+
+.compare-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.compare-table tr:hover td.us {
+  background: rgba(110, 58, 255, 0.08);
+}
+
+.cmp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.cmp-tag.yes {
+  color: var(--green);
+}
+
+.cmp-tag.no {
+  color: var(--red);
+  opacity: 0.75;
+}
+
+.cmp-tag.meh {
+  color: var(--gold);
+}
+
+.cmp-tag svg {
+  width: 14px;
+  height: 14px;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.9. PRICING TIERS
+   ─────────────────────────────────────────────────────────────────
+   Two/three column pricing. Free tier on the left, premium on the
+   right. Premium card has glow and "popular" badge.
+   ═════════════════════════════════════════════════════════════════ */
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+@media (max-width: 760px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+}
+
+.price-card {
+  position: relative;
+  padding: 48px 36px 40px;
+  border-radius: var(--r-2xl);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color 0.4s,
+              background 0.4s,
+              transform 0.4s var(--ease-out);
+}
+
+.price-card:hover {
+  border-color: var(--line-2);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-4px);
+}
+
+.price-card.popular {
+  background: linear-gradient(160deg,
+    rgba(110, 58, 255, 0.1) 0%,
+    rgba(74, 144, 255, 0.05) 100%
+  );
+  border-color: var(--line-3);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4),
+              0 0 60px var(--acc-glow);
+}
+
+.price-card.popular::before {
+  /* Subtle animated border gradient */
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--r-2xl);
+  padding: 1px;
+  background: linear-gradient(135deg,
+    var(--acc) 0%,
+    var(--blue) 50%,
+    var(--cyan) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.price-popular-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  background: var(--acc);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 14px var(--acc-glow);
+}
+
+.price-card .tier-name {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+
+.price-card .tier-name em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+.price-card .tier-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.price-card .price {
+  font-family: var(--serif);
+  font-size: 64px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--fg);
+  margin-bottom: 6px;
+  font-feature-settings: "tnum";
+}
+
+.price-card .price em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+.price-card .price-unit {
+  font-size: 13px;
+  color: var(--fg-3);
+  font-family: var(--mono);
+  margin-bottom: 32px;
+}
+
+.price-card ul {
+  flex: 1;
+  margin-bottom: 32px;
+}
+
+.price-card ul li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  font-size: 14px;
+  color: var(--fg-2);
+  line-height: 1.5;
+}
+
+.price-card ul li svg {
+  width: 14px;
+  height: 14px;
+  color: var(--green);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.price-card ul li.muted {
+  color: var(--fg-4);
+  text-decoration: line-through;
+}
+
+.price-card ul li.muted svg {
+  color: var(--fg-4);
+}
+
+.price-card .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.10. CHANGELOG
+   ─────────────────────────────────────────────────────────────────
+   Recent updates with version + date + bullet points of changes.
+   ═════════════════════════════════════════════════════════════════ */
+
+.changelog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.changelog-item {
+  position: relative;
+  padding: 32px 36px;
+  border-radius: var(--r-xl);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+  align-items: start;
+  transition: border-color 0.35s,
+              background 0.35s,
+              transform 0.35s var(--ease-out);
+}
+
+@media (max-width: 720px) {
+  .changelog-item {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 24px 24px;
+  }
+}
+
+.changelog-item:hover {
+  border-color: var(--line-2);
+  background: rgba(110, 58, 255, 0.04);
+}
+
+.changelog-meta .v {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+
+.changelog-meta .v em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+.changelog-meta .date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.changelog-meta .badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.changelog-meta .badge {
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.changelog-meta .badge.new {
+  background: rgba(16, 217, 126, 0.1);
+  border: 1px solid rgba(16, 217, 126, 0.3);
+  color: var(--green);
+}
+
+.changelog-meta .badge.fix {
+  background: rgba(74, 144, 255, 0.08);
+  border: 1px solid rgba(74, 144, 255, 0.3);
+  color: var(--blue);
+}
+
+.changelog-meta .badge.imp {
+  background: rgba(245, 200, 66, 0.08);
+  border: 1px solid rgba(245, 200, 66, 0.25);
+  color: var(--gold);
+}
+
+.changelog-body ul li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 7px 0;
+  font-size: 14.5px;
+  color: var(--fg-2);
+  line-height: 1.55;
+}
+
+.changelog-body ul li svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.changelog-body ul li.new svg  { color: var(--green); }
+.changelog-body ul li.fix svg  { color: var(--blue); }
+.changelog-body ul li.imp svg  { color: var(--gold); }
+
+.changelog-body ul li b {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.11. NEWSLETTER / SUBSCRIBE BLOCK
+   ─────────────────────────────────────────────────────────────────
+   Telegram channel CTA block with input-style design.
+   ═════════════════════════════════════════════════════════════════ */
+
+.newsletter {
+  position: relative;
+  padding: 80px 64px;
+  border-radius: var(--r-2xl);
+  background: linear-gradient(160deg,
+    rgba(110, 58, 255, 0.12) 0%,
+    rgba(74, 144, 255, 0.06) 100%
+  );
+  border: 1px solid var(--line-2);
+  overflow: hidden;
+  text-align: center;
+}
+
+.newsletter::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -10%;
+  width: 60%;
+  height: 200%;
+  background: radial-gradient(circle,
+    rgba(110, 58, 255, 0.15),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.newsletter::after {
+  content: '';
+  position: absolute;
+  bottom: -50%;
+  right: -10%;
+  width: 60%;
+  height: 200%;
+  background: radial-gradient(circle,
+    rgba(74, 144, 255, 0.1),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+  .newsletter { padding: 56px 28px; }
+}
+
+.newsletter-content {
+  position: relative;
+  z-index: 2;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.newsletter h3 {
+  font-family: var(--serif);
+  font-size: clamp(36px, 4.5vw, 56px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--fg);
+  margin-bottom: 16px;
+}
+
+.newsletter h3 em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--acc-2) 0%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.newsletter p {
+  font-size: 15px;
+  color: var(--fg-2);
+  line-height: 1.55;
+  margin-bottom: 32px;
+}
+
+.newsletter-form {
+  display: flex;
+  gap: 8px;
+  max-width: 480px;
+  margin: 0 auto 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  padding: 6px;
+  transition: border-color 0.3s;
+}
+
+.newsletter-form:focus-within {
+  border-color: var(--acc-2);
+}
+
+.newsletter-form input {
+  flex: 1;
+  padding: 14px 20px;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--fg);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.newsletter-form input::placeholder {
+  color: var(--fg-3);
+}
+
+.newsletter-form button {
+  padding: 14px 24px;
+  border-radius: var(--r-pill);
+  background: var(--fg);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 14px;
+  transition: background 0.25s,
+              box-shadow 0.3s;
+  white-space: nowrap;
+}
+
+.newsletter-form button:hover {
+  background: var(--acc-2);
+  box-shadow: 0 8px 24px var(--acc-glow);
+}
+
+.newsletter-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-3);
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 540px) {
+  .newsletter-form { flex-direction: column; padding: 8px; }
+  .newsletter-form input { padding: 14px 16px; }
+  .newsletter-form button { width: 100%; padding: 14px; }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.12. TRUST BADGES STRIP
+   ─────────────────────────────────────────────────────────────────
+   Row of small badges: "no logs", "open source", "GDPR", etc.
+   ═════════════════════════════════════════════════════════════════ */
+
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 32px 0;
+  border-block: 1px solid var(--line);
+}
+
+@media (max-width: 880px) { .trust-strip { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .trust-strip { grid-template-columns: 1fr; } }
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  transition: background 0.3s,
+              border-color 0.3s,
+              transform 0.3s var(--ease-out);
+}
+
+.trust-item:hover {
+  background: rgba(110, 58, 255, 0.04);
+  border-color: var(--line-2);
+  transform: translateY(-2px);
+}
+
+.trust-item .ico {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg,
+    rgba(110, 58, 255, 0.2),
+    rgba(74, 144, 255, 0.1)
+  );
+  border: 1px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--acc-2);
+  flex-shrink: 0;
+}
+
+.trust-item .ico svg {
+  width: 16px;
+  height: 16px;
+}
+
+.trust-item .body {
+  flex: 1;
+  min-width: 0;
+}
+
+.trust-item .title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 2px;
+}
+
+.trust-item .sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.13. STAT INFOGRAPHIC (mini chart)
+   ─────────────────────────────────────────────────────────────────
+   Used in stats area for visual comparisons.
+   ═════════════════════════════════════════════════════════════════ */
+
+.metric-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 480px;
+}
+
+.metric-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.metric-row .lbl {
+  width: 120px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.metric-row .bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.metric-row .bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--acc) 0%, var(--blue) 100%);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 1.4s var(--ease-out);
+  box-shadow: 0 0 12px var(--acc-glow);
+}
+
+.metric-row .val {
+  width: 60px;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.14. NUMBERED CAROUSEL DOTS (testimonials, etc.)
+   ═════════════════════════════════════════════════════════════════ */
+
+.dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-2);
+  transition: background 0.3s,
+              width 0.3s,
+              transform 0.3s var(--ease-spring);
+}
+
+.dots i.active {
+  background: var(--acc);
+  width: 32px;
+  border-radius: 4px;
+  box-shadow: 0 0 12px var(--acc-glow);
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.15. LIVE STATUS WIDGET
+   ─────────────────────────────────────────────────────────────────
+   Small fixed widget bottom-right showing "all systems operational"
+   with pulse animation. Adds trust + activity feel.
+   ═════════════════════════════════════════════════════════════════ */
+
+.live-status {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 90;
+  padding: 10px 16px 10px 12px;
+  border-radius: var(--r-pill);
+  background: rgba(15, 13, 36, 0.85);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fg-2);
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s var(--ease-out),
+              transform 0.5s var(--ease-out),
+              border-color 0.3s;
+  cursor: default;
+}
+
+.live-status.shown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.live-status:hover {
+  border-color: var(--line-3);
+}
+
+.live-status .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 0 rgba(16, 217, 126, 0.5);
+  animation: live-pulse 2s var(--ease-out) infinite;
+}
+
+.live-status .label {
+  color: var(--fg);
+}
+
+@media (max-width: 720px) {
+  .live-status {
+    bottom: 14px;
+    right: 14px;
+    font-size: 10px;
+    padding: 8px 12px 8px 10px;
+  }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.16. BACK-TO-TOP BUTTON
+   ═════════════════════════════════════════════════════════════════ */
+
+.back-top {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  z-index: 90;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(15, 13, 36, 0.85);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--line-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-2);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s var(--ease-out),
+              transform 0.4s var(--ease-out),
+              background 0.3s,
+              border-color 0.3s,
+              color 0.3s;
+  pointer-events: none;
+}
+
+.back-top.shown {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-top:hover {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: #fff;
+  box-shadow: 0 8px 24px var(--acc-glow);
+}
+
+.back-top svg {
+  width: 18px;
+  height: 18px;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.17. SECTION DIVIDERS — variations
+   ═════════════════════════════════════════════════════════════════ */
+
+.divider-line {
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--line-2) 30%,
+    var(--line-3) 50%,
+    var(--line-2) 70%,
+    transparent 100%
+  );
+  margin: 80px 0;
+}
+
+.divider-text {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 80px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.divider-text::before,
+.divider-text::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--line-2));
+}
+
+.divider-text::after {
+  background: linear-gradient(to left, transparent, var(--line-2));
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.18. SERVER STATUS GRID
+   ─────────────────────────────────────────────────────────────────
+   Live grid of servers with name, country flag, ping, uptime, load.
+   Uses pseudo-realtime updates from JS to feel "live".
+   ═════════════════════════════════════════════════════════════════ */
+
+.servers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 720px) {
+  .servers-grid { grid-template-columns: 1fr; }
+}
+
+.server-card {
+  position: relative;
+  padding: 28px 30px;
+  border-radius: var(--r-xl);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  transition: border-color 0.35s,
+              background 0.35s,
+              transform 0.35s var(--ease-out);
+  overflow: hidden;
+}
+
+.server-card:hover {
+  border-color: var(--line-2);
+  background: rgba(110, 58, 255, 0.04);
+  transform: translateY(-3px);
+}
+
+.server-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.server-card-id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.server-card-id .flag {
+  width: 32px;
+  height: 22px;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12),
+              0 1px 4px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.flag-de  { background: linear-gradient(to bottom, #000 33.33%, #dd0000 33.33%, #dd0000 66.66%, #ffce00 66.66%); }
+.flag-fi  { background: #fff; position: relative; }
+.flag-fi::before, .flag-fi::after { content: ''; position: absolute; background: #003580; }
+.flag-fi::before { left: 0; right: 0; top: 38.9%; height: 22.2%; }
+.flag-fi::after  { top: 0; bottom: 0; left: 30.8%; width: 18.5%; }
+.flag-nl  { background: linear-gradient(to bottom, #ae1c28 33.33%, #fff 33.33%, #fff 66.66%, #21468b 66.66%); }
+.flag-fr  { background: linear-gradient(to right, #002395 33.33%, #fff 33.33%, #fff 66.66%, #ed2939 66.66%); }
+.flag-us  { background: linear-gradient(to bottom, #b22234 0 7.7%, #fff 7.7% 15.4%, #b22234 15.4% 23.1%, #fff 23.1% 30.8%, #b22234 30.8% 38.5%, #fff 38.5% 46.2%, #b22234 46.2% 53.8%, #fff 53.8% 61.5%, #b22234 61.5% 69.2%, #fff 69.2% 76.9%, #b22234 76.9% 84.6%, #fff 84.6% 92.3%, #b22234 92.3% 100%); position: relative; }
+.flag-us::before { content: ''; position: absolute; left: 0; top: 0; width: 40%; height: 53.8%; background: #3c3b6e; }
+.flag-jp  { background: #fff; position: relative; }
+.flag-jp::before { content: ''; position: absolute; left: 50%; top: 50%; width: 60%; height: 60%; background: #bc002d; border-radius: 50%; transform: translate(-50%, -50%); }
+.flag-uk  { background: linear-gradient(45deg, #012169 35%, transparent 35%, transparent 65%, #012169 65%), linear-gradient(135deg, #012169 35%, transparent 35%, transparent 65%, #012169 65%), linear-gradient(#012169 0 0); }
+
+.server-card-name {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+}
+
+.server-card-name em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+.server-card-name .city {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fg-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.server-card-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: var(--r-pill);
+  background: rgba(16, 217, 126, 0.08);
+  border: 1px solid rgba(16, 217, 126, 0.25);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.server-card-status.degraded {
+  background: rgba(245, 200, 66, 0.08);
+  border-color: rgba(245, 200, 66, 0.25);
+  color: var(--gold);
+}
+
+.server-card-status.offline {
+  background: rgba(255, 92, 92, 0.08);
+  border-color: rgba(255, 92, 92, 0.25);
+  color: var(--red);
+}
+
+.server-card-status .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  animation: live-pulse 2s var(--ease-out) infinite;
+}
+
+.server-card-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.server-card-metric .label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+
+.server-card-metric .value {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  line-height: 1;
+  font-feature-settings: "tnum";
+}
+
+.server-card-metric .value em {
+  font-style: italic;
+  color: var(--acc-2);
+  font-size: 0.6em;
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.19. INFOGRAPHIC SECTION (metric bars)
+   ─────────────────────────────────────────────────────────────────
+   Visual breakdown of which categories users use VPN for.
+   ═════════════════════════════════════════════════════════════════ */
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 64px;
+  align-items: center;
+}
+
+@media (max-width: 880px) {
+  .info-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+.info-side h3 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  margin-bottom: 16px;
+}
+
+.info-side h3 em {
+  font-style: italic;
+  color: var(--acc-2);
+}
+
+.info-side p {
+  font-size: 16px;
+  color: var(--fg-2);
+  line-height: 1.6;
+  max-width: 460px;
+  margin-bottom: 24px;
+}
+
+.info-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.info-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-bar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.info-bar-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.info-bar-name svg {
+  width: 16px;
+  height: 16px;
+  color: var(--acc-2);
+}
+
+.info-bar-pct {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.info-bar-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.info-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  width: 0;
+  transition: width 1.6s var(--ease-out);
+}
+
+.info-bar-fill.acc {
+  background: linear-gradient(90deg, var(--acc) 0%, var(--blue) 100%);
+  box-shadow: 0 0 12px var(--acc-glow);
+}
+
+.info-bar-fill.blue {
+  background: linear-gradient(90deg, var(--blue) 0%, var(--cyan) 100%);
+  box-shadow: 0 0 12px var(--blue-glow);
+}
+
+.info-bar-fill.green {
+  background: linear-gradient(90deg, var(--green) 0%, #4dd6ff 100%);
+  box-shadow: 0 0 12px var(--green-glow);
+}
+
+.info-bar-fill.gold {
+  background: linear-gradient(90deg, var(--gold) 0%, #ff9a3c 100%);
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+
+.info-bar-fill.pink {
+  background: linear-gradient(90deg, var(--pink) 0%, #c44dff 100%);
+  box-shadow: 0 0 12px var(--pink-glow);
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.20. EXTRA BUTTON VARIANTS
+   ─────────────────────────────────────────────────────────────────
+   Square buttons, icon-only buttons, large CTAs.
+   ═════════════════════════════════════════════════════════════════ */
+
+.btn-square {
+  border-radius: var(--r-md);
+}
+
+.btn-icon-only {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon-only svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-large {
+  padding: 22px 40px;
+  font-size: 18px;
+}
+
+.btn-small {
+  padding: 12px 20px;
+  font-size: 13px;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--fg);
+  border: 2px solid var(--acc);
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background: var(--acc);
+  color: #fff;
+  border-color: var(--acc);
+}
+
+.btn-outline-ghost {
+  background: transparent;
+  color: var(--fg-2);
+  border: 1px solid var(--line);
+}
+
+.btn-outline-ghost:hover {
+  border-color: var(--line-3);
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.21. ADDITIONAL ANIMATIONS
+   ─────────────────────────────────────────────────────────────────
+   Reusable keyframe animations for various interactions.
+   ═════════════════════════════════════════════════════════════════ */
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes glitch {
+  0%, 100% {
+    text-shadow: 0 0 0 transparent;
+    transform: translate(0);
+  }
+  20% {
+    text-shadow: -2px 0 var(--pink), 2px 0 var(--cyan);
+    transform: translate(-1px, 1px);
+  }
+  40% {
+    text-shadow: 2px 0 var(--pink), -2px 0 var(--cyan);
+    transform: translate(1px, -1px);
+  }
+  60% {
+    text-shadow: -2px 0 var(--pink), 2px 0 var(--cyan);
+    transform: translate(-1px, 1px);
+  }
+  80% {
+    text-shadow: 2px 0 var(--pink), -2px 0 var(--cyan);
+    transform: translate(1px, -1px);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slide-down {
+  from { transform: translateY(-20px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes slide-left {
+  from { transform: translateX(20px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes slide-right {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes blob {
+  0%, 100% {
+    border-radius: 50% 60% 40% 50% / 50% 40% 60% 50%;
+    transform: rotate(0deg);
+  }
+  25% {
+    border-radius: 60% 40% 50% 50% / 40% 50% 50% 60%;
+    transform: rotate(90deg);
+  }
+  50% {
+    border-radius: 40% 50% 60% 50% / 50% 60% 40% 50%;
+    transform: rotate(180deg);
+  }
+  75% {
+    border-radius: 50% 50% 40% 60% / 60% 40% 50% 50%;
+    transform: rotate(270deg);
+  }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   22.22. UTILITY CLASSES (extra)
+   ═════════════════════════════════════════════════════════════════ */
+
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed    { position: fixed; }
+.sticky   { position: sticky; }
+
+.flex      { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid      { display: grid; }
+.block     { display: block; }
+.hidden    { display: none; }
+
+.items-center  { align-items: center; }
+.items-start   { align-items: flex-start; }
+.items-end     { align-items: flex-end; }
+
+.justify-center  { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end     { justify-content: flex-end; }
+
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+.text-left   { text-align: left; }
+
+.gap-xs { gap: 4px; }
+.gap-sm { gap: 8px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 32px; }
+.gap-xl { gap: 64px; }
+
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+.opacity-30 { opacity: 0.3; }
+.opacity-50 { opacity: 0.5; }
+.opacity-70 { opacity: 0.7; }
+
+
+/* ═════════════════════════════════════════════════════════════════
+   23. SECTION DIVIDERS
+   ─────────────────────────────────────────────────────────────────
+   Visual breathing room between sections + decorative orbital pulse.
+   ═════════════════════════════════════════════════════════════════ */
+
 .divider-orbital {
   position: relative;
   height: 220px;
@@ -1713,16 +4335,29 @@ footer {
   height: 14px;
   border-radius: 50%;
   background: var(--acc);
-  box-shadow: 0 0 24px var(--acc-glow), 0 0 60px var(--acc-glow);
+  box-shadow: 0 0 24px var(--acc-glow),
+              0 0 60px var(--acc-glow);
   animation: orbital-pulse 3s var(--ease-in-out) infinite;
 }
 
 @keyframes orbital-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.4); box-shadow: 0 0 40px var(--acc-glow), 0 0 100px var(--acc-glow); }
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 24px var(--acc-glow), 0 0 60px var(--acc-glow);
+  }
+  50% {
+    transform: scale(1.4);
+    box-shadow: 0 0 40px var(--acc-glow), 0 0 100px var(--acc-glow);
+  }
 }
 
-/* ──────────────────────────────── Responsive overrides ──────────────────────────────── */
+
+/* ═════════════════════════════════════════════════════════════════
+   24. RESPONSIVE OVERRIDES
+   ─────────────────────────────────────────────────────────────────
+   Tighten paddings, scale headings down on small screens.
+   ═════════════════════════════════════════════════════════════════ */
+
 @media (max-width: 720px) {
   .hero { padding-top: calc(var(--header-h) + 24px); }
   .hero-eyebrow { font-size: 10px; padding: 6px 14px 6px 12px; }
@@ -1730,32 +4365,104 @@ footer {
   .btn { padding: 16px 26px; font-size: 14px; }
   .proj-feature { padding: 40px 24px; }
   .footer-brand h3 { font-size: 42px; }
+  .manifesto p { font-size: clamp(28px, 8vw, 48px); }
+  .marquee-item { font-size: clamp(36px, 12vw, 64px); }
+  .testi-quote { font-size: 19px; }
+  .stack-item .name { font-size: 18px; }
 }
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: clamp(48px, 14vw, 80px); }
+  .hero-sub { font-size: 15px; }
+  .stat .num { font-size: clamp(56px, 14vw, 80px); }
+  .section-title { font-size: clamp(34px, 10vw, 56px); }
+  .final-cta h2 { font-size: clamp(64px, 20vw, 120px); }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   25. REDUCED MOTION
+   ─────────────────────────────────────────────────────────────────
+   Respect users who set "Prefer reduced motion" in their OS.
+   Keep critical fades but kill complex animations.
+   ═════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ═════════════════════════════════════════════════════════════════
+   26. UTILITY HELPERS
+   ─────────────────────────────────────────────────────────────────
+   Last-minute spacing / typography helpers used inline.
+   ═════════════════════════════════════════════════════════════════ */
+
+.mt-xs { margin-top: 8px; }
+.mt-sm { margin-top: 16px; }
+.mt-md { margin-top: 32px; }
+.mt-lg { margin-top: 64px; }
+.mt-xl { margin-top: 96px; }
+
+.text-acc  { color: var(--acc-2); }
+.text-blue { color: var(--blue); }
+.text-mute { color: var(--fg-3); }
+
+.font-mono { font-family: var(--mono); }
+.font-serif { font-family: var(--serif); }
+
+
+/* ═════════════════════════════════════════════════════════════════
+   27. EXIT — end of styles
+   ═════════════════════════════════════════════════════════════════ */
 </style>
 </head>
+
 <body>
 
-<!-- Loading screen -->
+<!-- ════════════════════════════════════════════════════════════════════
+     LOADING SCREEN
+     ════════════════════════════════════════════════════════════════════ -->
 <div class="loader" id="loader" aria-hidden="false">
   <div class="loader-logo">
+    <div class="ring"></div>
+    <div class="ring ring-2"></div>
     <span class="doge">🐶</span>
   </div>
   <div class="loader-meta">
     <div class="loader-bar"><i id="lbar"></i></div>
     <div class="loader-pct" id="lpct">0%</div>
+    <div class="loader-tagline">Loading the experience</div>
   </div>
 </div>
 
-<!-- WebGL background canvas -->
+<!-- ════════════════════════════════════════════════════════════════════
+     PAGE TRANSITION OVERLAY
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page-overlay" id="overlay"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     BACKGROUND LAYERS
+     ════════════════════════════════════════════════════════════════════ -->
 <canvas class="bg-canvas" id="bgcanvas"></canvas>
 <div class="bg-grain"></div>
 <div class="bg-vignette"></div>
 
-<!-- Custom cursor -->
+<!-- ════════════════════════════════════════════════════════════════════
+     CUSTOM CURSOR (hidden on touch)
+     ════════════════════════════════════════════════════════════════════ -->
 <div class="cursor" id="cur"></div>
 <div class="cursor-ring" id="curRing"></div>
 
-<!-- Header -->
+<!-- ════════════════════════════════════════════════════════════════════
+     HEADER
+     ════════════════════════════════════════════════════════════════════ -->
 <header class="site-header" id="hdr">
   <div class="container">
     <a class="brand" href="#" data-link>
@@ -1764,29 +4471,37 @@ footer {
     </a>
     <nav class="nav">
       <a href="#projects" class="nl" data-link>Проекты</a>
-      <a href="#process" class="nl" data-link>Процесс</a>
-      <a href="#connect" class="nl" data-link>Связаться</a>
-      <a href="https://t.me/MrDogezProject" target="_blank" rel="noopener" class="cta" data-link>Telegram</a>
+      <a href="#process"  class="nl" data-link>Процесс</a>
+      <a href="#values"   class="nl" data-link>Принципы</a>
+      <a href="#faq"      class="nl" data-link>FAQ</a>
+      <a href="https://t.me/MrDogezProject" target="_blank" rel="noopener" class="cta" data-link>
+        <span>Telegram</span>
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6"/><path d="M3 9l6-6"/></svg>
+      </a>
     </nav>
   </div>
 </header>
 
 <main>
-  <!-- ════════════════════════════════════════════════════════════
-       HERO
-       ════════════════════════════════════════════════════════════ -->
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 1 — HERO
+       ══════════════════════════════════════════════════════════════════ -->
   <section class="hero">
     <div class="hero-particles" id="hp">
-      <i style="top:20%;left:10%;animation-duration:14s;animation-delay:0s;--dx:80px;--dy:-180px"></i>
-      <i style="top:60%;left:25%;animation-duration:18s;animation-delay:2s;--dx:-60px;--dy:-220px"></i>
-      <i style="top:40%;left:45%;animation-duration:16s;animation-delay:4s;--dx:120px;--dy:-260px"></i>
+      <i style="top:18%;left:10%;animation-duration:14s;animation-delay:0s;--dx:80px;--dy:-180px"></i>
+      <i style="top:62%;left:25%;animation-duration:18s;animation-delay:2s;--dx:-60px;--dy:-220px"></i>
+      <i style="top:38%;left:42%;animation-duration:16s;animation-delay:4s;--dx:120px;--dy:-260px"></i>
       <i style="top:80%;left:15%;animation-duration:20s;animation-delay:1s;--dx:-100px;--dy:-300px"></i>
       <i style="top:30%;left:75%;animation-duration:22s;animation-delay:3s;--dx:60px;--dy:-200px"></i>
-      <i style="top:65%;left:65%;animation-duration:19s;animation-delay:5s;--dx:-80px;--dy:-280px"></i>
+      <i style="top:67%;left:62%;animation-duration:19s;animation-delay:5s;--dx:-80px;--dy:-280px"></i>
+      <i style="top:48%;left:88%;animation-duration:17s;animation-delay:6s;--dx:-150px;--dy:-240px"></i>
     </div>
 
     <div class="hero-orb">
-      <div class="core">
+      <!-- Three.js will inject canvas here. CSS-fallback hidden by default
+           but shown if WebGL unavailable. -->
+      <div class="core-fallback" id="orbFallback" style="display:none">
         <span class="doge">🐶</span>
       </div>
     </div>
@@ -1810,7 +4525,7 @@ footer {
           <span>Смотреть проекты</span>
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12"/><path d="M9 3l6 6-6 6"/></svg>
         </a>
-        <a class="btn btn-ghost mag" href="#connect" data-link>Связаться</a>
+        <a class="btn btn-ghost mag" href="#process" data-link>Как работаю</a>
       </div>
     </div>
 
@@ -1819,9 +4534,9 @@ footer {
     </div>
   </section>
 
-  <!-- ════════════════════════════════════════════════════════════
-       MARQUEE
-       ════════════════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 2 — MARQUEE
+       ══════════════════════════════════════════════════════════════════ -->
   <div class="marquee">
     <div class="marquee-track" id="marq">
       <div class="marquee-item">
@@ -1835,51 +4550,59 @@ footer {
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════════════════════════
-       MANIFESTO
-       ════════════════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 3 — MANIFESTO
+       ══════════════════════════════════════════════════════════════════ -->
   <section class="manifesto">
     <div class="container">
       <div class="eyebrow"><span class="num">01</span> Манифест</div>
-      <p data-split>Я делаю инструменты которые <em>сам бы установил себе</em>. Без слежки, без рекламы, без премиум-уровней. Просто программы которые работают и не достают.</p>
+      <p data-split>
+        Я делаю инструменты которые <em>сам бы установил себе</em>.
+        Без слежки, без рекламы, без премиум-уровней.
+        Просто программы которые работают и не достают.
+      </p>
     </div>
   </section>
 
-  <!-- ════════════════════════════════════════════════════════════
-       STATS
-       ════════════════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 4 — STATS
+       ══════════════════════════════════════════════════════════════════ -->
   <section class="stats">
     <div class="container">
       <div class="stats-grid">
         <div class="stat">
-          <div class="num"><span data-count="2">0</span></div>
+          <div class="num"><span data-count="2" data-scramble>0</span></div>
           <div class="lbl">Проекта в работе</div>
+          <div class="stat-meta">MrDogez Ultimate в релизе, Tools и Mobile в разработке</div>
         </div>
         <div class="stat">
-          <div class="num"><span data-count="27">0</span></div>
+          <div class="num"><span data-count="27" data-scramble>0</span></div>
           <div class="lbl">Стратегий обхода</div>
+          <div class="stat-meta">Уникальные методы DPI-bypass для разных провайдеров</div>
         </div>
         <div class="stat">
           <div class="num"><em>∞</em></div>
           <div class="lbl">Бесплатных функций</div>
+          <div class="stat-meta">Базовый функционал бесплатный навсегда — никаких пейволов</div>
         </div>
         <div class="stat">
           <div class="num">24<em>/</em>7</div>
           <div class="lbl">Аптайм инфры</div>
+          <div class="stat-meta">Серверная инфраструктура работает круглосуточно без даунтаймов</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ════════════════════════════════════════════════════════════
-       PROJECTS
-       ════════════════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 5 — PROJECTS
+       ══════════════════════════════════════════════════════════════════ -->
   <section id="projects">
     <div class="container">
       <div class="section-head">
         <div class="eyebrow"><span class="num">02</span> Проекты</div>
         <h2 class="section-title">Что <em>сделал.</em></h2>
-        <p class="section-lead">Один зрелый продукт — VPN/обход блокировок, плюс будущие проекты в разработке.</p>
+        <p class="section-lead">Один зрелый продукт уже в релизе, плюс несколько в разработке. Все — для решения конкретных проблем, с которыми сталкиваюсь сам.</p>
       </div>
 
       <article class="proj-feature tilt" id="proj-mdu">
@@ -1895,11 +4618,13 @@ footer {
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WireGuard / WARP туннель</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Бесплатное ядро навсегда</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Авто-выбор метода</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Премиум для VIP-серверов</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Постоянные обновления</li>
             </ul>
             <div class="actions">
               <a class="btn-line primary" href="https://t.me/MrDogezProject" target="_blank" rel="noopener" data-link>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Скачать в Telegram-канале</span>
+                <span>Скачать в Telegram</span>
               </a>
               <a class="btn-line" href="https://github.com/MrDogez" target="_blank" rel="noopener" data-link>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M10 14L20.2 3.8"/><path d="M19 13.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6.5"/></svg>
@@ -1926,6 +4651,11 @@ footer {
                   <div class="name">Безопасный DNS</div>
                   <div class="meta">DoH</div>
                 </div>
+                <div class="proj-mock-row">
+                  <div class="ico" style="background:rgba(245,200,66,.4)">🌐</div>
+                  <div class="name">Мульти-локации</div>
+                  <div class="meta">43</div>
+                </div>
                 <div class="proj-mock-cta">Подключить</div>
               </div>
             </div>
@@ -1938,11 +4668,21 @@ footer {
           <div class="stat-line"><span class="pulse"></span><span>В РАЗРАБОТКЕ</span></div>
           <h4>MrDogez <em>Tools</em></h4>
           <p>Набор повседневных утилит — конвертеры, генераторы, инструменты для разработчиков. Один установщик, один интерфейс, всё под рукой.</p>
+          <div class="tag-row">
+            <span class="tag">Конвертеры</span>
+            <span class="tag">Генераторы</span>
+            <span class="tag">Dev Tools</span>
+          </div>
         </div>
         <div class="soon-card tilt">
           <div class="stat-line"><span class="pulse"></span><span>СКОРО</span></div>
           <h4>Mobile <em>версии</em></h4>
           <p>Android и iOS приложения для обхода блокировок и работы с играми. Тот же набор стратегий что в десктопе, но в мобильной обёртке.</p>
+          <div class="tag-row">
+            <span class="tag">Android</span>
+            <span class="tag">iOS</span>
+            <span class="tag">Cross-platform</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1951,13 +4691,100 @@ footer {
   <!-- divider -->
   <div class="divider-orbital"><div class="orb"></div></div>
 
-  <!-- ════════════════════════════════════════════════════════════
-       PROCESS
-       ════════════════════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 6 — USE CASES
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="usecases">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow"><span class="num">03</span> Что работает</div>
+        <h2 class="section-title">Один туннель — <em>все приложения.</em></h2>
+        <p class="section-lead">MrDogez Ultimate решает не одну узкую проблему, а целый класс задач — обход любых блокировок, защита соединений, доступ к заблокированным сервисам.</p>
+      </div>
+      <div class="usecases-grid">
+        <div class="usecase tilt">
+          <div class="icon-shell">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h4>Игры с <em>блокировкой</em></h4>
+          <p>Brawl Stars, Clash Royale, Genshin, Roblox — игры что заблокировали в РФ, открываются мгновенно через чистый IP без задержек.</p>
+          <div class="badge-row">
+            <span class="badge">Brawl Stars</span>
+            <span class="badge">Roblox</span>
+            <span class="badge">Genshin</span>
+          </div>
+        </div>
+        <div class="usecase tilt">
+          <div class="icon-shell">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9 22 2z"/></svg>
+          </div>
+          <h4><em>Telegram</em> на полной скорости</h4>
+          <p>Голосовые каналы, видеосвязь, загрузка файлов на сотни мегабайт — всё на нативной скорости провайдера. Без замедления.</p>
+          <div class="badge-row">
+            <span class="badge">Каналы</span>
+            <span class="badge">Голос</span>
+            <span class="badge">Видео</span>
+          </div>
+        </div>
+        <div class="usecase tilt">
+          <div class="icon-shell">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7z"/><polygon points="10 9 15 12 10 15 10 9" fill="currentColor"/></svg>
+          </div>
+          <h4>YouTube <em>без замедления</em></h4>
+          <p>4K видео без буферизации, минуя любые троттлеры провайдеров. Музыка, лайвы, премьеры — всё открывается как раньше.</p>
+          <div class="badge-row">
+            <span class="badge">4K</span>
+            <span class="badge">Лайвы</span>
+            <span class="badge">Музыка</span>
+          </div>
+        </div>
+        <div class="usecase tilt">
+          <div class="icon-shell">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg>
+          </div>
+          <h4>AI-чаты и <em>сервисы</em></h4>
+          <p>ChatGPT, Claude, Gemini, Discord, Spotify, GitHub Copilot — все заблокированные ресурсы автоматически возвращаются в строй.</p>
+          <div class="badge-row">
+            <span class="badge">ChatGPT</span>
+            <span class="badge">Discord</span>
+            <span class="badge">Spotify</span>
+          </div>
+        </div>
+        <div class="usecase tilt">
+          <div class="icon-shell">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h4>Защита <em>в публичных Wi-Fi</em></h4>
+          <p>Кафе, отель, аэропорт — туннель шифрует весь трафик через WireGuard, MITM-атаки и снифферы становятся бесполезны.</p>
+          <div class="badge-row">
+            <span class="badge">WireGuard</span>
+            <span class="badge">AES-256</span>
+            <span class="badge">DoH</span>
+          </div>
+        </div>
+        <div class="usecase tilt">
+          <div class="icon-shell">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <h4>Любые <em>заблокированные сайты</em></h4>
+          <p>Mediafire, Rutracker, специфические IT-ресурсы, новостные сайты — открывается всё что закрыли через DPI или DNS.</p>
+          <div class="badge-row">
+            <span class="badge">Mediafire</span>
+            <span class="badge">Rutracker</span>
+            <span class="badge">News</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 7 — PROCESS
+       ══════════════════════════════════════════════════════════════════ -->
   <section id="process" class="process">
     <div class="container">
       <div class="section-head">
-        <div class="eyebrow"><span class="num">03</span> Процесс</div>
+        <div class="eyebrow"><span class="num">04</span> Процесс</div>
         <h2 class="section-title">Как <em>работаю.</em></h2>
         <p class="section-lead">От идеи до релиза — без бюрократии, без коммитетов, без согласований. Соло-дев = быстро.</p>
       </div>
@@ -1986,15 +4813,15 @@ footer {
     </div>
   </section>
 
-  <!-- ════════════════════════════════════════════════════════════
-       VALUES / WHY
-       ════════════════════════════════════════════════════════════ -->
-  <section>
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 8 — VALUES
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="values">
     <div class="container">
       <div class="section-head">
-        <div class="eyebrow"><span class="num">04</span> Ценности</div>
+        <div class="eyebrow"><span class="num">05</span> Ценности</div>
         <h2 class="section-title">Что <em>важно.</em></h2>
-        <p class="section-lead">Принципы по которым делаю продукты — и почему они отличаются от того что предлагают &laquo;большие&raquo;.</p>
+        <p class="section-lead">Принципы по которым делаю продукты — и почему они отличаются от того что предлагают «большие».</p>
       </div>
       <div class="values">
         <div class="value tilt">
@@ -2022,9 +4849,514 @@ footer {
     </div>
   </section>
 
-  <!-- ════════════════════════════════════════════════════════════
-       CONNECT
-       ════════════════════════════════════════════════════════════ -->
+  <!-- divider -->
+  <div class="divider-orbital"><div class="orb"></div></div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 9 — TECH STACK
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="stack">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow"><span class="num">06</span> Стек</div>
+        <h2 class="section-title">Как <em>устроено.</em></h2>
+        <p class="section-lead">Какие технологии использую под капотом. Открыто и без эзотерики — чтобы любой разработчик мог разобраться.</p>
+      </div>
+      <div class="stack-grid">
+        <div class="stack-item">
+          <div class="logo">P</div>
+          <div class="name"><em>Python</em></div>
+          <div class="desc">Серверная логика, бэкенд, скрипты автоматизации, обработка данных пользователей.</div>
+        </div>
+        <div class="stack-item">
+          <div class="logo">Q</div>
+          <div class="name"><em>Qt</em> + C++</div>
+          <div class="desc">Десктопный UI приложения. Нативная производительность и интеграция с Windows.</div>
+        </div>
+        <div class="stack-item">
+          <div class="logo">W</div>
+          <div class="name"><em>WireGuard</em></div>
+          <div class="desc">VPN-протокол с шифрованием AES-256. Минимальная нагрузка, максимальная скорость.</div>
+        </div>
+        <div class="stack-item">
+          <div class="logo">CF</div>
+          <div class="name"><em>Cloudflare</em></div>
+          <div class="desc">CDN, Workers для платёжного гейта, WARP-инфраструктура для туннелей.</div>
+        </div>
+        <div class="stack-item">
+          <div class="logo">SQ</div>
+          <div class="name"><em>SQLite</em></div>
+          <div class="desc">Локальная БД пользователей, сессий и кешей. Без серверной БД — никакой утечки.</div>
+        </div>
+        <div class="stack-item">
+          <div class="logo">TG</div>
+          <div class="name"><em>Telegram</em> Bot API</div>
+          <div class="desc">Уведомления, поддержка, авто-канал с релизами и патчами.</div>
+        </div>
+        <div class="stack-item">
+          <div class="logo">JS</div>
+          <div class="name"><em>JavaScript</em></div>
+          <div class="desc">Воркеры на Cloudflare, веб-интерфейсы, real-time обновления статуса.</div>
+        </div>
+        <div class="stack-item">
+          <div class="logo">DH</div>
+          <div class="name"><em>DoH</em> / DoT</div>
+          <div class="desc">Зашифрованный DNS — провайдер не видит какие домены ты резолвишь.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 11 — FAQ
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow"><span class="num">08</span> FAQ</div>
+        <h2 class="section-title">Часто <em>спрашивают.</em></h2>
+        <p class="section-lead">Если твой вопрос здесь не разобран — пиши в <a href="https://t.me/MrDogez" target="_blank" rel="noopener" style="color:var(--acc-2)">@MrDogez</a>.</p>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-q"><span>Это правда бесплатно?</span><span class="faq-icon"></span></summary>
+          <div class="faq-a">
+            Да, базовое ядро бесплатное навсегда: 27 стратегий DPI-bypass, WARP-туннель, 5 ГБ трафика в месяц через WARP, 20+ DNS-серверов. Платными являются <strong>только премиум-функции</strong> — VIP-серверы с приоритетом, безлимит трафика, буст скорости. Это нужно для покрытия серверных расходов. Без них всё работает.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q"><span>Как ты зарабатываешь на бесплатном продукте?</span><span class="faq-icon"></span></summary>
+          <div class="faq-a">
+            Платные подписки на премиум-функции (~10% пользователей) полностью покрывают серверные расходы и дают мне возможность делать новые проекты. Я не показываю рекламу, не продаю данные, не использую сторонние трекеры. <strong>Деньги за то что стоит денег</strong> — за серверную инфраструктуру.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q"><span>Кто стоит за MrDogez?</span><span class="faq-icon"></span></summary>
+          <div class="faq-a">
+            Один человек — Danil aka <strong>@MrDogez</strong>. Не студия, не команда. Соло-разработчик который делает все продукты — от кода до сайта. Открытый канал в TG, прямая связь, без бюрократии.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q"><span>Безопасно ли пользоваться твоим VPN?</span><span class="faq-icon"></span></summary>
+          <div class="faq-a">
+            <strong>Логи трафика не пишутся</strong> — нет ни баз данных с историей подключений, ни файлов с метаданными. Шифрование — WireGuard с AES-256. Если параноишь насчёт критических операций (банкинг и т.п.) — для таких вещей лучше использовать платный сервис с понятной юрисдикцией. Для всего остального — мой VPN работает.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q"><span>Какие платформы поддерживаются?</span><span class="faq-icon"></span></summary>
+          <div class="faq-a">
+            Сейчас релизный продукт — <strong>MrDogez Ultimate</strong> для Windows 10/11. Mobile-версии (Android и iOS) в разработке — будут анонсированы в Telegram-канале. macOS и Linux пока не планируются, но если будет много запросов — добавлю.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q"><span>Можно ли вернуть деньги если не подошло?</span><span class="faq-icon"></span></summary>
+          <div class="faq-a">
+            Да, возврат возможен в течение <strong>24 часов</strong> для подписок и расходных товаров (Premium, пакеты трафика), и <strong>48 часов</strong> для постоянных функций (Разблокировка РФ, Безлимит профилей) — при условии что услуга не активирована или не использовалась активно. Для возврата напиши в <a href="https://t.me/MrDogez" target="_blank" rel="noopener">@MrDogez</a> с email и номером транзакции.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q"><span>А исходный код открыт?</span><span class="faq-icon"></span></summary>
+          <div class="faq-a">
+            Часть проектов открыта на <a href="https://github.com/MrDogez" target="_blank" rel="noopener">github.com/MrDogez</a> — этот сайт, утилиты, общедоступные библиотеки. Ядро MrDogez Ultimate (платежи, античит) частично закрыто по соображениям безопасности.
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q"><span>Берёшь ли ты заказы?</span><span class="faq-icon"></span></summary>
+          <div class="faq-a">
+            Сейчас сфокусирован на своих продуктах и <strong>не беру сторонние заказы</strong>. Открыт для предложений о сотрудничестве по open-source (pull requests на GitHub), технических консультациях и интеграции моих проектов в другие сервисы через API. Пиши в <a href="https://t.me/MrDogez" target="_blank" rel="noopener">@MrDogez</a>.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 11.5 — TRUST STRIP
+       ══════════════════════════════════════════════════════════════════ -->
+  <section style="padding-block:80px">
+    <div class="container">
+      <div class="trust-strip">
+        <div class="trust-item">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="body"><div class="title">No logs</div><div class="sub">Трафик не пишется</div></div>
+        </div>
+        <div class="trust-item">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <div class="body"><div class="title">Open source</div><div class="sub">Часть кода на GitHub</div></div>
+        </div>
+        <div class="trust-item">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+          <div class="body"><div class="title">24/7 аптайм</div><div class="sub">Серверы всегда онлайн</div></div>
+        </div>
+        <div class="trust-item">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9z"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="13" y1="10" x2="13.01" y2="10"/><line x1="17" y1="10" x2="17.01" y2="10"/></svg></div>
+          <div class="body"><div class="title">Прямой контакт</div><div class="sub">Telegram &lt; 24 ч</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 11.6 — ROADMAP TIMELINE
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="roadmap">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow"><span class="num">09</span> Roadmap</div>
+        <h2 class="section-title">Куда <em>иду.</em></h2>
+        <p class="section-lead">Что уже сделано, над чем работаю сейчас, и что планирую дальше. Без обещаний на воздух — только то, что в активной разработке.</p>
+      </div>
+      <div class="roadmap">
+        <div class="roadmap-item done">
+          <div class="row">
+            <div class="roadmap-date">2024 · Q4</div>
+            <div class="roadmap-content">
+              <span class="badge done">Релиз</span>
+              <h4>MrDogez Ultimate <em>v1.0</em></h4>
+              <p>Первый релиз — простой DPI bypass tool с 5 стратегиями. Чистый Python, консольный UI. Открыт на GitHub.</p>
+              <div class="feat-mini">
+                <span>5 стратегий</span><span>Console UI</span><span>Python</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item done">
+          <div class="row">
+            <div class="roadmap-date">2025 · Q1</div>
+            <div class="roadmap-content">
+              <span class="badge done">Релиз</span>
+              <h4>MrDogez Ultimate <em>v3.0</em></h4>
+              <p>Полная переработка: десктопный Qt UI, 18 стратегий DPI-bypass, базовый WARP-туннель. Первый билд под Windows.</p>
+              <div class="feat-mini">
+                <span>Qt UI</span><span>18 стратегий</span><span>WARP</span><span>Windows</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item done">
+          <div class="row">
+            <div class="roadmap-date">2025 · Q3</div>
+            <div class="roadmap-content">
+              <span class="badge done">Релиз</span>
+              <h4>MrDogez Ultimate <em>v4.0</em></h4>
+              <p>Premium-система с автооплатой через СБП и карты. Cloudflare Workers под платежи. Ребренд: переход на формат продуктовой компании.</p>
+              <div class="feat-mini">
+                <span>Premium</span><span>СБП</span><span>CF Workers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item current">
+          <div class="row">
+            <div class="roadmap-date">2026 · Q2</div>
+            <div class="roadmap-content">
+              <span class="badge current">Сейчас</span>
+              <h4>MrDogez Ultimate <em>v5.0</em></h4>
+              <p>27 стратегий DPI-bypass, Cloudflare WARP на WireGuard, авто-выбор оптимального метода, AmneziaWG для российских провайдеров. Текущая релизная версия.</p>
+              <div class="feat-mini">
+                <span>27 стратегий</span><span>WireGuard</span><span>AmneziaWG</span><span>Auto-detect</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item future">
+          <div class="row">
+            <div class="roadmap-date">2026 · Q3</div>
+            <div class="roadmap-content">
+              <span class="badge future">Скоро</span>
+              <h4>MrDogez <em>Tools</em></h4>
+              <p>Набор повседневных утилит — конвертеры, генераторы, hash-калькуляторы, инструменты для разработчиков. Один установщик, единый интерфейс.</p>
+              <div class="feat-mini">
+                <span>Конвертеры</span><span>Dev tools</span><span>Cross-OS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item future">
+          <div class="row">
+            <div class="roadmap-date">2026 · Q4</div>
+            <div class="roadmap-content">
+              <span class="badge future">Планы</span>
+              <h4>Mobile <em>версии</em></h4>
+              <p>Android и iOS приложения для обхода блокировок. Нативные UI на Compose / SwiftUI, тот же набор стратегий что в десктопе.</p>
+              <div class="feat-mini">
+                <span>Android</span><span>iOS</span><span>Native UI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-item future">
+          <div class="row">
+            <div class="roadmap-date">2027 · ??</div>
+            <div class="roadmap-content">
+              <span class="badge future">Идея</span>
+              <h4>MrDogez <em>Cloud</em></h4>
+              <p>Веб-панель управления — статистика трафика, удалённое управление туннелями, экспорт настроек. В стадии концепта.</p>
+              <div class="feat-mini">
+                <span>Web</span><span>API</span><span>Concept</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- divider -->
+  <div class="divider-orbital"><div class="orb"></div></div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 11.7 — COMPARISON TABLE
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="compare">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow"><span class="num">10</span> Сравнение</div>
+        <h2 class="section-title">MrDogez vs <em>остальные.</em></h2>
+        <p class="section-lead">Что мы делаем как они, что лучше, а где честно проигрываем. Без маркетинговой воды.</p>
+      </div>
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Функция</th>
+              <th class="us">MrDogez Ultimate</th>
+              <th>NordVPN / ExpressVPN</th>
+              <th>Браузерный VPN</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="feat">Цена за месяц</td>
+              <td class="us"><span class="cmp-tag yes">0 ₽ / Premium 249 ₽</span></td>
+              <td>$10–13</td>
+              <td><span class="cmp-tag yes">0 ₽</span></td>
+            </tr>
+            <tr>
+              <td class="feat">DPI-bypass для РФ</td>
+              <td class="us"><span class="cmp-tag yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>27 стратегий</span></td>
+              <td><span class="cmp-tag no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Не работает</span></td>
+              <td><span class="cmp-tag no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Нет</span></td>
+            </tr>
+            <tr>
+              <td class="feat">WireGuard</td>
+              <td class="us"><span class="cmp-tag yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Да</span></td>
+              <td><span class="cmp-tag yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Да</span></td>
+              <td><span class="cmp-tag no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Только HTTPS</span></td>
+            </tr>
+            <tr>
+              <td class="feat">Локации</td>
+              <td class="us"><span class="cmp-tag yes">43+ страны</span></td>
+              <td><span class="cmp-tag yes">60+ стран</span></td>
+              <td><span class="cmp-tag meh">2-3</span></td>
+            </tr>
+            <tr>
+              <td class="feat">Скорость</td>
+              <td class="us"><span class="cmp-tag yes">До провайдерской</span></td>
+              <td><span class="cmp-tag yes">До провайдерской</span></td>
+              <td><span class="cmp-tag meh">Ограничена</span></td>
+            </tr>
+            <tr>
+              <td class="feat">Логирование</td>
+              <td class="us"><span class="cmp-tag yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>No logs</span></td>
+              <td><span class="cmp-tag meh">Зависит</span></td>
+              <td><span class="cmp-tag no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Часто да</span></td>
+            </tr>
+            <tr>
+              <td class="feat">Поддержка</td>
+              <td class="us"><span class="cmp-tag yes">Telegram, &lt; 24ч</span></td>
+              <td><span class="cmp-tag meh">Email, 1-3 дня</span></td>
+              <td><span class="cmp-tag no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Нет</span></td>
+            </tr>
+            <tr>
+              <td class="feat">Ограничение трафика</td>
+              <td class="us"><span class="cmp-tag yes">5 ГБ free / ∞ Premium</span></td>
+              <td><span class="cmp-tag yes">∞</span></td>
+              <td><span class="cmp-tag meh">Часто ограничен</span></td>
+            </tr>
+            <tr>
+              <td class="feat">Несколько устройств</td>
+              <td class="us"><span class="cmp-tag yes">Без лимита</span></td>
+              <td><span class="cmp-tag meh">5–10 устройств</span></td>
+              <td><span class="cmp-tag no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Только браузер</span></td>
+            </tr>
+            <tr>
+              <td class="feat">Регистрация</td>
+              <td class="us"><span class="cmp-tag yes">Email только</span></td>
+              <td><span class="cmp-tag no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Карта + Email</span></td>
+              <td><span class="cmp-tag meh">Аккаунт браузера</span></td>
+            </tr>
+            <tr>
+              <td class="feat">Реклама</td>
+              <td class="us"><span class="cmp-tag yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Нет</span></td>
+              <td><span class="cmp-tag yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Нет</span></td>
+              <td><span class="cmp-tag no"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Часто да</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 11.8 — PRICING
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="pricing">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow"><span class="num">11</span> Тарифы</div>
+        <h2 class="section-title">Выбери <em>свой план.</em></h2>
+        <p class="section-lead">Бесплатное ядро для всех. Premium для тех кому нужны VIP-серверы и безлимит. Без подвохов и автопродлений по умолчанию.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="tier-name">Free</div>
+          <div class="tier-tag">Базовый план</div>
+          <div class="price">0 <em>₽</em></div>
+          <div class="price-unit">Навсегда</div>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>27 стратегий DPI-bypass</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>WARP туннель WireGuard</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>5 ГБ трафика в месяц</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>20+ DNS серверов с DoH</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Базовая поддержка</li>
+            <li class="muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>VIP-серверы недоступны</li>
+            <li class="muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Скорость до 10 МБ/с</li>
+          </ul>
+          <a class="btn btn-ghost mag" href="https://t.me/MrDogezProject" target="_blank" rel="noopener" data-link>
+            <span>Скачать бесплатно</span>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12"/><path d="M9 3l6 6-6 6"/></svg>
+          </a>
+        </div>
+        <div class="price-card popular">
+          <span class="price-popular-badge">Популярный</span>
+          <div class="tier-name"><em>Premium</em></div>
+          <div class="tier-tag">Расширенный план</div>
+          <div class="price">249 <em>₽</em></div>
+          <div class="price-unit">в месяц · Можно отменить в любой момент</div>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Всё из Free, плюс:</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Безлимит трафика</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>VIP-серверы (43 страны)</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Скорость до провайдерской</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Boost скорости (доп. оптимизация)</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Безлимит профилей</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Приоритетная поддержка</li>
+          </ul>
+          <a class="btn btn-glow mag" href="https://t.me/MrDogezProject" target="_blank" rel="noopener" data-link>
+            <span>Попробовать Premium</span>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12"/><path d="M9 3l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 11.9 — CHANGELOG
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="changelog">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow"><span class="num">12</span> Changelog</div>
+        <h2 class="section-title">Что <em>обновил.</em></h2>
+        <p class="section-lead">Последние релизы и патчи. Полная история на <a href="https://t.me/MrDogezProject" target="_blank" rel="noopener" style="color:var(--acc-2)">Telegram-канале</a>.</p>
+      </div>
+      <div class="changelog-list">
+
+        <div class="changelog-item">
+          <div class="changelog-meta">
+            <div class="v"><em>v5.0.3</em></div>
+            <div class="date">Апрель 2026</div>
+            <div class="badge-row">
+              <span class="badge new">3 new</span>
+              <span class="badge fix">2 fix</span>
+            </div>
+          </div>
+          <div class="changelog-body">
+            <ul>
+              <li class="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span><b>AmneziaWG</b> поддержка для российских провайдеров с агрессивным DPI</span></li>
+              <li class="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Авто-выбор оптимального протокола (WG → AmneziaWG → DPI-bypass)</span></li>
+              <li class="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Расширенная статистика трафика в трее</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Исправлен баг с переподключением после смены сети Wi-Fi</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Стабильность WireGuard на Windows 11 24H2</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="changelog-item">
+          <div class="changelog-meta">
+            <div class="v"><em>v5.0.2</em></div>
+            <div class="date">Март 2026</div>
+            <div class="badge-row">
+              <span class="badge imp">5 imp</span>
+              <span class="badge fix">3 fix</span>
+            </div>
+          </div>
+          <div class="changelog-body">
+            <ul>
+              <li class="imp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Скорость подключения к WARP <b>+40%</b> (оптимизация handshake)</span></li>
+              <li class="imp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Потребление RAM снижено на 30% при простое</span></li>
+              <li class="imp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Новый дизайн UI — сетка серверов с пингами</span></li>
+              <li class="imp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Улучшена индикация активной стратегии в системном трее</span></li>
+              <li class="imp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Прогресс-бар при копировании файлов профиля</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Краш при смене языка интерфейса</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Утечка памяти в долгоживущих сессиях (&gt; 24ч)</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Конфликт с системным WireGuard клиентом</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="changelog-item">
+          <div class="changelog-meta">
+            <div class="v"><em>v5.0.1</em></div>
+            <div class="date">Февраль 2026</div>
+            <div class="badge-row">
+              <span class="badge new">2 new</span>
+              <span class="badge fix">4 fix</span>
+            </div>
+          </div>
+          <div class="changelog-body">
+            <ul>
+              <li class="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Поддержка автозапуска при старте Windows</span></li>
+              <li class="new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Импорт/экспорт настроек одной кнопкой</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Зависание UI при отключении интернета</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Не сохранялись настройки между запусками</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Краш при отсутствии прав администратора</span></li>
+              <li class="fix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Неверная сортировка серверов по пингу</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- divider -->
+  <div class="divider-orbital"><div class="orb"></div></div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 11.10 — NEWSLETTER
+       ══════════════════════════════════════════════════════════════════ -->
+  <section id="newsletter">
+    <div class="container">
+      <div class="newsletter">
+        <div class="newsletter-content">
+          <h3>Получай <em>анонсы первым.</em></h3>
+          <p>Новые версии, патчи, скрытые фичи и закрытые тесты — всё через Telegram-канал. Без спама, ровно один пост на каждый релиз.</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault();window.open('https://t.me/MrDogezProject','_blank');return false;">
+            <input type="email" placeholder="Или просто открой Telegram канал" disabled>
+            <button type="submit">Подписаться в TG</button>
+          </form>
+          <div class="newsletter-meta">Без спама · ровно один пост на каждый релиз</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       SECTION 12 — FINAL CTA
+       ══════════════════════════════════════════════════════════════════ -->
   <section id="connect" class="final-cta">
     <div class="container">
       <h2><em>Поговорим?</em></h2>
@@ -2037,9 +5369,9 @@ footer {
   </section>
 </main>
 
-<!-- ════════════════════════════════════════════════════════════
+<!-- ════════════════════════════════════════════════════════════════════
      FOOTER
-     ════════════════════════════════════════════════════════════ -->
+     ════════════════════════════════════════════════════════════════════ -->
 <footer>
   <div class="container">
     <div class="footer-grid">
@@ -2071,7 +5403,8 @@ footer {
         <ul>
           <li><a href="#projects" data-link>Проекты</a></li>
           <li><a href="#process" data-link>Процесс</a></li>
-          <li><a href="#connect" data-link>Связаться</a></li>
+          <li><a href="#values" data-link>Ценности</a></li>
+          <li><a href="#faq" data-link>FAQ</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -2085,25 +5418,39 @@ footer {
     </div>
     <div class="footer-bottom">
       <div class="logo-mini"><i></i><span>MrDogez Project · 2024–2026</span></div>
-      <div>Сделано <em style="font-style:italic;color:var(--acc-2)">с любовью</em> в одиночку</div>
+      <div>Сделано <em>с любовью</em> в одиночку</div>
     </div>
   </div>
 </footer>
 
+<!-- ════════════════════════════════════════════════════════════════════
+     JAVASCRIPT — INTERACTIONS
+     ════════════════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
 
 /* ════════════════════════════════════════════════════════════════════
-   MrDogez — premium portfolio interactions
-   ════════════════════════════════════════════════════════════════════ */
+   MrDogez — premium portfolio interactions v2
+   ────────────────────────────────────────────────────────────────────
+   Loaded once after DOM ready. Modular IIFEs for each subsystem so
+   nothing leaks into global scope.
+   ──────────────────────────────────────────────────────────────────── */
 
 (function() {
+
+  /* ─── Helpers ─── */
   const $ = (s, p) => (p || document).querySelector(s);
   const $$ = (s, p) => Array.from((p || document).querySelectorAll(s));
   const lerp = (a, b, t) => a + (b - a) * t;
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+  const easeOutExpo  = (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
 
-  /* ──────────────────── Loading screen ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 1 — LOADING SCREEN
+     ════════════════════════════════════════════════════════════════ */
+
   function runLoader() {
     const loader = $('#loader');
     const bar = $('#lbar');
@@ -2112,6 +5459,7 @@ footer {
     return new Promise((resolve) => {
       let p = 0;
       const tick = () => {
+        // Smooth incremental — slows down near the end for "almost done" feel
         const inc = (100 - p) * (0.04 + Math.random() * 0.04);
         p = Math.min(100, p + inc);
         if (bar) bar.style.width = p + '%';
@@ -2121,6 +5469,7 @@ footer {
         } else {
           if (pct) pct.textContent = '100%';
           if (bar) bar.style.width = '100%';
+          // Hold full briefly so user sees completion
           setTimeout(() => {
             loader.classList.add('hidden');
             resolve();
@@ -2131,28 +5480,53 @@ footer {
     });
   }
 
-  /* ──────────────────── Custom cursor (lerp follower) ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 2 — CUSTOM CURSOR FOLLOWER
+     ────────────────────────────────────────────────────────────────
+     Two layers:
+       cur     — tight 6px dot, fast (lerp 0.5)
+       curRing — 36px ring, lagging (lerp 0.18) — creates trail effect
+     ════════════════════════════════════════════════════════════════ */
+
   function initCursor() {
     const cur = $('#cur'), ring = $('#curRing');
     if (!cur || !ring) return;
     let mx = window.innerWidth / 2, my = window.innerHeight / 2;
     let cx = mx, cy = my, rx = mx, ry = my;
-    document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+    document.addEventListener('mousemove', (e) => {
+      mx = e.clientX;
+      my = e.clientY;
+    });
     function tick() {
-      cx = lerp(cx, mx, 0.5); cy = lerp(cy, my, 0.5);
-      rx = lerp(rx, mx, 0.18); ry = lerp(ry, my, 0.18);
-      cur.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+      cx = lerp(cx, mx, 0.5);
+      cy = lerp(cy, my, 0.5);
+      rx = lerp(rx, mx, 0.18);
+      ry = lerp(ry, my, 0.18);
+      cur.style.transform  = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
       ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
       requestAnimationFrame(tick);
     }
     tick();
+
+    // Toggle cursor mode based on hovered element
     $$('a, button, [data-link]').forEach(el => {
       el.addEventListener('mouseenter', () => document.body.classList.add('cursor-link'));
       el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-link'));
     });
+
+    // Magnet zone — bigger ring on .mag elements
+    $$('.mag').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-magnet'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-magnet'));
+    });
   }
 
-  /* ──────────────────── Sticky header ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 3 — STICKY HEADER
+     ════════════════════════════════════════════════════════════════ */
+
   function initHeader() {
     const hdr = $('#hdr');
     if (!hdr) return;
@@ -2163,9 +5537,15 @@ footer {
     onScroll();
   }
 
-  /* ──────────────────── Three.js WebGL background ────────────────────
-     Particle system: thousands of dots floating in 3D space, drifting
-     slowly with mouse parallax. Color: blue→purple gradient. */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 4 — THREE.JS WEBGL BACKGROUND
+     ────────────────────────────────────────────────────────────────
+     Particle field (1800 dots) with mouse parallax + nebula sphere
+     with custom GLSL fresnel shader.
+     Background only, no per-section WebGL.
+     ════════════════════════════════════════════════════════════════ */
+
   function initWebGL() {
     if (typeof THREE === 'undefined') return;
     const canvas = $('#bgcanvas');
@@ -2174,20 +5554,29 @@ footer {
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x050410, 0.0007);
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      2000
+    );
     camera.position.z = 600;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+    });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x000000, 0);
 
-    /* Particle field */
+    /* ─── Particle field ─── */
     const pCount = 1800;
     const pGeo = new THREE.BufferGeometry();
-    const positions = new Float32Array(pCount * 3);
-    const colors = new Float32Array(pCount * 3);
-    const sizes = new Float32Array(pCount);
+    const positions  = new Float32Array(pCount * 3);
+    const colors     = new Float32Array(pCount * 3);
+    const sizes      = new Float32Array(pCount);
     const velocities = new Float32Array(pCount * 3);
 
     const colA = new THREE.Color(0x6e3aff); // purple
@@ -2195,6 +5584,7 @@ footer {
     const colC = new THREE.Color(0x4dd6ff); // cyan
 
     for (let i = 0; i < pCount; i++) {
+      // Distribute on a sphere shell
       const r = 200 + Math.random() * 800;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos((Math.random() * 2) - 1);
@@ -2203,10 +5593,11 @@ footer {
       positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = r * Math.cos(phi) - 200;
 
+      // Color: gradient blend purple → blue → cyan
       const t = Math.random();
       let c;
       if (t < 0.5) c = colA.clone().lerp(colB, t * 2);
-      else c = colB.clone().lerp(colC, (t - 0.5) * 2);
+      else         c = colB.clone().lerp(colC, (t - 0.5) * 2);
       colors[i * 3]     = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
@@ -2217,9 +5608,10 @@ footer {
       velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.06;
       velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.04;
     }
+
     pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    pGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    pGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    pGeo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+    pGeo.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
 
     const pMat = new THREE.ShaderMaterial({
       uniforms: { uTime: { value: 0 } },
@@ -2251,7 +5643,7 @@ footer {
     const points = new THREE.Points(pGeo, pMat);
     scene.add(points);
 
-    /* Big nebula sphere — soft glow blob */
+    /* ─── Nebula sphere with fresnel shader ─── */
     const nebulaGeo = new THREE.SphereGeometry(180, 48, 48);
     const nebulaMat = new THREE.ShaderMaterial({
       uniforms: { uTime: { value: 0 } },
@@ -2287,14 +5679,14 @@ footer {
     nebula.position.set(120, -50, -200);
     scene.add(nebula);
 
-    /* Mouse parallax */
+    /* ─── Mouse parallax target ─── */
     let tmx = 0, tmy = 0, mxL = 0, myL = 0;
     document.addEventListener('mousemove', (e) => {
       tmx = (e.clientX / window.innerWidth) * 2 - 1;
       tmy = -(e.clientY / window.innerHeight) * 2 + 1;
     });
 
-    /* Resize */
+    /* ─── Resize ─── */
     function resize() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -2302,20 +5694,20 @@ footer {
     }
     window.addEventListener('resize', resize);
 
-    /* Render loop */
+    /* ─── Render loop ─── */
     let scrollY = 0;
     window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
 
     const clock = new THREE.Clock();
     function render() {
       const t = clock.getElapsedTime();
-      // Update particle positions slowly
+
+      // Slowly drift particles, wrap around bounding sphere
       const pos = pGeo.attributes.position.array;
       for (let i = 0; i < pCount; i++) {
         pos[i * 3]     += velocities[i * 3];
         pos[i * 3 + 1] += velocities[i * 3 + 1];
         pos[i * 3 + 2] += velocities[i * 3 + 2];
-        // Wrap around bounding sphere
         const x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2];
         if (x*x + y*y + z*z > 1100*1100) {
           pos[i * 3]     *= -0.6;
@@ -2324,16 +5716,17 @@ footer {
         }
       }
       pGeo.attributes.position.needsUpdate = true;
-      pMat.uniforms.uTime.value = t;
+      pMat.uniforms.uTime.value     = t;
       nebulaMat.uniforms.uTime.value = t;
 
-      // Mouse parallax
+      // Mouse parallax — eased
       mxL = lerp(mxL, tmx, 0.04);
       myL = lerp(myL, tmy, 0.04);
       camera.position.x = mxL * 60;
       camera.position.y = myL * 40 - scrollY * 0.05;
       camera.lookAt(0, 0, 0);
 
+      // Slow constant drift
       points.rotation.y += 0.0006;
       points.rotation.x = Math.sin(t * 0.1) * 0.03;
       nebula.rotation.y -= 0.0008;
@@ -2345,41 +5738,273 @@ footer {
     render();
   }
 
-  /* ──────────────────── Magnetic buttons ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 5 — HERO 3D ORB (separate WebGL canvas)
+     ────────────────────────────────────────────────────────────────
+     Inserts a dedicated canvas inside .hero-orb and renders an
+     IcosahedronGeometry sphere with displacement vertex shader for
+     organic morph + fresnel rim glow.
+     ════════════════════════════════════════════════════════════════ */
+
+  function initHeroOrb() {
+    if (typeof THREE === 'undefined') return;
+    const wrap = document.querySelector('.hero-orb');
+    if (!wrap) return;
+    const fallback = document.getElementById('orbFallback');
+
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.style.cssText = 'width:100%;height:100%';
+      wrap.insertBefore(canvas, fallback);
+
+      const w = wrap.offsetWidth;
+      const h = wrap.offsetHeight;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+      camera.position.z = 6;
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas, alpha: true, antialias: true,
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(w, h);
+
+      const geo = new THREE.IcosahedronGeometry(1.7, 60);
+
+      // Custom shader: displace vertices with simplex noise +
+      // fresnel-style color blend.
+      const orbMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uMouse: { value: new THREE.Vector2(0, 0) },
+          uColorA: { value: new THREE.Color(0xa08afa) },
+          uColorB: { value: new THREE.Color(0x4a90ff) },
+          uColorC: { value: new THREE.Color(0x6e3aff) },
+        },
+        vertexShader: `
+          uniform float uTime;
+          uniform vec2 uMouse;
+          varying vec3 vNormal;
+          varying vec3 vPos;
+          varying float vDispl;
+
+          // 3D simplex noise (Ashima)
+          vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+          vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
+          vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
+          vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+          float snoise(vec3 v){
+            const vec2 C=vec2(1./6.,1./3.);
+            const vec4 D=vec4(0.,.5,1.,2.);
+            vec3 i=floor(v+dot(v,C.yyy));
+            vec3 x0=v-i+dot(i,C.xxx);
+            vec3 g=step(x0.yzx,x0.xyz);
+            vec3 l=1.-g;
+            vec3 i1=min(g.xyz,l.zxy);
+            vec3 i2=max(g.xyz,l.zxy);
+            vec3 x1=x0-i1+C.xxx;
+            vec3 x2=x0-i2+C.yyy;
+            vec3 x3=x0-D.yyy;
+            i=mod289(i);
+            vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
+            float n_=1./7.;
+            vec3 ns=n_*D.wyz-D.xzx;
+            vec4 j=p-49.*floor(p*ns.z*ns.z);
+            vec4 x_=floor(j*ns.z);
+            vec4 y_=floor(j-7.*x_);
+            vec4 x=x_*ns.x+ns.yyyy;
+            vec4 y=y_*ns.x+ns.yyyy;
+            vec4 h=1.-abs(x)-abs(y);
+            vec4 b0=vec4(x.xy,y.xy);
+            vec4 b1=vec4(x.zw,y.zw);
+            vec4 s0=floor(b0)*2.+1.;
+            vec4 s1=floor(b1)*2.+1.;
+            vec4 sh=-step(h,vec4(0.));
+            vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
+            vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+            vec3 p0=vec3(a0.xy,h.x);
+            vec3 p1=vec3(a0.zw,h.y);
+            vec3 p2=vec3(a1.xy,h.z);
+            vec3 p3=vec3(a1.zw,h.w);
+            vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+            p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+            vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);
+            m=m*m;
+            return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+          }
+
+          void main() {
+            vec3 pos = position;
+            float n = snoise(pos * 1.4 + uTime * 0.15);
+            float n2 = snoise(pos * 2.6 - uTime * 0.25) * 0.5;
+            float displ = n * 0.18 + n2 * 0.08;
+            // Mouse-pull: distort towards cursor
+            displ += uMouse.x * normal.x * 0.06 + uMouse.y * normal.y * 0.06;
+            vDispl = displ;
+            pos += normal * displ;
+            vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+            vNormal = normalize(normalMatrix * normal);
+            vPos = mvPos.xyz;
+            gl_Position = projectionMatrix * mvPos;
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform vec3 uColorA;
+          uniform vec3 uColorB;
+          uniform vec3 uColorC;
+          varying vec3 vNormal;
+          varying vec3 vPos;
+          varying float vDispl;
+          void main() {
+            float fresnel = pow(1.0 - abs(dot(vNormal, normalize(-vPos))), 1.6);
+            float t = (sin(uTime * 0.4) + 1.0) * 0.5;
+            vec3 base = mix(uColorA, uColorB, t);
+            base = mix(base, uColorC, fresnel);
+            base += vec3(vDispl) * 0.3;
+            // Add inner glow
+            float glow = smoothstep(0.0, 1.5, fresnel + 0.3);
+            gl_FragColor = vec4(base * (0.7 + glow * 0.7), 0.95);
+          }
+        `,
+        transparent: true,
+      });
+
+      const orb = new THREE.Mesh(geo, orbMat);
+      scene.add(orb);
+
+      // Outer halo glow as a back-side sphere
+      const haloGeo = new THREE.SphereGeometry(2.4, 48, 48);
+      const haloMat = new THREE.ShaderMaterial({
+        uniforms: { uTime: { value: 0 } },
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vPos;
+          void main(){
+            vNormal = normalize(normalMatrix * normal);
+            vec4 mvPos = modelViewMatrix * vec4(position,1.);
+            vPos = mvPos.xyz;
+            gl_Position = projectionMatrix * mvPos;
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          varying vec3 vNormal;
+          varying vec3 vPos;
+          void main(){
+            float fr = pow(1.0 - abs(dot(vNormal, normalize(-vPos))), 3.0);
+            vec3 col = mix(vec3(0.43,0.23,1.0), vec3(0.29,0.56,1.0), 0.5);
+            gl_FragColor = vec4(col * fr, fr * 0.4);
+          }
+        `,
+        transparent: true,
+        side: THREE.BackSide,
+        depthWrite: false,
+      });
+      const halo = new THREE.Mesh(haloGeo, haloMat);
+      scene.add(halo);
+
+      // Mouse drives uMouse uniform
+      let mtx = 0, mty = 0, mtxL = 0, mtyL = 0;
+      document.addEventListener('mousemove', (e) => {
+        mtx = (e.clientX / window.innerWidth) * 2 - 1;
+        mty = -(e.clientY / window.innerHeight) * 2 + 1;
+      });
+
+      // Resize
+      function resize() {
+        const w = wrap.offsetWidth;
+        const h = wrap.offsetHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+      window.addEventListener('resize', resize);
+
+      const clock = new THREE.Clock();
+      function render() {
+        const t = clock.getElapsedTime();
+        orb.rotation.y += 0.005;
+        orb.rotation.x = Math.sin(t * 0.3) * 0.15;
+        orbMat.uniforms.uTime.value = t;
+        haloMat.uniforms.uTime.value = t;
+        mtxL = lerp(mtxL, mtx, 0.05);
+        mtyL = lerp(mtyL, mty, 0.05);
+        orbMat.uniforms.uMouse.value.x = mtxL;
+        orbMat.uniforms.uMouse.value.y = mtyL;
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      }
+      render();
+    } catch (e) {
+      // WebGL failed — show CSS fallback
+      console.warn('Hero WebGL orb failed, falling back to CSS:', e);
+      if (fallback) fallback.style.display = '';
+    }
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 6 — MAGNETIC BUTTONS
+     ────────────────────────────────────────────────────────────────
+     Buttons with .mag class follow the cursor slightly when hovered.
+     Adds physical "weight" to the interaction.
+     ════════════════════════════════════════════════════════════════ */
+
   function initMagnetic() {
     $$('.mag').forEach(btn => {
       btn.addEventListener('mousemove', (e) => {
         const r = btn.getBoundingClientRect();
         const dx = (e.clientX - (r.left + r.width / 2)) * 0.25;
-        const dy = (e.clientY - (r.top + r.height / 2)) * 0.25;
+        const dy = (e.clientY - (r.top  + r.height / 2)) * 0.25;
         btn.style.transform = `translate(${dx}px, ${dy}px)`;
       });
-      btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = '';
+      });
     });
   }
 
-  /* ──────────────────── 3D card tilt ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 7 — 3D CARD TILT
+     ────────────────────────────────────────────────────────────────
+     Cards with .tilt class rotate based on cursor position. Plus
+     a CSS variable --mx/--my for the radial glow effect.
+     ════════════════════════════════════════════════════════════════ */
+
   function initTilt() {
     $$('.tilt').forEach(card => {
       card.addEventListener('mousemove', (e) => {
         const r = card.getBoundingClientRect();
         const x = (e.clientX - r.left) / r.width;
-        const y = (e.clientY - r.top) / r.height;
+        const y = (e.clientY - r.top)  / r.height;
         const rx = (y - 0.5) * -5;
-        const ry = (x - 0.5) * 5;
+        const ry = (x - 0.5) *  5;
         card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
         card.style.setProperty('--mx', (x * 100) + '%');
         card.style.setProperty('--my', (y * 100) + '%');
       });
-      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
     });
   }
 
-  /* ──────────────────── Manifesto split words ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 8 — MANIFESTO WORD-SPLIT + COLOR REVEAL
+     ────────────────────────────────────────────────────────────────
+     Wraps each word in a <span> with index, then GSAP's ScrollTrigger
+     transitions color from muted (--fg-3) to bright (--fg) tied to
+     scroll progress.
+     ════════════════════════════════════════════════════════════════ */
+
   function initManifesto() {
     $$('[data-split]').forEach(el => {
       const html = el.innerHTML;
-      // Wrap every word (preserve <em> tags)
       let i = 0;
       const wrapped = html.replace(/(<em>[^<]+<\/em>|[^\s<]+)/g, (m) => {
         const c = m.startsWith('<em>') ? 'word acc' : 'word';
@@ -2388,7 +6013,6 @@ footer {
       el.innerHTML = wrapped;
     });
 
-    // Light words on scroll
     if (window.gsap && window.ScrollTrigger) {
       gsap.registerPlugin(ScrollTrigger);
       $$('.manifesto p').forEach(p => {
@@ -2407,11 +6031,51 @@ footer {
     }
   }
 
-  /* ──────────────────── Counter animation ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 9 — STAT COUNTERS WITH SCRAMBLE
+     ────────────────────────────────────────────────────────────────
+     For elements with [data-count] AND [data-scramble], we show
+     random characters cycling for ~600ms before settling on the
+     final number.
+     ════════════════════════════════════════════════════════════════ */
+
   function initCounters() {
-    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-    function animate(el, target) {
-      const dur = 1600, start = performance.now();
+    const SCRAMBLE_CHARS = '0123456789';
+
+    function animateScramble(el, target) {
+      const phaseA_dur = 600;       // scramble phase
+      const phaseB_dur = 1200;      // settle phase (count up)
+      const start = performance.now();
+      const targetStr = String(target);
+
+      function frame(now) {
+        const elapsed = now - start;
+
+        if (elapsed < phaseA_dur) {
+          // Phase A: pure random characters
+          let s = '';
+          for (let i = 0; i < targetStr.length; i++) {
+            s += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+          }
+          el.textContent = s;
+          requestAnimationFrame(frame);
+        } else if (elapsed < phaseA_dur + phaseB_dur) {
+          // Phase B: count up to target with cubic easing
+          const t = (elapsed - phaseA_dur) / phaseB_dur;
+          const eased = easeOutCubic(t);
+          el.textContent = Math.round(target * eased);
+          requestAnimationFrame(frame);
+        } else {
+          el.textContent = target;
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function animatePlain(el, target) {
+      const dur = 1600;
+      const start = performance.now();
       function frame(now) {
         const t = Math.min(1, (now - start) / dur);
         el.textContent = Math.round(target * easeOutCubic(t));
@@ -2420,24 +6084,37 @@ footer {
       }
       requestAnimationFrame(frame);
     }
+
     if (!('IntersectionObserver' in window)) return;
     const io = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (!e.isIntersecting) return;
         const target = parseInt(e.target.dataset.count, 10);
-        if (!isNaN(target)) animate(e.target, target);
+        if (isNaN(target)) return;
+        if (e.target.dataset.scramble !== undefined) {
+          animateScramble(e.target, target);
+        } else {
+          animatePlain(e.target, target);
+        }
         io.unobserve(e.target);
       });
     }, { threshold: 0.5 });
     $$('[data-count]').forEach(el => io.observe(el));
   }
 
-  /* ──────────────────── GSAP scroll-trigger fade-up ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 10 — GSAP SCROLL-TRIGGERED REVEAL ANIMATIONS
+     ────────────────────────────────────────────────────────────────
+     Animates section heads, project cards, soon-cards, process steps,
+     values, etc. into view as user scrolls.
+     ════════════════════════════════════════════════════════════════ */
+
   function initScrollAnimations() {
     if (!window.gsap || !window.ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
 
-    // Generic fade-up on sections
+    // Section heads — eyebrow, title, lead
     $$('section').forEach(sec => {
       const heads = $$('.section-head, .section-title, .eyebrow, .section-lead', sec);
       heads.forEach(h => {
@@ -2451,7 +6128,7 @@ footer {
       });
     });
 
-    // Project feature card
+    // Featured project card
     gsap.from('.proj-feature', {
       y: 80,
       opacity: 0,
@@ -2460,6 +6137,7 @@ footer {
       scrollTrigger: { trigger: '.proj-feature', start: 'top 80%' },
     });
 
+    // Soon cards (stagger)
     gsap.from('.soon-card', {
       y: 60,
       opacity: 0,
@@ -2469,6 +6147,17 @@ footer {
       scrollTrigger: { trigger: '.soon-grid', start: 'top 85%' },
     });
 
+    // Use case cards (stagger 6)
+    gsap.from('.usecase', {
+      y: 60,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.08,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.usecases-grid', start: 'top 85%' },
+    });
+
+    // Process steps
     gsap.from('.proc', {
       y: 40,
       opacity: 0,
@@ -2478,6 +6167,7 @@ footer {
       scrollTrigger: { trigger: '.process-list', start: 'top 80%' },
     });
 
+    // Values cards
     gsap.from('.value', {
       y: 60,
       opacity: 0,
@@ -2487,6 +6177,37 @@ footer {
       scrollTrigger: { trigger: '.values', start: 'top 80%' },
     });
 
+    // Tech stack items
+    gsap.from('.stack-item', {
+      y: 40,
+      opacity: 0,
+      duration: 0.9,
+      stagger: 0.05,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.stack-grid', start: 'top 85%' },
+    });
+
+    // Testimonials
+    gsap.from('.testi', {
+      y: 50,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.1,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.testimonial-grid', start: 'top 85%' },
+    });
+
+    // FAQ items
+    gsap.from('.faq-item', {
+      y: 30,
+      opacity: 0,
+      duration: 0.9,
+      stagger: 0.06,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.faq-list', start: 'top 85%' },
+    });
+
+    // Stat blocks
     gsap.from('.stat', {
       y: 40,
       opacity: 0,
@@ -2496,6 +6217,7 @@ footer {
       scrollTrigger: { trigger: '.stats-grid', start: 'top 85%' },
     });
 
+    // Final CTA — scale + fade
     gsap.from('.final-cta h2', {
       scale: 0.85,
       opacity: 0,
@@ -2505,7 +6227,15 @@ footer {
     });
   }
 
-  /* ──────────────────── Lenis smooth scroll ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 11 — LENIS SMOOTH SCROLL
+     ────────────────────────────────────────────────────────────────
+     Adds momentum-based smooth scroll for the entire page. We hook
+     it into GSAP ScrollTrigger so scroll-driven animations stay in
+     sync.
+     ════════════════════════════════════════════════════════════════ */
+
   function initSmoothScroll() {
     if (typeof Lenis === 'undefined') return;
     const lenis = new Lenis({
@@ -2524,7 +6254,6 @@ footer {
       requestAnimationFrame(raf);
     }
     requestAnimationFrame(raf);
-    // Hook GSAP ScrollTrigger to Lenis
     if (window.ScrollTrigger) {
       lenis.on('scroll', ScrollTrigger.update);
       gsap.ticker.add((time) => { lenis.raf(time * 1000); });
@@ -2532,8 +6261,17 @@ footer {
     }
   }
 
-  /* ──────────────────── Anchor smooth scroll fallback ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 12 — ANCHOR LINK SMOOTH SCROLL FALLBACK
+     ────────────────────────────────────────────────────────────────
+     If Lenis isn't loaded, this provides smooth anchor scrolling.
+     Plus triggers the page-overlay sweep effect.
+     ════════════════════════════════════════════════════════════════ */
+
   function initAnchors() {
+    const overlay = $('#overlay');
+
     $$('a[href^="#"]').forEach(a => {
       a.addEventListener('click', (e) => {
         const href = a.getAttribute('href');
@@ -2541,27 +6279,312 @@ footer {
         const target = $(href);
         if (!target) return;
         e.preventDefault();
-        const top = target.getBoundingClientRect().top + window.scrollY - 40;
-        window.scrollTo({ top, behavior: 'smooth' });
+
+        // Trigger overlay sweep
+        if (overlay) {
+          overlay.classList.add('active');
+          setTimeout(() => {
+            const top = target.getBoundingClientRect().top + window.scrollY - 40;
+            window.scrollTo({ top, behavior: 'smooth' });
+            // Sweep out from the other side
+            overlay.classList.remove('active');
+            overlay.classList.add('exiting');
+            setTimeout(() => overlay.classList.remove('exiting'), 800);
+          }, 700);
+        } else {
+          const top = target.getBoundingClientRect().top + window.scrollY - 40;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
       });
     });
   }
 
-  /* ──────────────────── INIT ──────────────────── */
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 13 — MARQUEE SEAMLESS LOOP
+     ────────────────────────────────────────────────────────────────
+     Duplicates the marquee track content so the CSS infinite loop
+     appears seamless (no visible "jump" at the end).
+     ════════════════════════════════════════════════════════════════ */
+
+  function initMarquee() {
+    const marq = $('#marq');
+    if (!marq) return;
+    marq.innerHTML = marq.innerHTML + marq.innerHTML;
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 14 — CURSOR TRAIL PARTICLES
+     ────────────────────────────────────────────────────────────────
+     Spawns small particles behind the cursor. Density scales with
+     cursor speed (faster movement = more particles). Particles
+     auto-cleanup after their CSS animation finishes.
+     ════════════════════════════════════════════════════════════════ */
+
+  function initCursorTrail() {
+    if (window.matchMedia('(hover: none)').matches) return;
+    let lastX = 0, lastY = 0, lastTime = 0;
+    let throttle = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      const now = performance.now();
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dt = now - lastTime;
+      const speed = dt > 0 ? dist / dt : 0;
+
+      // Throttle to ~30fps for performance
+      if (now - throttle < 32) {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastTime = now;
+        return;
+      }
+      throttle = now;
+
+      // Only spawn if moving fast enough
+      if (speed < 0.4) {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastTime = now;
+        return;
+      }
+
+      // Spawn 1-3 particles depending on speed
+      const count = Math.min(3, Math.max(1, Math.floor(speed * 1.5)));
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'trail-particle';
+        // Slight randomness around cursor position
+        const offsetX = (Math.random() - 0.5) * 14;
+        const offsetY = (Math.random() - 0.5) * 14;
+        p.style.left = (e.clientX + offsetX) + 'px';
+        p.style.top  = (e.clientY + offsetY) + 'px';
+        // Random size
+        const size = 4 + Math.random() * 5;
+        p.style.width  = size + 'px';
+        p.style.height = size + 'px';
+        document.body.appendChild(p);
+        // Auto-remove after animation
+        setTimeout(() => p.remove(), 700);
+      }
+
+      lastX = e.clientX;
+      lastY = e.clientY;
+      lastTime = now;
+    });
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 15 — SCROLL PROGRESS BAR
+     ────────────────────────────────────────────────────────────────
+     Thin gradient bar at the top fills as user scrolls.
+     ════════════════════════════════════════════════════════════════ */
+
+  function initScrollProgress() {
+    const bar = document.createElement('div');
+    bar.className = 'scroll-progress';
+    document.body.appendChild(bar);
+    function update() {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+      bar.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 16 — LIVE STATUS WIDGET
+     ────────────────────────────────────────────────────────────────
+     Bottom-right pill showing "all systems operational". Fades in
+     after a delay so it doesn't compete with the hero entrance.
+     ════════════════════════════════════════════════════════════════ */
+
+  function initLiveStatus() {
+    const widget = document.createElement('div');
+    widget.className = 'live-status';
+    widget.innerHTML = `
+      <span class="dot"></span>
+      <span><span class="label">Все серверы</span> · OK</span>
+    `;
+    document.body.appendChild(widget);
+    setTimeout(() => widget.classList.add('shown'), 2400);
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 17 — BACK-TO-TOP BUTTON
+     ────────────────────────────────────────────────────────────────
+     Fixed circular button with up-arrow that appears after scrolling
+     past 800px and smooth-scrolls to top on click.
+     ════════════════════════════════════════════════════════════════ */
+
+  function initBackToTop() {
+    const btn = document.createElement('button');
+    btn.className = 'back-top';
+    btn.setAttribute('aria-label', 'Наверх');
+    btn.setAttribute('data-link', '');
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5"/>
+        <polyline points="5 12 12 5 19 12"/>
+      </svg>
+    `;
+    document.body.appendChild(btn);
+    function update() {
+      btn.classList.toggle('shown', window.scrollY > 800);
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    btn.addEventListener('mouseenter', () => document.body.classList.add('cursor-link'));
+    btn.addEventListener('mouseleave', () => document.body.classList.remove('cursor-link'));
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 18 — METRIC BARS REVEAL
+     ────────────────────────────────────────────────────────────────
+     For .metric-bars elements, animate the inner .bar > i width when
+     the parent enters viewport.
+     ════════════════════════════════════════════════════════════════ */
+
+  function initMetricBars() {
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        $$('.bar i', e.target).forEach(bar => {
+          const target = bar.dataset.value || '0';
+          // Trigger CSS transition
+          requestAnimationFrame(() => { bar.style.width = target + '%'; });
+        });
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.4 });
+    $$('.metric-bars').forEach(el => io.observe(el));
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 19 — PAGE-OVERLAY SWEEP ON ANCHOR CLICK
+     ────────────────────────────────────────────────────────────────
+     Already integrated into initAnchors but isolated here for clarity.
+     The overlay element sweeps left-to-right then exits right-to-left.
+     ════════════════════════════════════════════════════════════════ */
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 20 — ROADMAP REVEAL
+     ────────────────────────────────────────────────────────────────
+     Slide each roadmap item in from the side (alternating L/R could
+     be added; for now just fade-up with stagger).
+     ════════════════════════════════════════════════════════════════ */
+
+  function initRoadmap() {
+    if (!window.gsap || !window.ScrollTrigger) return;
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.from('.roadmap-item', {
+      x: -40,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.12,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.roadmap', start: 'top 80%' },
+    });
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     SUBSYSTEM 21 — COMPARISON / PRICING / CHANGELOG REVEAL
+     ════════════════════════════════════════════════════════════════ */
+
+  function initExtrasReveals() {
+    if (!window.gsap || !window.ScrollTrigger) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.from('.compare-table tr', {
+      y: 20,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.04,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.compare-table', start: 'top 85%' },
+    });
+
+    gsap.from('.price-card', {
+      y: 60,
+      opacity: 0,
+      duration: 1.1,
+      stagger: 0.15,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.pricing-grid', start: 'top 80%' },
+    });
+
+    gsap.from('.changelog-item', {
+      y: 50,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.12,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.changelog-list', start: 'top 85%' },
+    });
+
+    gsap.from('.trust-item', {
+      y: 30,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.08,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.trust-strip', start: 'top 90%' },
+    });
+
+    gsap.from('.newsletter', {
+      scale: 0.95,
+      opacity: 0,
+      duration: 1.2,
+      ease: 'expo.out',
+      scrollTrigger: { trigger: '.newsletter', start: 'top 85%' },
+    });
+  }
+
+
+  /* ════════════════════════════════════════════════════════════════
+     INIT — wire it all up after DOM ready
+     ════════════════════════════════════════════════════════════════ */
+
   document.addEventListener('DOMContentLoaded', () => {
     runLoader().then(() => {
       initCursor();
+      initCursorTrail();
       initHeader();
+      initScrollProgress();
       initWebGL();
+      initHeroOrb();
       initMagnetic();
       initTilt();
       initManifesto();
       initCounters();
+      initMarquee();
       initSmoothScroll();
       initScrollAnimations();
+      initRoadmap();
+      initExtrasReveals();
+      initMetricBars();
+      initLiveStatus();
+      initBackToTop();
       initAnchors();
     });
   });
+
 })();
 </script>
 </body>
